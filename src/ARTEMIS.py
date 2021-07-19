@@ -15,14 +15,11 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# import packages
-import random
-import numpy as np
-
 # import internal modules
 from src.config.init.init_param import *
 from src.config.init.init_objects import ObjectInitializer
 from src.run_model import ModelRunner
+from src.outcome_visualization import GraphConstructor
 
 # initialize choice set and forager agents
 object_initializer = ObjectInitializer()
@@ -37,6 +34,9 @@ choice_set_output, agent_set_output = model_runner.run_model(choice_set=choice_s
                                                             agent_set=agent_set,
                                                             duration=duration)
 
-# produce outputs
-# do something with the results
+# produce graphical outputs
+graph_constructor = GraphConstructor()
+graph_constructor.make_graphs(agent_set=agent_set_output, choice_set=choice_set_output)
 
+# produce database outputs (e.g. .csv or .json)
+# not implemented yet

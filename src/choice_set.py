@@ -22,10 +22,11 @@ import numpy as np
 class ChoiceSet:
     def __init__(self):
         self.discrete_alternatives = {}
+        self.effort_map = {}
+        self.catch_map = {}
 
-    def load_standard_alternatives(self, s):
-        return s
-
+    def load_standard_alternatives(self):
+        pass
 
     def load_observed_alternatives(self, dataset):
         pass
@@ -61,6 +62,6 @@ class SpatialGridCell(DiscreteAlternative):         # for future use
 
     def __init__(self):
         DiscreteAlternative.__init__(self)
-        self.location = [float('nan'), float('nan')]
+        self.location = (float('nan'), float('nan'))
 
 

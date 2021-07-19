@@ -18,13 +18,13 @@
 # Module usable to define the exogenous variables of any ARTEMIS run
 
 # Forager Characteristics
-explore_probability = 0.5           # probability a forager does not choose a known cell, but picks a random cell
+explore_probability = 0.2           # probability a forager does not choose a known cell, but picks a random cell
 catchability_coefficient = 0.2      # proportional uptake of the resource stock in one foraging event
 
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present
 sd_init_stock = 25                  # standard deviation of initial stock present
-init_number_of_alternatives_known = 4   # number of altenratives each agents knows at initialisation
+init_number_of_alternatives_known = 4   # number of alternatives each agents knows at initialisation
 growth_factor = 2                   # per time step growth of stock
 
 # model characteristics

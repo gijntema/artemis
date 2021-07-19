@@ -34,10 +34,14 @@ class ModelRunner:
             # loop for every agent
             for agent in agent_index_list:
                 if random.random() > agent_set[agent].explore_probability:
-                    alternative_index, catch = agent_set[agent].forage_maximalization('BASIC')
+                    alternative_index, catch = agent_set[agent].forage_maximalization('BASIC', choice_set)
+
                 else:
                     alternative_index, catch = agent_set[agent].forage_random(choice_set)
 
+                choice_set.discrete_alternatives[alternative_index].resource_stock_harvest(catch)
+                choice_set.catch_map[alternative_index] += catch
+                choice_set.effort_map[alternative_index] += 1
                 agent_set[agent].update_agent_trackers(alternative_index=alternative_index, catch=catch)
             time_tracker += 1
 

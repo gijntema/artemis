@@ -17,6 +17,15 @@
 
 import random
 
+
+class AgentSet:         # to be implemented
+    def __init__(self):
+        self.agents = {}
+        self.agent_global_tracker = {}
+
+    def update_agent_tracker(self, agent_id, catch):
+        self.agents[agent_id] += catch
+
 class ForagerAgent:
     """general class to define objects as agents that may forage from a resource"""
     def __init__(self):
@@ -63,9 +72,9 @@ class ForagerAgent:
         self.catchability_coefficient = catchability_coefficient
         self.explore_probability = explore_probability
 
-    def forage_maximalization(self, optimalization_method):
+    def forage_maximalization(self, optimalization_method, choice_set):
         if optimalization_method == "BASIC":
-            choice_alternative, choice_catch = self.basic_heatmap_optimalization()
+            choice_alternative, choice_catch = self.basic_heatmap_optimalization(choice_set)
         else:
             raise NotImplementedError('optimalization option not yet implemented')
 
@@ -76,17 +85,20 @@ class ForagerAgent:
         catch = choice_set.discrete_alternatives[alternative_index].resource_stock * self.catchability_coefficient
         return alternative_index, catch
 
-    def basic_heatmap_optimalization(self):
+    def basic_heatmap_optimalization(self, choice_set):
         optimal_catch = 0
         optimal_alternative = 'choice_none'
         for alternative in self.heatmap:
             # discern the catch you would gain according to the heatmap
-            catch = self.heatmap[alternative]
-            if catch > optimal_catch:
-                optimal_catch = catch
+            expected_catch = self.heatmap[alternative]
+            if expected_catch > optimal_catch:
+                optimal_catch = expected_catch
                 optimal_alternative = alternative
 
-        return optimal_alternative, optimal_catch
+        actual_catch = choice_set.discrete_alternatives[optimal_alternative].resource_stock\
+                       * self.catchability_coefficient
+
+        return optimal_alternative, actual_catch
 
 
     def update_agent_trackers(self, alternative_index, catch):

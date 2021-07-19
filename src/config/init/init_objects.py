@@ -34,6 +34,8 @@ class ObjectInitializer:
         while alternative_tracker < nb_alternatives:
             alternative_id = "alternative_" + str(alternative_tracker)
             choice_set.discrete_alternatives[alternative_id] = DiscreteAlternative()
+            choice_set.effort_map[alternative_id] = 0
+            choice_set.catch_map[alternative_id] = 0
             choice_set.discrete_alternatives[alternative_id].initialize_standard_stock(init_stock, sd_init_stock)
             alternative_tracker += 1
 
