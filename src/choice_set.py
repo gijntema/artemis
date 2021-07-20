@@ -20,6 +20,8 @@ import numpy as np
 
 # ----------------------------- Objects to contain the full choice set -------------------------------------------------
 class ChoiceSet:
+    """Class to contain all data for a given choice set of alternatives,
+    including the alternatives in the choice set as DiscreteAlternative objects in a dictionary object"""
     def __init__(self):
         self.discrete_alternatives = {}
         self.effort_map = {}
@@ -33,6 +35,9 @@ class ChoiceSet:
 
 
 class SpatialChoiceSet(ChoiceSet):
+    """Class to represent a spatially explicit ChoiceSet,
+    more specific version of the ChoiceSet object, inheriting all functionality from the ChoiceSet,
+    but leaving room for spatial aspects of the Choice set"""
 
     def __init__(self):
         self.grid = None
@@ -47,9 +52,13 @@ class SpatialChoiceSet(ChoiceSet):
 
 # --------------------- Objects to contain individual alternatives in a discrete choice set ----------------------------
 class DiscreteAlternative:
+    """Class to contain the alternative specific aspects and modifications,
+    for now only resource stock is included"""
 
     def __init__(self):
-        self.resource_stock = 0
+        self.resource_stock = 0                         # contains the value(s) for the stock present
+        self.stock_type = 'singular'                    # indicates the structure of the stock (e.g. singular/age class)
+        self.alternative_id = None                      # id consistent with other indices used in the rest of the model
 
     def initialize_standard_stock(self, init_stock, sd_init_stock):
         self.resource_stock = np.random.normal(loc=init_stock, scale=sd_init_stock)
@@ -59,6 +68,9 @@ class DiscreteAlternative:
 
 
 class SpatialGridCell(DiscreteAlternative):         # for future use
+    """"Extension of the DiscreteAlternative class to include
+    spatially explicit attributes of a discrete alternative object,
+    all functionality from the DiscreteAlternative class is inherited"""
 
     def __init__(self):
         DiscreteAlternative.__init__(self)

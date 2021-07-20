@@ -18,24 +18,34 @@
 import random
 
 
-class AgentSet:         # to be implemented
+class AgentSet:                                         # to be implemented, not yet included in the other scripts
+    """Class to contain both the agents in ForagerAgent objects (or a more specified version of it)
+    and global data on all agents in the model """
     def __init__(self):
-        self.agents = {}
-        self.agent_global_tracker = {}
+        self.agents = {}                                # dictionary with all agents as ForagerAgent objects
+        self.agent_global_tracker = {}                  # forgot why I implemented this and what it means
+        self.total_catch = 0                            # Tracker for total catch of all agents and years combined
+        self.total_yearly_catch_tracker = {}            # tracker for total catch each year
+        self.average_yearly_catch_tracker = {}          # tracker for average catch each year
 
-    def update_agent_tracker(self, agent_id, catch):
+    def update_agent_trackers(self, agent_id, catch):
         self.agents[agent_id] += catch
+        self.update_total_catch(catch)
+
+    def update_total_catch(self, catch):
+        self.total_catch += catch
+
 
 class ForagerAgent:
-    """general class to define objects as agents that may forage from a resource"""
+    """general class to define objects as agents that may forage from a resource and their attributes"""
     def __init__(self):
-        self.forage_catch_tracker = {}
-        self.forage_effort_tracker = {}
-        self.heatmap = {}
-        self.total_catch = 0
-        self.catchability_coefficient = 0
-        self.explore_probability = 0
-        self.id = "no_id"
+        self.forage_catch_tracker = {}                  # tracker variable for total catch gained from each alternative
+        self.forage_effort_tracker = {}                 # tracker variable for effort exerted on each alternative
+        self.heatmap = {}                               # agents memory on the last forage event in each alternative
+        self.total_catch = 0                            # tracker variable to track total catch for this agent
+        self.catchability_coefficient = 0               # efficiency of resource uptake of the agent
+        self.explore_probability = 0                    # chance an agent chooses a random alternative (when allowed)
+        self.id = "no_id"                               # id consistent with other indices used in the rest of the model
 
     def initialize_content(self,
                            choice_set,
@@ -43,8 +53,8 @@ class ForagerAgent:
                            catchability_coefficient,
                            nb_of_alternatives_known,
                            explore_probability):
-        # initialise all maps containing data on expectations and results of forage events
 
+        # initialise all maps containing data on expectations and results of forage events
         alternative_tracker = 0
         alternative_indices = []
         while alternative_tracker < len(choice_set.discrete_alternatives):
@@ -53,16 +63,17 @@ class ForagerAgent:
             self.forage_effort_tracker[alternative_id] = 0          # map with previous effort per alternative
             self.heatmap[alternative_id] = 0                        # map with expectations per alternative
             alternative_indices.append(alternative_id)              # construct index list for later use
-            alternative_tracker += 1
+            alternative_tracker += 1                                # proceed to the next alternative
 
         # fill heatmap will initial known alternatives
-
         list_of_knowns = []
         i = 0
         while i < nb_of_alternatives_known:
+            # choose a random alternatives that the agent will know
             list_of_knowns.append(random.choice(alternative_indices))
-            i += 1
+            i += 1                                                  # proceed to generate the next known
 
+        # add the heatmap data for each cell initially known as the catch they would get when fishing there at t=0
         for known_cell in list_of_knowns:
             self.heatmap[known_cell] = \
                 choice_set.discrete_alternatives[known_cell].resource_stock * catchability_coefficient
@@ -73,14 +84,16 @@ class ForagerAgent:
         self.explore_probability = explore_probability
 
     def forage_maximalization(self, optimalization_method, choice_set):
+        # method containing the actual choice of foraging alternative
         if optimalization_method == "BASIC":
             choice_alternative, choice_catch = self.basic_heatmap_optimalization(choice_set)
-        else:
+        else:                                               # Give Error when an unknown optimalization option is chosen
             raise NotImplementedError('optimalization option not yet implemented')
 
         return choice_alternative, choice_catch
 
     def forage_random(self, choice_set):
+        # forage using a random alternative from the choice set
         alternative_index = random.choice(list(self.heatmap.keys()))
         catch = choice_set.discrete_alternatives[alternative_index].resource_stock * self.catchability_coefficient
         return alternative_index, catch
@@ -89,7 +102,7 @@ class ForagerAgent:
         optimal_catch = 0
         optimal_alternative = 'choice_none'
         for alternative in self.heatmap:
-            # discern the catch you would gain according to the heatmap
+            # discern the catch you would gain according to the information/memory an agent has
             expected_catch = self.heatmap[alternative]
             if expected_catch > optimal_catch:
                 optimal_catch = expected_catch
@@ -123,7 +136,7 @@ class ForagerAgent:
 class FishermanAgent(ForagerAgent):           # empty for now
     """specific class to define objects as agents that may forage from a resource.
     Constructed to add functionality specific to agents resembling fishermen.
-    Class inherits all functionality from the, more general, Forager object"""
+    Class inherits all functionality from the, more general, ForagerAgent object"""
 
     pass
 
@@ -131,6 +144,6 @@ class FishermanAgent(ForagerAgent):           # empty for now
 class PredatorAgent(ForagerAgent):            # empty for now
     """specific class to define objects as agents that may forage from a resource.
     Specifically constructed to add functionality specific to agents resembling biological predators.
-    Class inherits all functionality from the, more general, Forager object"""
+    Class inherits all functionality from the, more general, ForagerAgent object"""
 
     pass
