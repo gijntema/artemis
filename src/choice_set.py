@@ -59,12 +59,21 @@ class DiscreteAlternative:
         self.resource_stock = 0                         # contains the value(s) for the stock present
         self.stock_type = 'singular'                    # indicates the structure of the stock (e.g. singular/age class)
         self.alternative_id = None                      # id consistent with other indices used in the rest of the model
+        self.growth_factor = 2                          # fraction of population that is added through growth - needs to be added in initialisation
+        self.stock_growth_type = 'exponential'          # indicator for the way the stock grows
 
     def initialize_standard_stock(self, init_stock, sd_init_stock):
         self.resource_stock = np.random.normal(loc=init_stock, scale=sd_init_stock)
 
+    def stock_growth(self):
+        if self.stock_type == 'singular' and self.stock_growth_type == 'exponential':
+            self.resource_stock_growth_exp()
+
     def resource_stock_harvest(self, resource_uptake):
         self.resource_stock -= resource_uptake
+
+    def resource_stock_growth_exp(self):
+        self.resource_stock = self.resource_stock * self.growth_factor
 
 
 class SpatialGridCell(DiscreteAlternative):         # for future use

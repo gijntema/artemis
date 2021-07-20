@@ -29,7 +29,7 @@ growth_factor = 2                   # per time step growth of stock
 
 # model characteristics
 duration = 20                       # amount of time steps in the model
-choice_set_size = 20                # amount of discrete alternatives in the choice set
-amount_of_agents = 100              # amount of foragers in the model
+choice_set_size = 100                # amount of discrete alternatives in the choice set
+amount_of_agents = 200              # amount of foragers in the model
 
 

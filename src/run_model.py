@@ -46,6 +46,8 @@ class ModelRunner:
                 choice_set.catch_map[alternative_index] += catch
                 choice_set.effort_map[alternative_index] += 1
                 agent_set[agent].update_agent_trackers(alternative_index=alternative_index, catch=catch)
+            for alternative in choice_set.discrete_alternatives:
+                choice_set.discrete_alternatives[alternative].stock_growth()
             time_tracker += 1                                           # proceed to the next time step
 
         return choice_set, agent_set
