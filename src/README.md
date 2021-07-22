@@ -1,12 +1,12 @@
 # ARTEMIS model
 
 ## Introduction
-The Agents in Resources T. E. Model for Information Strategies (ARTEMIS) is a general investigation the role of informed decision making in strategies of human or biological agents in foraging or extracting resources. 
+The Agents in Resource T. Extraction Model for Information Strategies (ARTEMIS) is a general investigation the role of informed decision making in strategies of human or biological agents in foraging or extracting resources. 
 Examples include food foraging or commercial fishing.
 
 ## Requirements
 	* Python 3.9.4+
-	* git
+	* Git
 
 see package_versions.txt for python packages and versions employed
 
@@ -29,15 +29,15 @@ Define the desired local location of the model
 
 clone the remote repository into the defined location:
 
-(Using SSH key):
-
-    $ git clone git@git.wur.nl:ecodyn/artemis.git 
-
-or
- 
 (Using https):
 
     $ git clone https://git.wur.nl/ecodyn/artemis.git
+
+or
+
+(Using SSH key):
+
+    $ git clone git@git.wur.nl:ecodyn/artemis.git
 
 ### Create virtual environment
 Depends on the interpreter chosen (should be adjusted to include several interpreters)
@@ -45,7 +45,7 @@ Depends on the interpreter chosen (should be adjusted to include several interpr
 
 ## Using the model
 
-## Install packages
+### Install packages
 
 Enter into console:
 
