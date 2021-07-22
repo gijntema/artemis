@@ -38,8 +38,10 @@ agent_set = object_initializer.initialize_forager_agents(amount_of_agents, choic
 # RUN MODEL
 model_runner = ModelRunner()
 choice_set_output, agent_set_output = model_runner.run_model(choice_set=choice_set,
-                                                            agent_set=agent_set,
-                                                            duration=duration)
+                                                             agent_set=agent_set,
+                                                             duration=duration,
+                                                             information_sharing_scenario=information_sharing_scenario,
+                                                             shared_alternatives=shared_alternatives)
 
 # produce graphical outputs
 graph_constructor = GraphConstructor()
