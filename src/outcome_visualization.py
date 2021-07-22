@@ -19,16 +19,16 @@ class GraphConstructor:
         fig, axs = plt.subplots(2, 2)
         # Effort Graph
         axs[0, 0].bar(effort_data_x, effort_data_y)
-        axs[0, 0].set_title('Effort per alternative')
+        axs[0, 0].set_title('Effort(y) per alternative (x)')
         # agent catch graph
         axs[0, 1].bar(agent_catch_x, agent_catch_y)
-        axs[0, 1].set_title('Catch per agent')
+        axs[0, 1].set_title('Catch (y) per agent(x)')
         # yearly catch graph
         axs[1, 0].plot(yearly_catch_x, yearly_catch_y)
-        axs[1, 0].set_title('Catch per time step')
+        axs[1, 0].set_title('Catch (y) per time step (x)')
         # final resource stock graph
         axs[1, 1].bar(stock_x, stock_y)
-        axs[1, 1].set_title('Final stock per alternative')
+        axs[1, 1].set_title('Final stock (y) per alternative (x)')
 
 
     def prepare_data(self, agent_set, choice_set):

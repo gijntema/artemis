@@ -21,6 +21,13 @@ from src.config.init.init_objects import ObjectInitializer
 from src.run_model import ModelRunner
 from src.outcome_visualization import GraphConstructor
 
+# ensure the defined information sharing scenario is implemented
+if information_sharing_scenario not in ['No Sharing',
+                                        'Coalition Sharing',
+                                        'Random Sharing']:
+
+    raise NotImplementedError('Defined information sharing scenario not supported')
+
 # initialize choice set and forager agents
 object_initializer = ObjectInitializer()
 choice_set = object_initializer.initialize_choice_set(choice_set_size, init_stock, sd_init_stock)
