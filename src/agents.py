@@ -28,9 +28,12 @@ class AgentSet:                                         # to be implemented, not
         self.total_yearly_catch_tracker = {}            # tracker for total catch each year
         self.average_yearly_catch_tracker = {}          # tracker for average catch each year
 
-    def update_agent_trackers(self, agent_id, catch):
-        self.agents[agent_id] += catch
+    def update_agent_trackers(self, agent_id, catch, alternative_index, time_tracker):
+        self.agents[agent_id].update_agent_trackers(alternative_index=alternative_index, catch=catch,
+                                                   year_counter=time_tracker)
+
         self.update_total_catch(catch)
+        self.update_total_yearly_catch(catch, time_tracker)
 
     def update_total_catch(self, catch):
         self.total_catch += catch
@@ -38,8 +41,8 @@ class AgentSet:                                         # to be implemented, not
     def update_average_yearly_catch(self):
         pass
 
-    def update_total_yearly_catch(self):
-        pass
+    def update_total_yearly_catch(self, catch, time_tracker):
+        self.total_yearly_catch_tracker[str(time_tracker)] += catch
 
 
 class ForagerAgent:

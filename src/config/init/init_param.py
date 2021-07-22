@@ -30,9 +30,9 @@ growth_factor = 2                   # per time step growth of stock
 # model characteristics
 duration = 20                       # amount of time steps in the model
 choice_set_size = 20                # amount of discrete alternatives in the choice set
-amount_of_agents = 100              # amount of foragers in the model
+amount_of_agents = 50              # amount of foragers in the model
 
-# Scenario indicators
+# Scenario indicators --  NOT Implemented yet
 coalition_forming = False           # indicates Agents participate in information sharing within a select group
 coalition_cheaters = False          # indicates Agents can contain cheaters (agents that are part of multiple groups)
 

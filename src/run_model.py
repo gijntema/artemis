@@ -43,10 +43,10 @@ class ModelRunner:
                 choice_set.discrete_alternatives[alternative_index].resource_stock_harvest(catch)
                 choice_set.catch_map[alternative_index] += catch
                 choice_set.effort_map[alternative_index] += 1
-                agent_set.agents[agent].update_agent_trackers(alternative_index=alternative_index, catch=catch,
-                                                              year_counter=time_tracker)
+                agent_set.update_agent_trackers(agent, catch, alternative_index, time_tracker)
             for alternative in choice_set.discrete_alternatives:
                 choice_set.discrete_alternatives[alternative].stock_growth()
+
             time_tracker += 1                                           # proceed to the next time step
 
         return choice_set, agent_set
