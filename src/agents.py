@@ -44,6 +44,9 @@ class AgentSet:                                         # to be implemented, not
     def update_total_yearly_catch(self, catch, time_tracker):
         self.total_yearly_catch_tracker[str(time_tracker)] += catch
 
+# ----------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------- the ForagerAgent object -----------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
 class ForagerAgent:
     """general class to define objects as agents that may forage from a resource and their attributes"""
@@ -56,6 +59,9 @@ class ForagerAgent:
         self.explore_probability = 0                    # chance an agent chooses a random alternative (when allowed)
         self.id = "no_id"                               # id consistent with other indices used in the rest of the model
         self.yearly_catch = {}                          # tracker variable to check yearly fluctuations in catch
+        self.list_of_known_alternatives = []            # list of alternatives that an agent has information on
+
+# --------------------------------------Method to initialize agents before running the main model ----------------------
 
     def initialize_content(self,
                            choice_set,
@@ -92,6 +98,9 @@ class ForagerAgent:
         self.id = agent_id
         self.catchability_coefficient = catchability_coefficient
         self.explore_probability = explore_probability
+        self.list_of_known_alternatives = list_of_knowns
+
+# ----------------------------- Methods to prompt foraging events ------------------------------------------------------
 
     def forage_maximalization(self, optimalization_method, choice_set):
         # method containing the actual choice of foraging alternative
@@ -123,6 +132,8 @@ class ForagerAgent:
 
         return optimal_alternative, actual_catch
 
+# ------------------------------- Methods to update internal parameters and trackers -----------------------------------
+
     def update_agent_trackers(self, alternative_index, catch, year_counter):
         self.update_heatmap(alternative_index, catch)
         self.update_forage_effort_tracker(alternative_index, catch)
@@ -145,8 +156,66 @@ class ForagerAgent:
     def update_yearly_catch(self, year_counter, catch):
         self.yearly_catch[year_counter] += catch
 
+    def update_list_of_knowns(self):  # Quick and dirty way of finding all knowns instead of only adding new ones
+        for alternative in self.heatmap:  # unknowns are alternatives with an integer (0) as catch estimate, not a float
+            if isinstance(self.heatmap[alternative], float):
+                if alternative not in self.list_of_known_alternatives:
+                    self.list_of_known_alternatives.append(alternative)
 
-class FishermanAgent(ForagerAgent):           # empty for now
+# --------------------------- Methods for information sharing scenarios ------------------------------------------------
+
+    def share_heatmap_knowledge(self, number_of_alternatives=1):
+        """method that returns a given number of alternatives the ForagerAgent has knowledge on
+        to be shared with other ForagerAgents"""
+        self.update_list_of_knowns()  # make sure the list of known alternatives is up to date
+        shared_alternatives_indices = []
+        shared_alternatives_data = []
+        if not isinstance(number_of_alternatives, int) or number_of_alternatives is not 'ALL':
+            raise TypeError("number can only be an integer or ALL")
+
+        elif number_of_alternatives is 'ALL':
+            shared_alternatives_indices = self.list_of_known_alternatives
+            for alternative in shared_alternatives_indices:
+                shared_alternatives_data.append(self.heatmap[alternative])
+
+        else:
+            alternative_counter = 0
+            while alternative_counter < number_of_alternatives:
+                shared_alternative = random.choice(self.list_of_known_alternatives)
+                if shared_alternative not in shared_alternatives_indices:
+                    shared_alternatives_indices.append(shared_alternative)
+                    shared_alternatives_data.append(self.heatmap[shared_alternative])
+                alternative_counter += 1
+
+        return tuple((shared_alternatives_indices, shared_alternatives_data))
+
+    def receive_heatmap_knowledge(self, shared_data):
+        """updates personal heatmap based on the output from a ForagerAgent().share_heatmap_knowledge() method """
+        received_alternative_indices = shared_data[0]
+        received_alternative_data = shared_data[1]
+
+        received_counter = 0
+        while received_counter < len(received_alternative_indices):
+            # add knowledge if the alternative is unknown
+            received_index = received_alternative_indices[received_counter]
+            received_data = received_alternative_data[received_counter]
+            if isinstance(self.heatmap[received_index], int):
+                self.heatmap[received_index] = received_data
+
+            # When the receiving agent already has knowledge on the shared knowledge, take the average of both
+            elif isinstance(self.heatmap[received_index], float):
+                self.heatmap[received_index] = (received_data + self.heatmap[received_index])/2
+
+            received_counter += 1
+
+        self.update_list_of_knowns()  # update list of known alternatives
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# -------------------------------- Subclasses of the ForagerAgent object -----------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+class FishermanAgent(ForagerAgent):           # Not Implemented for now
     """specific class to define objects as agents that may forage from a resource.
     Constructed to add functionality specific to agents resembling fishermen.
     Class inherits all functionality from the, more general, ForagerAgent object"""
@@ -155,7 +224,7 @@ class FishermanAgent(ForagerAgent):           # empty for now
         ForagerAgent.__init__(self)
 
 
-class PredatorAgent(ForagerAgent):            # empty for now
+class PredatorAgent(ForagerAgent):            # Not Implemented for now
     """specific class to define objects as agents that may forage from a resource.
     Specifically constructed to add functionality specific to agents resembling biological predators.
     Class inherits all functionality from the, more general, ForagerAgent object"""

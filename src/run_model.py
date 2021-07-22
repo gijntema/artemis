@@ -22,7 +22,7 @@ class ModelRunner:
     def __init__(self):
         pass
 
-    def run_model(self, choice_set, agent_set, duration=10):
+    def run_model(self, choice_set, agent_set, information_sharing_scenario, shared_alternatives, duration=10):
 
         agent_index_list = list(agent_set.agents.keys())                # identify the id of every agent in a list
         # loop for every time step
@@ -44,6 +44,16 @@ class ModelRunner:
                 choice_set.catch_map[alternative_index] += catch
                 choice_set.effort_map[alternative_index] += 1
                 agent_set.update_agent_trackers(agent, catch, alternative_index, time_tracker)
+
+                # operations specific to a sharing scenario
+                if information_sharing_scenario is 'Random Sharing':
+                    shared_heatmap_data = agent_set.agents[agent].share_heatmap_knowledge(
+                        number_of_alternatives=shared_alternatives)
+
+                    data_receiver_agent = random.choice(agent_index_list)
+                    agent_set.agents[data_receiver_agent].receive_heatmap_knowlegde(shared_heatmap_data)
+
+            # growth of the resource stock
             for alternative in choice_set.discrete_alternatives:
                 choice_set.discrete_alternatives[alternative].stock_growth()
 

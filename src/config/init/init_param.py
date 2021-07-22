@@ -28,7 +28,7 @@ init_number_of_alternatives_known = 4   # number of alternatives each agents kno
 growth_factor = 2                   # per time step growth of stock
 
 # model characteristics
-duration = 20                       # amount of time steps in the model
+duration = 50                       # amount of time steps in the model
 choice_set_size = 20                # amount of discrete alternatives in the choice set
 amount_of_agents = 50               # amount of foragers in the model
 
@@ -37,7 +37,8 @@ amount_of_agents = 50               # amount of foragers in the model
 # ----------------------------------------------------------------------------------------------------------------------
 
 # information Sharing Scenario Indicators
-information_sharing_scenario = 'No Sharing'
+# information_sharing_scenario = 'No Sharing'
+information_sharing_scenario = 'Random Sharing'
 # considered functionality: ['No Sharing', Coalition Sharing', 'Random Sharing']
 information_sharing_method = 'Shared Heatmap'
 # considered functionality: ['Shared Heatmap, Information Diffusion']
@@ -48,4 +49,4 @@ coalition_size = amount_of_agents/10    # indicates the size of the coalition (i
 
 # Indicators 'Random Sharing'
 share_partners = 1                      # the amount of agents an agent informs about a (part of) the personal heatmap
-
+shared_alternatives = 1                 # amount of known alternatives shared at any given time
