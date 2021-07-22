@@ -23,10 +23,8 @@ class ModelRunner:
         pass
 
     def run_model(self, choice_set, agent_set, duration=10):
-        agent_set = agent_set                                           # helped in debugging, not sure if needed
-        if not isinstance(agent_set, dict):                             # helped in debugging, not sure if needed
-            raise TypeError("Agent_set is not an agent dictionary")
-        agent_index_list = list(agent_set.keys())                       # identify the id of every agent in a list
+
+        agent_index_list = list(agent_set.agents.keys())                # identify the id of every agent in a list
         # loop for every time step
         time_tracker = 0                                                # set a counter for time loops
         while time_tracker < duration:                                  # begin time loop
@@ -35,17 +33,18 @@ class ModelRunner:
             for agent in agent_index_list:                              # begin loop for every agent
 
                 # forage event occurs and agents choose an optimal or random alternative
-                if random.random() > agent_set[agent].explore_probability:          # optimalization using heatmap
-                    alternative_index, catch = agent_set[agent].forage_maximalization('BASIC', choice_set)
+                if random.random() > agent_set.agents[agent].explore_probability:          # optimalization using heatmap
+                    alternative_index, catch = agent_set.agents[agent].forage_maximalization('BASIC', choice_set)
 
                 else:                                                               # explore a random cell in the grid
-                    alternative_index, catch = agent_set[agent].forage_random(choice_set)
+                    alternative_index, catch = agent_set.agents[agent].forage_random(choice_set)
 
                 # the stock in the chosen alternative is reduced and tracked using trackers
                 choice_set.discrete_alternatives[alternative_index].resource_stock_harvest(catch)
                 choice_set.catch_map[alternative_index] += catch
                 choice_set.effort_map[alternative_index] += 1
-                agent_set[agent].update_agent_trackers(alternative_index=alternative_index, catch=catch)
+                agent_set.agents[agent].update_agent_trackers(alternative_index=alternative_index, catch=catch,
+                                                              year_counter=time_tracker)
             for alternative in choice_set.discrete_alternatives:
                 choice_set.discrete_alternatives[alternative].stock_growth()
             time_tracker += 1                                           # proceed to the next time step

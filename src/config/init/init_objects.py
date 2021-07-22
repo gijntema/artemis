@@ -17,7 +17,7 @@
 
 # from init_endogenous import *
 # from init_param import *
-from src.agents import ForagerAgent
+from src.agents import AgentSet, ForagerAgent
 from src.choice_set import ChoiceSet, DiscreteAlternative
 import numpy as np
 
@@ -41,18 +41,35 @@ class ObjectInitializer:
 
         return choice_set
 
-    def initialize_forager_agents(self, nb_agents, choice_set, catchability_coeffcient, nb_alternatives_known, explore_probability):
-        agent_set = {}
+    def initialize_forager_agents(self, nb_agents, choice_set,
+                                  catchability_coefficient, nb_alternatives_known,
+                                  explore_probability, duration_model,
+                                  coalition_forming=False, coalition_cheaters=False):
+
+        # initialize all agents and time independent tracker variables
+        agent_set = AgentSet()
         agent_tracker = 0
         while agent_tracker < nb_agents:
             agent_id = 'agent_' + str(agent_tracker)
-            agent_set[agent_id] = ForagerAgent()
-            agent_set[agent_id].initialize_content(choice_set=choice_set,
-                                                   agent_id=agent_id,
-                                                   catchability_coefficient=catchability_coeffcient,
-                                                   nb_of_alternatives_known=nb_alternatives_known,
-                                                   explore_probability=explore_probability)
-
+            agent_set.agents[agent_id] = ForagerAgent()
+            agent_set.agents[agent_id].initialize_content(choice_set=choice_set,
+                                                        agent_id=agent_id,
+                                                        catchability_coefficient=catchability_coefficient,
+                                                        nb_of_alternatives_known=nb_alternatives_known,
+                                                        explore_probability=explore_probability)
             agent_tracker += 1
+
+        # initialize all time dependent tracker variables
+        duration_counter = 0
+        while duration_counter < duration_model:
+            agent_set.total_yearly_catch_tracker[str(duration_counter)] = 0
+            agent_set.average_yearly_catch_tracker[str(duration_counter)] = 0
+            agent_tracker = 0
+            while agent_tracker < nb_agents:
+                agent_id = 'agent_' + str(agent_tracker)
+                agent_set.agents[agent_id].yearly_catch[duration_counter] = 0
+                agent_tracker += 1
+
+            duration_counter += 1
 
         return agent_set

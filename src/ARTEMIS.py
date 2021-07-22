@@ -26,7 +26,7 @@ object_initializer = ObjectInitializer()
 choice_set = object_initializer.initialize_choice_set(choice_set_size, init_stock, sd_init_stock)
 agent_set = object_initializer.initialize_forager_agents(amount_of_agents, choice_set,
                                                          catchability_coefficient, init_number_of_alternatives_known,
-                                                         explore_probability)
+                                                         explore_probability, duration)
 
 # RUN MODEL
 model_runner = ModelRunner()

@@ -35,6 +35,12 @@ class AgentSet:                                         # to be implemented, not
     def update_total_catch(self, catch):
         self.total_catch += catch
 
+    def update_average_yearly_catch(self):
+        pass
+
+    def update_total_yearly_catch(self):
+        pass
+
 
 class ForagerAgent:
     """general class to define objects as agents that may forage from a resource and their attributes"""
@@ -46,6 +52,7 @@ class ForagerAgent:
         self.catchability_coefficient = 0               # efficiency of resource uptake of the agent
         self.explore_probability = 0                    # chance an agent chooses a random alternative (when allowed)
         self.id = "no_id"                               # id consistent with other indices used in the rest of the model
+        self.yearly_catch = {}                          # tracker variable to check yearly fluctuations in catch
 
     def initialize_content(self,
                            choice_set,
@@ -113,12 +120,12 @@ class ForagerAgent:
 
         return optimal_alternative, actual_catch
 
-
-    def update_agent_trackers(self, alternative_index, catch):
+    def update_agent_trackers(self, alternative_index, catch, year_counter):
         self.update_heatmap(alternative_index, catch)
         self.update_forage_effort_tracker(alternative_index, catch)
         self.update_forage_catch_tracker(alternative_index, catch)
         self.update_catch(catch)
+        self.update_yearly_catch(year_counter, catch)
 
     def update_heatmap(self, alternative_index, catch):
         self.heatmap[alternative_index] = catch
@@ -132,13 +139,17 @@ class ForagerAgent:
     def update_catch(self, catch):
         self.total_catch += catch
 
+    def update_yearly_catch(self, year_counter, catch):
+        self.yearly_catch[year_counter] += catch
+
 
 class FishermanAgent(ForagerAgent):           # empty for now
     """specific class to define objects as agents that may forage from a resource.
     Constructed to add functionality specific to agents resembling fishermen.
     Class inherits all functionality from the, more general, ForagerAgent object"""
 
-    pass
+    def __init__(self):
+        ForagerAgent.__init__(self)
 
 
 class PredatorAgent(ForagerAgent):            # empty for now
@@ -146,4 +157,5 @@ class PredatorAgent(ForagerAgent):            # empty for now
     Specifically constructed to add functionality specific to agents resembling biological predators.
     Class inherits all functionality from the, more general, ForagerAgent object"""
 
-    pass
+    def __init__(self):
+        ForagerAgent.__init__(self)
