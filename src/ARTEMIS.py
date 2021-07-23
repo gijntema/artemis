@@ -41,6 +41,7 @@ choice_set_output, agent_set_output = model_runner.run_model(choice_set=choice_s
                                                              agent_set=agent_set,
                                                              duration=duration,
                                                              information_sharing_scenario=information_sharing_scenario,
+                                                             share_partners=share_partners,
                                                              shared_alternatives=shared_alternatives)
 
 # produce graphical outputs

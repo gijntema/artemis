@@ -22,7 +22,7 @@ class ModelRunner:
     def __init__(self):
         pass
 
-    def run_model(self, choice_set, agent_set, information_sharing_scenario, shared_alternatives, duration=10):
+    def run_model(self, choice_set, agent_set, information_sharing_scenario, shared_alternatives, share_partners, duration=10):
 
         agent_index_list = list(agent_set.agents.keys())                # identify the id of every agent in a list
         # loop for every time step
@@ -47,11 +47,14 @@ class ModelRunner:
 
                 # operations specific to a sharing scenario
                 if information_sharing_scenario == 'Random Sharing':
-                    shared_heatmap_data = agent_set.agents[agent].share_heatmap_knowledge(
-                        number_of_alternatives=shared_alternatives)
-
-                    data_receiver_agent = random.choice(agent_index_list)
-                    agent_set.agents[data_receiver_agent].receive_heatmap_knowlegde(shared_heatmap_data) # should watch out this gives later Agents in the order a advantage
+                    share_partner_counter = 0
+                    while share_partner_counter < share_partners:
+                        shared_heatmap_data = agent_set.agents[agent].share_heatmap_knowledge(
+                            number_of_alternatives=shared_alternatives)
+                        data_receiver_agent = random.choice(agent_index_list)
+                        agent_set.agents[data_receiver_agent].receive_heatmap_knowledge(shared_heatmap_data)
+                        print('{} is now sharing data on stock(s) in {} with {}'.format(str(agent), str(shared_heatmap_data[0]), str(data_receiver_agent)))
+                        share_partner_counter += 1
 
             # growth of the resource stock
             for alternative in choice_set.discrete_alternatives:

@@ -22,6 +22,7 @@ class AgentSet:                                         # to be implemented, not
     """Class to contain both the agents in ForagerAgent objects (or a more specified version of it)
     and global data on all agents in the model """
     def __init__(self):
+        pass
         self.agents = {}                                # dictionary with all agents as ForagerAgent objects
         self.agent_global_tracker = {}                  # forgot why I implemented this and what it means
         self.total_catch = 0                            # Tracker for total catch of all agents and years combined
@@ -170,10 +171,10 @@ class ForagerAgent:
         self.update_list_of_knowns()  # make sure the list of known alternatives is up to date
         shared_alternatives_indices = []
         shared_alternatives_data = []
-        if not isinstance(number_of_alternatives, int) or number_of_alternatives is not 'ALL':
+        if not isinstance(number_of_alternatives, int) and number_of_alternatives != 'ALL':
             raise TypeError("number can only be an integer or ALL")
 
-        elif number_of_alternatives is 'ALL':
+        elif number_of_alternatives == 'ALL':
             shared_alternatives_indices = self.list_of_known_alternatives
             for alternative in shared_alternatives_indices:
                 shared_alternatives_data.append(self.heatmap[alternative])
