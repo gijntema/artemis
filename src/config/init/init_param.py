@@ -33,13 +33,22 @@ choice_set_size = 20                # amount of discrete alternatives in the cho
 amount_of_agents = 50               # amount of foragers in the model
 
 # ----------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------- INFORMATION SHARING PARAMETERS -------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+information_sharing_scenario = 'Random Sharing'
+# considered functionality: ['No Sharing', Coalition Sharing', 'Random Sharing']
+
+# Indicators 'Random Sharing'
+share_partners = 1                      # the amount of agents an agent informs about a (part of) the personal heatmap
+shared_alternatives = 1                 # amount of known alternatives shared at any given time
+
+# ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- UNIMPLEMENTED FUNCTIONALITY PLANNED FOR FUTURE --------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
 # information Sharing Scenario Indicators
 # information_sharing_scenario = 'No Sharing'
-information_sharing_scenario = 'Random Sharing'
-# considered functionality: ['No Sharing', Coalition Sharing', 'Random Sharing']
+
 information_sharing_method = 'Shared Heatmap'
 # considered functionality: ['Shared Heatmap, Information Diffusion']
 
@@ -47,6 +56,4 @@ information_sharing_method = 'Shared Heatmap'
 coalition_cheaters = False              # indicates the existence of cheaters (agents that are part of multiple groups)
 coalition_size = amount_of_agents/10    # indicates the size of the coalition (in number of agent members)
 
-# Indicators 'Random Sharing'
-share_partners = 1                      # the amount of agents an agent informs about a (part of) the personal heatmap
-shared_alternatives = 1                 # amount of known alternatives shared at any given time
+

@@ -15,11 +15,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# from init_endogenous import *
-# from init_param import *
 from src.agents import AgentSet, ForagerAgent
 from src.choice_set import ChoiceSet, DiscreteAlternative
-import numpy as np
 
 
 class ObjectInitializer:
@@ -28,7 +25,7 @@ class ObjectInitializer:
     def __init__(self):
         pass
 
-    def initialize_choice_set(self, nb_alternatives, init_stock, sd_init_stock):
+    def initialize_choice_set(self, nb_alternatives, init_stock, sd_init_stock, growth_factor):
         choice_set = ChoiceSet()
         alternative_tracker = 0
         while alternative_tracker < nb_alternatives:
@@ -36,8 +33,11 @@ class ObjectInitializer:
             choice_set.discrete_alternatives[alternative_id] = DiscreteAlternative()
             choice_set.effort_map[alternative_id] = 0
             choice_set.catch_map[alternative_id] = 0
-            choice_set.discrete_alternatives[alternative_id].initialize_standard_stock(init_stock, sd_init_stock)
+            choice_set.discrete_alternatives[alternative_id].initialize_standard_stock(init_stock,
+                                                                                       sd_init_stock,
+                                                                                       growth_factor)
             alternative_tracker += 1
+
 
         return choice_set
 
@@ -53,10 +53,10 @@ class ObjectInitializer:
             agent_id = 'agent_' + str(agent_tracker)
             agent_set.agents[agent_id] = ForagerAgent()
             agent_set.agents[agent_id].initialize_content(choice_set=choice_set,
-                                                        agent_id=agent_id,
-                                                        catchability_coefficient=catchability_coefficient,
-                                                        nb_of_alternatives_known=nb_alternatives_known,
-                                                        explore_probability=explore_probability)
+                                                          agent_id=agent_id,
+                                                          catchability_coefficient=catchability_coefficient,
+                                                          nb_of_alternatives_known=nb_alternatives_known,
+                                                          explore_probability=explore_probability)
             agent_tracker += 1
 
         # initialize all time dependent tracker variables

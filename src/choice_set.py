@@ -27,9 +27,6 @@ class ChoiceSet:
         self.effort_map = {}
         self.catch_map = {}
 
-    def load_standard_alternatives(self):
-        pass
-
     def load_observed_alternatives(self, dataset):
         pass
 
@@ -62,8 +59,9 @@ class DiscreteAlternative:
         self.growth_factor = 2                          # fraction of population that is added through growth - needs to be added in initialisation
         self.stock_growth_type = 'exponential'          # indicator for the way the stock grows
 
-    def initialize_standard_stock(self, init_stock, sd_init_stock):
+    def initialize_standard_stock(self, init_stock, sd_init_stock, growth_factor):
         self.resource_stock = np.random.normal(loc=init_stock, scale=sd_init_stock)
+        self.growth_factor = growth_factor
 
     def stock_growth(self):
         if self.stock_type == 'singular' and self.stock_growth_type == 'exponential':
