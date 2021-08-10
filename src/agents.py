@@ -1,5 +1,5 @@
 #
-# This file is part of ARTEMIS (https://git.wur.nl/ecodyn/XXXX).
+# This file is part of ARTEMIS (https://git.wur.nl/ecodyn/artemis.git).
 # Copyright (c) 2021 Wageningen Marine Research
 #
 # This program is free software: you can redistribute it and/or modify

@@ -60,4 +60,5 @@ run **src/ARTEMIS.py**
 
 ### Tips for adjusting the Model
 Please realise that a testing framework **tests/test_functionality.py** is present to test if any adjustments hinder 
-the functionality of the model. New functionality test can also be included in this framework
+the functionality of the model. New functionality test can also be included in this framework. Simply run the script 
+to test the functionality

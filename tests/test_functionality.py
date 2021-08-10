@@ -1,5 +1,5 @@
 #
-# This file is part of ARTEMIS (https://git.wur.nl/ecodyn/XXXX).
+# This file is part of ARTEMIS (https://git.wur.nl/ecodyn/artemis.git).
 # Copyright (c) 2021 Wageningen Marine Research
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# TODO: Implement tests for all functionality of objects
-
 # # import testing package and internal modules
 import unittest
 from src.agents import AgentSet, ForagerAgent, FishermanAgent, PredatorAgent
@@ -25,6 +23,7 @@ from src.config.init.init_objects import ObjectInitializer
 from src.run_model import ModelRunner
 
 
+# TODO: Implement tests for ALL functionality of objects in modules
 class TestModelModules(unittest.TestCase):
     """class to test all functionality supported by the model"""
 

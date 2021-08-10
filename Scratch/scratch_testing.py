@@ -1,3 +1,4 @@
+
 from src.agents import ForagerAgent
 
 forager_a = ForagerAgent()
