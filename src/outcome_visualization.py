@@ -47,7 +47,6 @@ class GraphConstructor:
         axs[1, 1].bar(stock_x, stock_y)
         axs[1, 1].set_title('Final stock (y) per alternative (x)')
 
-
     def prepare_data(self, agent_set, choice_set):
 
         effort_data = choice_set.effort_map

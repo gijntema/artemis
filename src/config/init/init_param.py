@@ -20,13 +20,14 @@
 # Forager Characteristics
 explore_probability = 0.2           # probability a forager does not choose a known cell, but picks a random cell
 catchability_coefficient = 0.2      # proportional uptake of the resource stock in one foraging event
-# TODO: Add functionality to scale catchability by effort
+init_number_of_alternatives_known = 4   # number of alternatives each agents knows at initialisation
+
+
 # TODO: Add functionality to make resource uptake neglectable
 
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present
 sd_init_stock = 25                  # standard deviation of initial stock present
-init_number_of_alternatives_known = 4   # number of alternatives each agents knows at initialisation
 growth_factor = 1                  # per time step growth of stock
 
 # growth scenario parameters
@@ -34,7 +35,7 @@ growth_factor = 1                  # per time step growth of stock
 
 # model characteristics
 duration = 50                       # amount of time steps in the model
-choice_set_size = 20                # amount of discrete alternatives in the choice set
+choice_set_size = 100                # amount of discrete alternatives in the choice set
 amount_of_agents = 100               # amount of foragers in the model
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,9 @@
 # ARTEMIS model
 
 ## Introduction
-The Agents in Resource T. Extraction Model for Information Strategies (ARTEMIS) is a general investigation the role of informed decision making in strategies of human or biological agents in foraging or extracting resources. 
+The Agents in Resource Tracking and Extracting Model for Information Strategies (ARTEMIS) 
+is a general investigation into the role of informed decision making 
+in strategies of human or biological agents in foraging or extracting resources. 
 Examples include food foraging or commercial fishing.
 
 ## Requirements

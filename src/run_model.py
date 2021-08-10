@@ -22,7 +22,16 @@ class ModelRunner:
     def __init__(self):
         pass
 
-    def run_model(self, choice_set, agent_set, information_sharing_scenario, shared_alternatives, share_partners, duration=10):
+    def run_model(self,
+                  choice_set,
+                  agent_set,
+                  information_sharing_scenario,
+                  shared_alternatives,
+                  share_partners,
+                  duration=10,
+                  stock_reset_scenario='no-reset',                      # default is a dynamics stock
+                  init_stock=100,                                       # default if a non dynamic stock is 100 units
+                  sd_init_stock=25):                                    # default sd if a non-dynamic stock is sd=25
 
         agent_index_list = list(agent_set.agents.keys())                # identify the id of every agent in a list
         # loop for every time step
@@ -40,7 +49,8 @@ class ModelRunner:
                     alternative_index, catch = agent_set.agents[agent].forage_random(choice_set)
 
                 # the stock in the chosen alternative is reduced and tracked using trackers
-                choice_set.discrete_alternatives[alternative_index].resource_stock_harvest(catch)
+                # TODO: Add functionality to scale catchability (and resulting catch) by effort
+                # choice_set.discrete_alternatives[alternative_index].resource_stock_harvest(catch)
                 choice_set.catch_map[alternative_index] += catch
                 choice_set.effort_map[alternative_index] += 1
                 agent_set.update_agent_trackers(agent, catch, alternative_index, time_tracker)
@@ -59,6 +69,19 @@ class ModelRunner:
             # growth of the resource stock
             for alternative in choice_set.discrete_alternatives:
                 choice_set.discrete_alternatives[alternative].stock_growth()
+
+            # reset the stocks if chosen for a static stock format
+            # TODO : Implement random repeating of previous stock
+
+            if stock_reset_scenario == 'random-repeat':
+                if random.random() < 0.5:                   # 50 chance of resetting the stock
+                    alternative_tracker = 0
+                    nb_alternatives = len(choice_set.discrete_alternatives)
+                    while alternative_tracker < nb_alternatives:
+                        alternative_id = "alternative_" + str(alternative_tracker)
+                        choice_set.discrete_alternatives[alternative_id].initialize_standard_stock(init_stock=init_stock,
+                                                                                                   sd_init_stock=sd_init_stock)
+                        alternative_tracker += 1
 
             time_tracker += 1                                           # proceed to the next time step
 

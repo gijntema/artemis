@@ -60,7 +60,7 @@ class DiscreteAlternative:
         self.growth_factor = 2                          # fraction of population that is added through growth - needs to be added in initialisation
         self.stock_growth_type = 'exponential'          # indicator for the way the stock grows
 
-    def initialize_standard_stock(self, init_stock, sd_init_stock, growth_factor):
+    def initialize_standard_stock(self, init_stock, sd_init_stock, growth_factor=1):
         self.resource_stock = np.random.normal(loc=init_stock, scale=sd_init_stock)
         self.growth_factor = growth_factor
 

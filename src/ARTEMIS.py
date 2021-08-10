@@ -42,11 +42,17 @@ choice_set_output, agent_set_output = model_runner.run_model(choice_set=choice_s
                                                              duration=duration,
                                                              information_sharing_scenario=information_sharing_scenario,
                                                              share_partners=share_partners,
-                                                             shared_alternatives=shared_alternatives)
+                                                             shared_alternatives=shared_alternatives,
+                                                             stock_reset_scenario=stock_reset_scenario,
+                                                             init_stock=init_stock,
+                                                             sd_init_stock=sd_init_stock)
+
+# transform the outcome objects of the model into usable data
+# TODO: make the functionality present in the GraphConstructor().prepare_data method more broadly applicable
 
 # produce graphical outputs
 graph_constructor = GraphConstructor()
 graph_constructor.make_graphs(agent_set=agent_set_output, choice_set=choice_set_output)
 
 # produce database outputs (e.g. .csv or .json)
-# not implemented yet
+# TODO: make data writer module with new DataWriter() object

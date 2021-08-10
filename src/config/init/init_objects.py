@@ -25,7 +25,7 @@ class ObjectInitializer:
     def __init__(self):
         pass
 
-    def initialize_choice_set(self, nb_alternatives, init_stock, sd_init_stock, growth_factor):
+    def initialize_choice_set(self, nb_alternatives, init_stock, sd_init_stock, growth_factor=1):
         choice_set = ChoiceSet()
         alternative_tracker = 0
         while alternative_tracker < nb_alternatives:

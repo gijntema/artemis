@@ -72,28 +72,13 @@ class ForagerAgent:
                            explore_probability):
 
         # initialise all maps containing data on expectations and results of forage events
-        alternative_tracker = 0
-        alternative_indices = []
-        while alternative_tracker < len(choice_set.discrete_alternatives):
-            alternative_id = "alternative_" + str(alternative_tracker)
-            self.forage_catch_tracker[alternative_id] = 0           # map with previous yield per alternative
-            self.forage_effort_tracker[alternative_id] = 0          # map with previous effort per alternative
-            self.heatmap[alternative_id] = 0                        # map with expectations per alternative
-            alternative_indices.append(alternative_id)              # construct index list for later use
-            alternative_tracker += 1                                # proceed to the next alternative
+        choice_set_length = len(choice_set.discrete_alternatives)
+        alternative_indices = self.initialize_choice_set_mirrors(choice_set_length)
 
         # fill heatmap will initial known alternatives
-        list_of_knowns = []
-        i = 0
-        while i < nb_of_alternatives_known:
-            # choose a random alternatives that the agent will know
-            list_of_knowns.append(random.choice(alternative_indices))
-            i += 1                                                  # proceed to generate the next known
-
+        list_of_knowns = self.initialize_list_of_knowns(nb_of_alternatives_known, alternative_indices)
         # add the heatmap data for each cell initially known as the catch they would get when fishing there at t=0
-        for known_cell in list_of_knowns:
-            self.heatmap[known_cell] = \
-                choice_set.discrete_alternatives[known_cell].resource_stock * catchability_coefficient
+        self.initialize_fill_heatmap(list_of_knowns, choice_set, catchability_coefficient)
 
         # include final internal measures of the agent
         self.id = agent_id
@@ -101,12 +86,44 @@ class ForagerAgent:
         self.explore_probability = explore_probability
         self.list_of_known_alternatives = list_of_knowns
 
+    def initialize_choice_set_mirrors(self, choice_set_length):
+        alternative_indices = []
+        alternative_tracker = 0
+        while alternative_tracker < choice_set_length:
+            alternative_id = "alternative_" + str(alternative_tracker)
+            self.forage_catch_tracker[alternative_id] = 0           # map with previous yield per alternative
+            self.forage_effort_tracker[alternative_id] = 0          # map with previous effort per alternative
+            self.heatmap[alternative_id] = 0                        # map with expectations per alternative
+            alternative_indices.append(alternative_id)              # construct index list for later use
+            alternative_tracker += 1                                # proceed to the next alternative
+
+        return alternative_indices
+
+    def initialize_list_of_knowns(self, nb_of_alternatives_known, alternative_indices):
+        list_of_knowns = []
+        i = 0
+        while i < nb_of_alternatives_known:
+            # choose a random alternatives that the agent will know
+            list_of_knowns.append(random.choice(alternative_indices))
+            i += 1                                                  # proceed to generate the next known
+
+        return list_of_knowns
+
+    def initialize_fill_heatmap(self, list_of_knowns, choice_set, catchability_coefficient):
+        for known_cell in list_of_knowns:
+            self.heatmap[known_cell] = \
+                choice_set.discrete_alternatives[known_cell].resource_stock * catchability_coefficient
+
+
 # ----------------------------- Methods to prompt foraging events ------------------------------------------------------
 
-    def forage_maximalization(self, optimalization_method, choice_set):
+    def forage_maximalization(self, optimalization_method, choice_set, number_of_competitors=1):
         # method containing the actual choice of foraging alternative
         if optimalization_method == "BASIC":
             choice_alternative, choice_catch = self.basic_heatmap_optimalization(choice_set)
+        elif optimalization_method == "CROWD-CORRECTED":
+            choice_alternative, choice_catch = self.crowded_heatmap_optimalization(choice_set, number_of_competitors)
+
         else:                                               # Give Error when an unknown optimalization option is chosen
             raise NotImplementedError('optimalization option not yet implemented')
 
@@ -117,6 +134,11 @@ class ForagerAgent:
         alternative_index = random.choice(list(self.heatmap.keys()))
         catch = choice_set.discrete_alternatives[alternative_index].resource_stock * self.catchability_coefficient
         return alternative_index, catch
+
+    def forage_random_crowded(self, choice_set, number_of_competitors):
+        alternative_index, uncorrected_catch = self.forage_random(choice_set)
+        corrected_catch = uncorrected_catch / number_of_competitors  # quick and dirty fix
+        return alternative_index, corrected_catch
 
     def basic_heatmap_optimalization(self, choice_set):
         optimal_catch = 0
@@ -132,6 +154,11 @@ class ForagerAgent:
                        * self.catchability_coefficient
 
         return optimal_alternative, actual_catch
+
+    def crowded_heatmap_optimalization(self, choice_set, number_of_competitors):
+        optimal_alternative, uncorrected_catch = self.basic_heatmap_optimalization(choice_set)
+        corrected_catch = uncorrected_catch / number_of_competitors # dirty fix of simply divindg catch by number of competitors
+        return optimal_alternative, corrected_catch
 
 # ------------------------------- Methods to update internal parameters and trackers -----------------------------------
 

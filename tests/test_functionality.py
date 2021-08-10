@@ -24,8 +24,20 @@ from src.run_model import ModelRunner
 
 
 # TODO: Implement tests for ALL functionality of objects in modules
+# TODO: refine testing framework using unitttest.TestSuite
+
 class TestModelModules(unittest.TestCase):
     """class to test all functionality supported by the model"""
+
+# ----------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------- setup objects and parameters needed for testing ------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------- Test AgentSet object functionality -------------------------------------
@@ -49,13 +61,28 @@ class TestModelModules(unittest.TestCase):
     def test_ForagerAgent_initialize_content(self):
         pass
 
+    def test_ForagerAgent_initialize_choice_set_mirrors(self):
+        pass
+
+    def test_initialize_list_of_knowns(self):
+        pass
+
+    def test_ForagerAgent_initialize_fill_heatmap(self):
+        pass
+
     def test_ForagerAgent_forage_maximalization(self):
         pass
 
     def test_ForagerAgent_forage_random(self):
         pass
 
+    def test_ForagerAgent_forage_random_crowded(self):
+        pass
+
     def test_ForagerAgent_basic_heatmap_optimalization(self):
+        pass
+
+    def test_ForagerAgent_crowded_heatmap_optimalization(self):
         pass
 
     def test_ForagerAgent_update_agent_trackers(self):
@@ -109,9 +136,8 @@ class TestModelModules(unittest.TestCase):
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
-# --------------------------------------------- Test ModelRunner Object functionality ------------------------------
+# --------------------------------------------- Test ModelRunner Object functionality ----------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------- Run Tests --------------------------------------------------------------
