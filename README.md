@@ -59,5 +59,5 @@ Open **src/config/init_param.py** and enter desired parameters defined there
 run **src/ARTEMIS.py**
 
 ### Tips for adjusting the Model
-Please realise that a testing **tests/test_functionality.py** is present to test if any adjustments hinder 
+Please realise that a testing framework **tests/test_functionality.py** is present to test if any adjustments hinder 
 the functionality of the model. New functionality test can also be included in this framework
