@@ -26,6 +26,7 @@ class ChoiceSet:
         self.discrete_alternatives = {}
         self.effort_map = {}
         self.catch_map = {}
+        self.resource_uptake = False            # measure to change if a foraging event changes the cells properties
 
     def load_observed_alternatives(self, dataset):
         pass
