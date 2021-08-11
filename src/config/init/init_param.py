@@ -24,7 +24,7 @@ catchability_coefficient = 0.2      # proportional uptake of the resource stock 
 init_number_of_alternatives_known = 4   # number of alternatives each agents knows at initialisation
 
 
-# TODO: Add functionality to make resource uptake True/False (now fixed quick and dirty through making a line of code a comment
+# TODO: Add functionality to make resource uptake Boolean (replace quick and dirty fix in run_model line 53)
 
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present

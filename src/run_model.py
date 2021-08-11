@@ -70,11 +70,10 @@ class ModelRunner:
             for alternative in choice_set.discrete_alternatives:
                 choice_set.discrete_alternatives[alternative].stock_growth()
 
-            # reset the stocks if chosen for a static stock format
-            # TODO : Implement random repeating of previous stock
-
+            # reset the stocks if chosen for a static stock format - otherwise keep old stock
             if stock_reset_scenario == 'random-repeat':
-                if random.random() < 0.9:                   # 90 chance of resetting the stock
+                # TODO: change hardcoded chance at stock reset/repetition to adaptable
+                if random.random() < 0.9:                   # 90% chance of resetting the stock/10% chance at same stock
                     alternative_tracker = 0
                     nb_alternatives = len(choice_set.discrete_alternatives)
                     while alternative_tracker < nb_alternatives:
