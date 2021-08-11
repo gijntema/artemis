@@ -77,7 +77,7 @@ class GraphConstructor:
         # shorten the names of alternatives for clarity reason in the graph
         alternative_counter = 0
         while alternative_counter < len(effort_x):
-            effort_x[alternative_counter] = effort_x[alternative_counter][-2:]
+            effort_x[alternative_counter] = effort_x[alternative_counter].split("_")[1]
             alternative_counter += 1
 
         return effort_y, effort_x
@@ -91,7 +91,7 @@ class GraphConstructor:
         # shorten the names of agents for clarity reason in the graph
         agent_counter = 0
         while agent_counter < len(agent_catch_x):
-            agent_catch_x[agent_counter] = agent_catch_x[agent_counter][-2:]
+            agent_catch_x[agent_counter] = agent_catch_x[agent_counter].split("_")[1]
             agent_counter += 1
 
         return agent_catch_y, agent_catch_x
@@ -116,7 +116,7 @@ class GraphConstructor:
 
         alternative_counter = 0
         while alternative_counter < len(stock_x):
-            stock_x[alternative_counter] = stock_x[alternative_counter][-2:]
+            stock_x[alternative_counter] = stock_x[alternative_counter].split("_")[1]
             alternative_counter += 1
 
         return stock_y, stock_x

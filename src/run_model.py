@@ -74,7 +74,7 @@ class ModelRunner:
             # TODO : Implement random repeating of previous stock
 
             if stock_reset_scenario == 'random-repeat':
-                if random.random() < 0.5:                   # 50 chance of resetting the stock
+                if random.random() < 0.9:                   # 90 chance of resetting the stock
                     alternative_tracker = 0
                     nb_alternatives = len(choice_set.discrete_alternatives)
                     while alternative_tracker < nb_alternatives:

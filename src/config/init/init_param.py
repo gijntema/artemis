@@ -16,6 +16,7 @@
 #
 
 # Module usable to define the exogenous variables of any ARTEMIS run
+# TODO: eventually change this module to read the specified information form a configuration file (e.g. a .json file)
 
 # Forager Characteristics
 explore_probability = 0.2           # probability a forager does not choose a known cell, but picks a random cell
@@ -23,7 +24,7 @@ catchability_coefficient = 0.2      # proportional uptake of the resource stock 
 init_number_of_alternatives_known = 4   # number of alternatives each agents knows at initialisation
 
 
-# TODO: Add functionality to make resource uptake neglectable
+# TODO: Add functionality to make resource uptake True/False (now fixed quick and dirty through making a line of code a comment
 
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present
@@ -66,7 +67,7 @@ shared_alternatives = 1                 # amount of known alternatives shared at
 
 information_sharing_method = 'Shared Heatmap'
 # considered functionality: ['Shared Heatmap, Information Diffusion']
-# TODO: Implemented shared heatmap functionality
+# TODO: Implement shared heatmap functionality
 
 # Indicators 'Coalition Forming'
 coalition_cheaters = False              # indicates the existence of cheaters (agents that are part of multiple groups)

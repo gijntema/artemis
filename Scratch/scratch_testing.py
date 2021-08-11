@@ -1,34 +1,39 @@
+# tests for determining possibilities of dictionaries regarding functions
 
-from src.agents import ForagerAgent
+# define basic class with methods
+class DictionaryFunctionalityTests:
 
-forager_a = ForagerAgent()
-forager_a.heatmap = {'stock_1': 100.0, 'stock_2': 0}
-forager_a.update_list_of_knowns()
-
-forager_b = ForagerAgent()
-forager_b.heatmap = {'stock_1': 0, 'stock_2': 15}
-forager_b.update_list_of_knowns()
-
-data = forager_a.share_heatmap_knowledge()
-forager_b.receive_heatmap_knowledge(data)
-
-print(forager_b.heatmap)
-
-
-class DataSharer:
     def __init__(self):
-        pass
+        self.instruction_dict = instruction_dict = {"x2": self.x2(nb=number),
+                                                    "split_string": self.split_string(text=txt)}
 
-    def share_knowledge(self, forager_a, forager_b):
-        data = forager_a.share_heatmap_knowledge()
-        forager_b.receive_heatmap_knowledge(data)
+    def add_instruction(self):
+        new_instruction = {"new": "new"}
+        self.instruction_dict = self.instruction_dict | new_instruction
 
 
-forager_a = ForagerAgent()
-forager_a.heatmap = {'stock_1': 100.0, 'stock_2': 0}
+    def x2(self, nb):
+        nb2 = nb * 2
+        return nb2
 
-forager_b = ForagerAgent()
-forager_b.heatmap = {'stock_1': 0, 'stock_2': 15}
+    def split_string(self, text):
+        split_text = text.split()
+        return split_text
 
-data_sharer = DataSharer()
-data_sharer.share_knowledge(forager_a=forager_a, forager_b=forager_b)
+    def updated_instruction(self, name):
+        return "updated instruction --{}-- with successful functionality".format(name)
+
+
+number = 5
+txt = "word1 word2"
+new_name = "new_name"
+
+dict_test = DictionaryFunctionalityTests()
+dict_test.add_instruction({'updated_instruction': self.updated_instruction(new_name)})
+
+
+output_number, output_text, update_method = [dict_test.instruction_dict['x2'],
+                                             dict_test.instruction_dict['split_string'],
+                                             dict_test.instruction_dict['updated_instruction']]
+
+print(output_number, '/n', output_text, update_method)
