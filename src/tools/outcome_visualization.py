@@ -121,3 +121,11 @@ class GraphConstructor:
 
         return stock_y, stock_x
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Methods using a different way of plotting
+# ----------------------------------------------------------------------------------------------------------------------
+    def plot_bar_pandas(self, pd_dataframe, x_values, y_values=None):
+        pd_dataframe.plot.bar(x=x_values, y=y_values)
+
+    def plot_line_pandas(self, pd_dataframe, x_values, y_values=None):
+        pd_dataframe.plot.line(x=x_values, y=y_values)

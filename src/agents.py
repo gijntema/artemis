@@ -24,10 +24,11 @@ class AgentSet:                                         # to be implemented, not
     def __init__(self):
         pass
         self.agents = {}                                # dictionary with all agents as ForagerAgent objects
-        self.agent_global_tracker = {}                  # forgot why I implemented this and what it means
+        self.agent_global_tracker = {}                  # TODO: forgot why I implemented this and what it means
         self.total_catch = 0                            # Tracker for total catch of all agents and years combined
         self.total_yearly_catch_tracker = {}            # tracker for total catch each year
         self.average_yearly_catch_tracker = {}          # tracker for average catch each year
+        self.yearly_catch_distribution = {}             # tracker to save distribution of catch over the agents for every year
 
     def update_agent_trackers(self, agent_id, catch, alternative_index, time_tracker):
         self.agents[agent_id].update_agent_trackers(alternative_index=alternative_index, catch=catch,
@@ -44,6 +45,10 @@ class AgentSet:                                         # to be implemented, not
 
     def update_total_yearly_catch(self, catch, time_tracker):
         self.total_yearly_catch_tracker[str(time_tracker)] += catch
+
+
+
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------- the ForagerAgent object -----------------------------------------------
@@ -193,6 +198,7 @@ class ForagerAgent:
 # --------------------------- Methods for information sharing scenarios ------------------------------------------------
 
     def share_heatmap_knowledge(self, number_of_alternatives=1):
+        # TODO: ensure the knowledge is not shared with the agent itself (which would be pointless)
         """method that returns a given number of alternatives the ForagerAgent has knowledge on
         to be shared with other ForagerAgents"""
         self.update_list_of_knowns()  # make sure the list of known alternatives is up to date

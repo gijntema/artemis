@@ -43,6 +43,13 @@ class TestModelModules(unittest.TestCase):
 # --------------------------------------------- Test AgentSet object functionality -------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
+    def test_test(self):
+        """" basic test to show how functionality of unittest is applied
+        and to test if the modules are properly loaded"""
+
+        agent = ForagerAgent()
+        self.assertIsInstance(agent, ForagerAgent)
+
     def test_AgentSet_update_agent_trackers(self):
         pass
 
@@ -110,10 +117,12 @@ class TestModelModules(unittest.TestCase):
 # ----------------------------------------------------------------------------------------------------------------------
 
     def test_FishermenAgent_inheritance(self):
-        pass
+        fisher_agent = FishermanAgent()
+        self.assertIsInstance(fisher_agent.heatmap, dict)
 
     def test_PredatorAgent_inheritance(self):
-        pass
+        predator_agent = PredatorAgent()
+        self.assertIsInstance(predator_agent.heatmap, dict)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------- Test ChoiceSet Object functionality ------------------------------------

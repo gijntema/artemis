@@ -50,6 +50,7 @@ class ModelRunner:
 
                 # the stock in the chosen alternative is reduced and tracked using trackers
                 # TODO: Add functionality to scale catchability (and resulting catch) by effort
+                # TODO: change quick and dirty fix one line below as parameter in init_param.py
                 # choice_set.discrete_alternatives[alternative_index].resource_stock_harvest(catch)
                 choice_set.catch_map[alternative_index] += catch
                 choice_set.effort_map[alternative_index] += 1
