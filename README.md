@@ -49,7 +49,7 @@ Depends on the interpreter chosen (should be adjusted to include several interpr
 
 ### Install packages
 
-Enter into console:
+Enter into terminal:
 
     $ pip install -r src/package_versions.txt 
 
