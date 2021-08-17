@@ -95,7 +95,7 @@ class ForagerAgent:
         alternative_indices = []
         alternative_tracker = 0
         while alternative_tracker < choice_set_length:
-            alternative_id = "alternative_" + str(alternative_tracker)
+            alternative_id = "alternative_" + str(alternative_tracker).zfill(4)
             self.forage_catch_tracker[alternative_id] = 0           # map with previous yield per alternative
             self.forage_effort_tracker[alternative_id] = 0          # map with previous effort per alternative
             self.heatmap[alternative_id] = 0                        # map with expectations per alternative

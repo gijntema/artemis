@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 class GraphConstructor:
 
     def __init__(self):
-        self.supported_graphs = []
+        self.supported_graphs = [] # piece of code if we want to make the methods below more flexible
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Methods using a different way of plotting

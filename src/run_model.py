@@ -82,7 +82,7 @@ class ModelRunner:
                     alternative_tracker = 0
                     nb_alternatives = len(choice_set.discrete_alternatives)
                     while alternative_tracker < nb_alternatives:
-                        alternative_id = "alternative_" + str(alternative_tracker)
+                        alternative_id = "alternative_" + str(alternative_tracker).zfill(4)
                         choice_set.discrete_alternatives[alternative_id].initialize_standard_stock(init_stock=init_stock,
                                                                                                    sd_init_stock=sd_init_stock)
                         alternative_tracker += 1

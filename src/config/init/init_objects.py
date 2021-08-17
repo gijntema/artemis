@@ -29,7 +29,7 @@ class ObjectInitializer:
         choice_set = ChoiceSet()
         alternative_tracker = 0
         while alternative_tracker < nb_alternatives:
-            alternative_id = "alternative_" + str(alternative_tracker)
+            alternative_id = "alternative_" + str(alternative_tracker).zfill(4)
             choice_set.discrete_alternatives[alternative_id] = DiscreteAlternative()
             choice_set.effort_map[alternative_id] = 0
             choice_set.catch_map[alternative_id] = 0
@@ -50,7 +50,7 @@ class ObjectInitializer:
         agent_set = AgentSet()
         agent_tracker = 0
         while agent_tracker < nb_agents:
-            agent_id = 'agent_' + str(agent_tracker)
+            agent_id = 'agent_' + str(agent_tracker).zfill(4)
             agent_set.agents[agent_id] = ForagerAgent()
             agent_set.agents[agent_id].initialize_content(choice_set=choice_set,
                                                           agent_id=agent_id,
@@ -66,7 +66,7 @@ class ObjectInitializer:
             agent_set.average_yearly_catch_tracker[str(duration_counter)] = 0
             agent_tracker = 0
             while agent_tracker < nb_agents:
-                agent_id = 'agent_' + str(agent_tracker)
+                agent_id = 'agent_' + str(agent_tracker).zfill(4)
                 agent_set.agents[agent_id].yearly_catch[duration_counter] = 0
                 agent_tracker += 1
 
