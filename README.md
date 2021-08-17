@@ -10,7 +10,7 @@ Examples include food foraging or commercial fishing.
 	* Python 3.9.4+
 	* Git
 
-see package_versions.txt for python packages and versions employed
+see src/package_versions.txt for python packages and versions employed
 
 
 ## Getting Started
@@ -51,7 +51,7 @@ Depends on the interpreter chosen (should be adjusted to include several interpr
 
 Enter into console:
 
-    $ pip install -r package_versions.txt 
+    $ pip install -r src/package_versions.txt 
 
 
 ### Adjust initial parameters (if not running the basic version of the model)

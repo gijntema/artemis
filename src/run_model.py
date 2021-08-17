@@ -37,6 +37,10 @@ class ModelRunner:
         # loop for every time step
         time_tracker = 0                                                # set a counter for time loops
         while time_tracker < duration:                                  # begin time loop
+            print('---------------------------------------------------------------------------------------------------',
+                  '\nStarting time step no.{} \n'.format(str(time_tracker)),
+                  "---------------------------------------------------------------------------------------------------"
+                  )
             random.shuffle(agent_index_list)                            # shuffle agent order for equal opportunities
             # loop for every agent
             for agent in agent_index_list:                              # begin loop for every agent

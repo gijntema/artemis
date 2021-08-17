@@ -60,7 +60,7 @@ shared_alternatives = 1                 # amount of known alternatives shared at
 # information Sharing Scenario Indicators
 # information_sharing_scenario = 'No Sharing'
 
-information_sharing_method = 'Shared Heatmap'
+# information_sharing_method = 'Shared Heatmap'
 # considered functionality: ['Shared Heatmap, Information Diffusion']
 # TODO: Implement shared heatmap functionality
 

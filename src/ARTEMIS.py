@@ -90,7 +90,6 @@ while iteration_counter < number_of_iterations:
 # Exit iteration loop and finish up
 # ----------------------------------------------------------------------------------------------------------------------
 
-# TODO: Include method in DataTransformer() to extract average values from a pd.Dataframe filled with all iteration data
 data_transformer = DataTransformer()
 avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
     data_transformer.get_average_dataframes(alternative_specific_data,
@@ -124,6 +123,7 @@ data_writer.write_json(choice_set_time_series, "choice_set_time_series.json")
 data_writer.write_json(agent_specific_data, "agent_data.json")
 data_writer.write_json(agent_set_time_series, "choice_set_time_series.json")
 
+# TODO: Writing average data outcomes not supported yet (only templates given below)
 # data_writer.write_json(alternative_specific_data, "average_alternative_data.json")
 # data_writer.write_json(choice_set_time_series, "average_choice_set_time_series.json")
 # data_writer.write_json(agent_specific_data, "average_agent_data.json")
