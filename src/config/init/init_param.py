@@ -34,7 +34,7 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 duration = 50                       # amount of time steps in the model
 choice_set_size = 100               # amount of discrete alternatives in the choice set
 amount_of_agents = 20               # amount of foragers in the model
-number_of_iterations = 500           # amount of iterations the model runs for
+number_of_iterations = 10           # amount of iterations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------

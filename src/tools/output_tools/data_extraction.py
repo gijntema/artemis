@@ -19,7 +19,7 @@ import pandas as pd
 import numpy as np
 
 
-# TODO: add desired functionality, only some examples of data are implemented for now:
+# TODO: --FUNCTIONALITY-- add desired functionality, only some examples of data are implemented for now:
 # - Total Forage Effort per Alternative (check)
 # - Final Resource Stock per Alternative
 # - Total Catch per Agent
@@ -67,7 +67,7 @@ class DataTransformer:
         temp_dictionary = {}
         temp_dictionary['time_step_id'] = self.extract_list_of_time_steps(duration)
 
-        # currently implemented extractable data - NONE so far # TODO: implement examples for yearly alternative data
+        # currently implemented extractable data TODO: --FUNCTIONALITY-- implement examples for yearly alternative data
         # add additional functionality HERE
         # CONSIDERING YEARLY EFFORT GINI COEFFICIENT AS MEASURE FOR EQUALITY IN ENVIRONMENTAL PRESSURE
 
@@ -80,7 +80,7 @@ class DataTransformer:
 
         return alternative_time_series_data
 
-    def transform_agent_data(self, agent_set, iteration_id=99):
+    def transform_agent_data(self, agent_set, iteration_id=-99):
         # extract list of time_steps
         temp_dictionary = dict()
         temp_dictionary['agent_id'] = self.extract_list_of_agents(agent_set)
@@ -100,12 +100,12 @@ class DataTransformer:
         return alternative_time_series_data
 
     def transform_agent_time_series_data(self, agent_set, duration, iteration_id=99):
-        # TODO: method is is a near-duplicate of method transform_alternative_time_series_data, could be merged?
+        # TODO: --STRUCTURAL-- near-duplicate of method transform_alternative_time_series_data, could be merged?
         # extract list of time_steps
         temp_dictionary = dict()
         temp_dictionary['time_step_id'] = self.extract_list_of_time_steps(duration)
 
-        # currently implemented extractable data - NONE so far # TODO: implement examples for yearly alternative data
+        # currently implemented extractable data
         temp_dictionary['total_catch'] = self.transform_agent_set_total_catch_data(agent_set)
         # add additional functionality HERE
         # CONSIDERING YEARLY CATCH GINI COEFFICIENT AS MEASURE FOR EQUALITY IN AGENT INCOME
@@ -183,28 +183,13 @@ class DataTransformer:
 
         return final_stock
 
-    #def transform_agent_gini_data(self, agent_set): # TODO: Finish Method
-    #    agent_gini = []
-    #    return agent_gini
 
-    #def transform_alternative_gini_data(self, choice_set): #TODO Finish Method
-    #    alternative_gini = []
-    #    return alternative_gini
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------- Methods to Extract Data Related to Distributional Effects --------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-    # def extract_agent_gini_time_series(self, agent_set, time_step_list):
-        # get data as dictionary
-    #    catch_distribution_dict = dict()
-    #    for time_step in time_step_list:
-    #        catch_distribution_dict[time_step] = self.extract_time_step_catch_data(agent_set, time_step)
 
-        # get list of gini coefficients
-    #    gini_list = self.get_gini(catch_distribution_dict)
-
-    #    return gini_list
 
     def extract_time_step_catch_data(self, agent_set, time_step):
         catch_list = []
@@ -212,24 +197,6 @@ class DataTransformer:
         for agent in data:
             catch_list.append(data[agent].yearly_catch[time_step])
         return catch_list
-
-    #def get_gini(self, distribution_dictionary):
-    #    gini_list = []
-    #    for time_step in distribution_dictionary:
-    #        sorted_catch_data = sorted(distribution_dictionary[time_step])
-    #        gini_list.append(self.calculate_gini(sorted_catch_data))
-    #    return gini_list
-
-    # def calculate_gini(self, ordered_list):
-    #    total = sum(ordered_list)
-    #    proportional_list = [number / total for number in ordered_list]
-    #    cumulative_list = []
-    #    for number_index in range(len(proportional_list)):
-    #        if number_index == 0:
-    #            cumulative_list.append(proportional_list[number_index])
-    #        else:
-    #            cumulative_list.append(proportional_list[number_index] + cumulative_list[number_index-1])
-        # TODO: Finish Method
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------- Methods to Extract Average Data Series ---------------------------------------------

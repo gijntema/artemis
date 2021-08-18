@@ -53,8 +53,8 @@ class ModelRunner:
                     alternative_index, catch = agent_set.agents[agent].forage_random(choice_set)
 
                 # the stock in the chosen alternative is reduced and tracked using trackers
-                # TODO: Add functionality to scale catchability (and resulting catch) by effort
-                # TODO: change quick and dirty fix one line below as parameter in init_param.py
+                # TODO: --STRUCTURAL-- Add functionality to scale catchability (and resulting catch) by effort
+                # TODO: --STURCTURAL-- change quick and dirty fix one line below as parameter in init_param.py
                 # choice_set.discrete_alternatives[alternative_index].resource_stock_harvest(catch)
                 choice_set.catch_map[alternative_index] += catch
                 choice_set.effort_map[alternative_index] += 1
@@ -77,7 +77,7 @@ class ModelRunner:
 
             # reset the stocks if chosen for a static stock format - otherwise keep old stock
             if stock_reset_scenario == 'random-repeat':
-                # TODO: change hardcoded chance at stock reset/repetition to adaptable
+                # TODO: --STRUCTURAL-- change hardcoded chance at stock reset/repetition to adaptable
                 if random.random() < 0.9:                   # 90% chance of resetting the stock/10% chance at same stock
                     alternative_tracker = 0
                     nb_alternatives = len(choice_set.discrete_alternatives)

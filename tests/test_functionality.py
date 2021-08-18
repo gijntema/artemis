@@ -17,14 +17,11 @@
 
 # # import testing package and internal modules
 import unittest
-from src.agents import AgentSet, ForagerAgent, FishermanAgent, PredatorAgent
-from src.choice_set import ChoiceSet, SpatialChoiceSet, DiscreteAlternative, SpatialGridCell
-from src.config.init.init_objects import ObjectInitializer
-from src.run_model import ModelRunner
+from src.tools.model_tools.agents import ForagerAgent, FishermanAgent, PredatorAgent
 
 
-# TODO: Implement tests for ALL functionality of objects in modules
-# TODO: refine testing framework using unitttest.TestSuite
+# TODO: rework module to pytest framework rather than unittest
+
 
 class TestModelModules(unittest.TestCase):
     """class to test all functionality supported by the model"""

@@ -15,8 +15,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-from src.agents import AgentSet, ForagerAgent
-from src.choice_set import ChoiceSet, DiscreteAlternative
+from src.tools.model_tools.agents import AgentSet, ForagerAgent
+from src.tools.model_tools.choice_set import ChoiceSet, DiscreteAlternative
 
 
 class ObjectInitializer:

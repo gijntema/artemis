@@ -16,15 +16,17 @@
 #
 
 import random
+from collections import defaultdict  # TODO: --STRUCTURAL-- Replace difficult initialisation
+from src.tools.model_tools.optimizers import ChoiceMaker
 
+
+# TODO: --MINOR-- hide internal functions
 
 class AgentSet:                                         # to be implemented, not yet included in the other scripts
     """Class to contain both the agents in ForagerAgent objects (or a more specified version of it)
     and global data on all agents in the model """
     def __init__(self):
-        pass
         self.agents = {}                                # dictionary with all agents as ForagerAgent objects
-        self.agent_global_tracker = {}                  # TODO: forgot why I implemented this and what it means
         self.total_catch = 0                            # Tracker for total catch of all agents and years combined
         self.total_yearly_catch_tracker = {}            # tracker for total catch each year
         self.average_yearly_catch_tracker = {}          # tracker for average catch each year
@@ -34,20 +36,17 @@ class AgentSet:                                         # to be implemented, not
         self.agents[agent_id].update_agent_trackers(alternative_index=alternative_index, catch=catch,
                                                    year_counter=time_tracker)
 
-        self.update_total_catch(catch)
-        self.update_total_yearly_catch(catch, time_tracker)
+        self.__update_total_catch(catch)
+        self.__update_total_yearly_catch(catch, time_tracker)
 
-    def update_total_catch(self, catch):
+    def __update_total_catch(self, catch):
         self.total_catch += catch
 
-    def update_average_yearly_catch(self):
+    def __update_average_yearly_catch(self):
         pass
 
-    def update_total_yearly_catch(self, catch, time_tracker):
+    def __update_total_yearly_catch(self, catch, time_tracker):
         self.total_yearly_catch_tracker[str(time_tracker)] += catch
-
-
-
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -66,6 +65,7 @@ class ForagerAgent:
         self.id = "no_id"                               # id consistent with other indices used in the rest of the model
         self.yearly_catch = {}                          # tracker variable to check yearly fluctuations in catch
         self.list_of_known_alternatives = []            # list of alternatives that an agent has information on
+        self.choice_maker = 'empty'               # TODO: --STRUCTURAL-- Migrate methods and make compatible
 
 # --------------------------------------Method to initialize agents before running the main model ----------------------
 
@@ -78,12 +78,12 @@ class ForagerAgent:
 
         # initialise all maps containing data on expectations and results of forage events
         choice_set_length = len(choice_set.discrete_alternatives)
-        alternative_indices = self.initialize_choice_set_mirrors(choice_set_length)
+        alternative_indices = self.__initialize_choice_set_mirrors(choice_set_length)
 
         # fill heatmap will initial known alternatives
-        list_of_knowns = self.initialize_list_of_knowns(nb_of_alternatives_known, alternative_indices)
+        list_of_knowns = self.__initialize_list_of_knowns(nb_of_alternatives_known, alternative_indices)
         # add the heatmap data for each cell initially known as the catch they would get when fishing there at t=0
-        self.initialize_fill_heatmap(list_of_knowns, choice_set, catchability_coefficient)
+        self.__initialize_fill_heatmap(list_of_knowns, choice_set, catchability_coefficient)
 
         # include final internal measures of the agent
         self.id = agent_id
@@ -91,7 +91,7 @@ class ForagerAgent:
         self.explore_probability = explore_probability
         self.list_of_known_alternatives = list_of_knowns
 
-    def initialize_choice_set_mirrors(self, choice_set_length):
+    def __initialize_choice_set_mirrors(self, choice_set_length):
         alternative_indices = []
         alternative_tracker = 0
         while alternative_tracker < choice_set_length:
@@ -104,7 +104,7 @@ class ForagerAgent:
 
         return alternative_indices
 
-    def initialize_list_of_knowns(self, nb_of_alternatives_known, alternative_indices):
+    def __initialize_list_of_knowns(self, nb_of_alternatives_known, alternative_indices):
         list_of_knowns = []
         i = 0
         while i < nb_of_alternatives_known:
@@ -114,14 +114,14 @@ class ForagerAgent:
 
         return list_of_knowns
 
-    def initialize_fill_heatmap(self, list_of_knowns, choice_set, catchability_coefficient):
+    def __initialize_fill_heatmap(self, list_of_knowns, choice_set, catchability_coefficient):
         for known_cell in list_of_knowns:
             self.heatmap[known_cell] = \
                 choice_set.discrete_alternatives[known_cell].resource_stock * catchability_coefficient
 
 
 # ----------------------------- Methods to prompt foraging events ------------------------------------------------------
-
+# TODO: --STRUCTURAl-- Migrate Functionality to ChoiceMaker() object (in optimizer.py)
     def forage_maximalization(self, optimalization_method, choice_set, number_of_competitors=1):
         # method containing the actual choice of foraging alternative
         if optimalization_method == "BASIC":
@@ -198,7 +198,6 @@ class ForagerAgent:
 # --------------------------- Methods for information sharing scenarios ------------------------------------------------
 
     def share_heatmap_knowledge(self, number_of_alternatives=1):
-        # TODO: ensure the knowledge is not shared with the agent itself (which would be pointless)
         """method that returns a given number of alternatives the ForagerAgent has knowledge on
         to be shared with other ForagerAgents"""
         self.update_list_of_knowns()  # make sure the list of known alternatives is up to date
