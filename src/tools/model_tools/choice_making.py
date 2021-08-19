@@ -27,18 +27,51 @@ class ChoiceMaker:
         self.relevant_agent_data = self.__init_relevant_data(agent)
 
     def __init_instructions(self):
+        # all entries are REFERENCES to function object, which are only executed when () are added (see line 76)
         instructions = {
-            "random": self.__make_choice_random,
-            "full_heatmap": self.__make_choice_full_heatmap,
-            "explore_heatmap": self.__make_choice_explore_heatmap
+
+            "random": {
+                'init': self.__init_relevant_random,
+                'choose': self.__make_choice_random
+            },
+
+            "full_heatmap": {
+                'init': self.__init_relevant_full_heatmap,
+                'choose': self.__make_choice_full_heatmap
+            },
+
+            "explore_heatmap": {
+                'init': self.__init_relevant_explore_heatmap,
+                'choose': self.__make_choice_explore_heatmap
+            }
+
+            # include further decision making options HERE (and as methods below)
         }
 
         return instructions
 
-    def __init_relevant_data(self, choice_method, agent):
+    def __init_relevant_data(self, agent):
         """set up a dictionary containing the relevant functions to extract the data from ForagerAgent need for a specific operations"""
-        relevant_data = {}
+
+        relevant_data = self.choice_instruction[self.choice_method]['init'](agent)
         return relevant_data
+
+    def __init_relevant_random(self, agent):
+        return dict()
+
+    def __init_relevant_full_heatmap(self, agent):
+        relevant_data = dict()
+        relevant_data['heatmap'] = agent.heatmap
+        return relevant_data
+
+    def __init_relevant_explore_heatmap(self, agent):
+        relevant_data = dict()
+        relevant_data['explore_probability'] = agent.explore_probability
+        relevant_data['heatmap'] = agent.heatmap
+        return relevant_data
+# ----------------------------------------------------------------------------------------------------------------------
+# Methods that make the actual for the ForagerAgent
+# ----------------------------------------------------------------------------------------------------------------------
 
     def __make_choice_random(self):
         chosen = choice(self.choice_indices)
@@ -47,21 +80,27 @@ class ChoiceMaker:
     def __make_choice_full_heatmap(self):
         heatmap = self.relevant_agent_data['heatmap']
         optimal_catch = 0
-        optimal_alternative = 'choice_none'
-        for alternative in heatmap:
+        chosen = 'choice_none'
+        for potential_choice in heatmap:
             # discern the catch you would gain according to the information/memory an agent has
-            expected_catch = heatmap[alternative]
+            expected_catch = heatmap[potential_choice]
             if expected_catch > optimal_catch:
                 optimal_catch = expected_catch
-                optimal_alternative = alternative
-        return optimal_alternative
+                chosen = potential_choice
+
+        return chosen
 
     def __make_choice_explore_heatmap(self):
-        pass
+        if random < self.relevant_agent_data['explore_probability']:
+            chosen = self.__make_choice_random()
+        else:
+            chosen = self.__make_choice_full_heatmap()
+
+        return chosen
 
     def make_choice(self):
         """method that chooses the data based on the choice method provided"""
-        chosen = self.choice_instruction[self.choice_method]()
+        chosen = self.choice_instruction[self.choice_method]['choose']()
         return chosen
 
 

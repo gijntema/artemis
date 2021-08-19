@@ -44,14 +44,15 @@ class ObjectInitializer:
     def initialize_forager_agents(self, nb_agents, choice_set,
                                   catchability_coefficient, nb_alternatives_known,
                                   explore_probability, duration_model,
-                                  coalition_forming=False, coalition_cheaters=False):
+                                  coalition_forming=False, coalition_cheaters=False,
+                                  choice_method='random'):
 
         # initialize all agents and time independent tracker variables
         agent_set = AgentSet()
         agent_tracker = 0
         while agent_tracker < nb_agents:
             agent_id = 'agent_' + str(agent_tracker).zfill(4)
-            agent_set.agents[agent_id] = ForagerAgent()
+            agent_set.agents[agent_id] = ForagerAgent(choice_set=choice_set, choice_method=choice_method)
             agent_set.agents[agent_id].initialize_content(choice_set=choice_set,
                                                           agent_id=agent_id,
                                                           catchability_coefficient=catchability_coefficient,

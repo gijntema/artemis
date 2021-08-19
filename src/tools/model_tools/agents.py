@@ -17,7 +17,7 @@
 
 import random
 from collections import defaultdict  # TODO: --STRUCTURAL-- Replace difficult initialisation
-from src.tools.model_tools.optimizers import ChoiceMaker
+from src.tools.model_tools.choice_making import ChoiceMaker
 
 
 # TODO: --MINOR-- hide internal functions
@@ -55,7 +55,7 @@ class AgentSet:                                         # to be implemented, not
 
 class ForagerAgent:
     """general class to define objects as agents that may forage from a resource and their attributes"""
-    def __init__(self):
+    def __init__(self, choice_set, choice_method):
         self.forage_catch_tracker = {}                  # tracker variable for total catch gained from each alternative
         self.forage_effort_tracker = {}                 # tracker variable for effort exerted on each alternative
         self.heatmap = {}                               # agents memory on the last forage event in each alternative
@@ -65,7 +65,11 @@ class ForagerAgent:
         self.id = "no_id"                               # id consistent with other indices used in the rest of the model
         self.yearly_catch = {}                          # tracker variable to check yearly fluctuations in catch
         self.list_of_known_alternatives = []            # list of alternatives that an agent has information on
-        # self.choice_maker = ChoiceMaker()               # TODO: --STRUCTURAL-- Migrate methods and make compatible
+
+        # TODO: --STRUCTURAL-- Migrate methods and make compatible
+        self.choice_maker = ChoiceMaker(choice_set=choice_set,          # object that identifies/loads the relevant data
+                                        choice_method=choice_method,    # from ForagerAgents and can make foraging
+                                        agent=self)                     # decisions for ForagerAgents based on that data
 
 # --------------------------------------Method to initialize agents before running the main model ----------------------
 
