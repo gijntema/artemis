@@ -15,6 +15,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# TODO: replace 'alternatives' with 'choices' or 'options' in all variable, method and function nomenclature
+# TODO: --MINOR-- Write consistent block comments and explanation at ALL classes and Methods in ALL modules
 # TODO: --STRUCTURAL-- Clean up Main Script
 # import module to track runtime
 import timeit
