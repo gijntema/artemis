@@ -65,7 +65,7 @@ class ForagerAgent:
         self.id = "no_id"                               # id consistent with other indices used in the rest of the model
         self.yearly_catch = {}                          # tracker variable to check yearly fluctuations in catch
         self.list_of_known_alternatives = []            # list of alternatives that an agent has information on
-        self.choice_maker = 'empty'               # TODO: --STRUCTURAL-- Migrate methods and make compatible
+        # self.choice_maker = ChoiceMaker()               # TODO: --STRUCTURAL-- Migrate methods and make compatible
 
 # --------------------------------------Method to initialize agents before running the main model ----------------------
 
@@ -121,7 +121,7 @@ class ForagerAgent:
 
 
 # ----------------------------- Methods to prompt foraging events ------------------------------------------------------
-# TODO: --STRUCTURAl-- Migrate Functionality to ChoiceMaker() object (in optimizer.py)
+# TODO: --STRUCTURAL-- Migrate Functionality to ChoiceMaker() object (in optimizer.py)
     def forage_maximalization(self, optimalization_method, choice_set, number_of_competitors=1):
         # method containing the actual choice of foraging alternative
         if optimalization_method == "BASIC":
