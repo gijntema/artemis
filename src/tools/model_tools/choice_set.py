@@ -15,6 +15,33 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+This Module is used to define (the characteristics of) options any Forager may choose from during a module run,
+examples of choices are:
+- which grid cell to fish/forage in
+- what forage search tactic to employ
+- what prey/target species to choose
+
+basic functionality of the model currently is mostly geared towards fishery (spatial) options, but model structure
+allows for future implementations of other types of options.
+
+characteristics general to all options and a list of choices (in dictioanry format) are added as part of
+the ChoiceSet object
+
+the dictionary contains all DiscreteAlternatives as the actual options that are present in a considered system
+(e.g. the different grid cells to fish/forage in). Functionality for spatially explicit options can be added
+in the child class SpatialGridCell
+
+Module inputs:
+-   the parameters form init_param.py are used to load the characteristics in any ChoiceSet object
+
+Module Usage:
+-   init_objects.py uses the module to initialize all objects needed at any later stage in the model
+-   run_model.py uses the module to execute choice set operations
+-   agents.py uses the module to create a mirror of the choice set to map acquired information on
+
+"""
+
 import numpy as np
 
 
@@ -55,9 +82,9 @@ class DiscreteAlternative:
 
     def __init__(self):
         self.resource_stock = 0                         # contains the value(s) for the stock present
+        self.growth_factor = 2                          # fraction of population that is added through growth - needs to be added in initialisation
         self.stock_type = 'singular'                    # indicates the structure of the stock (e.g. singular/age class)
         self.alternative_id = None                      # id consistent with other indices used in the rest of the model
-        self.growth_factor = 2                          # fraction of population that is added through growth - needs to be added in initialisation
         self.stock_growth_type = 'exponential'          # indicator for the way the stock grows
 
     def initialize_standard_stock(self, init_stock, sd_init_stock, growth_factor=1):

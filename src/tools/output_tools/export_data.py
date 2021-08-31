@@ -13,6 +13,20 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+"""
+This Module is used to write model results to data files (e.g. .csv, .json)
+
+All functionality is contained in methods and attributes of the DataWriter object
+
+Module inputs:
+-   any data formatted as pandas.DataFrame Object
+
+Module Usage:
+-   ARTEMIS.py uses this module as Data writer
+
+"""
 
 import pandas as pd
 

@@ -15,8 +15,22 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+This Module is aimed at defining all parameter values and scenarios used in the model,
+
+this module is read by ARTEMIS.py to determine all parameter variables and scenarios.
+
+Module inputs:
+-   None
+
+Module Usage:
+-   all defined variables are input for module ARTEMIS.py
+
+"""
+
 # Module usable to define the exogenous variables of any ARTEMIS run
 # TODO: eventually change this module to read the specified information form a configuration file (e.g. .json file)
+# TODO: amount = number
 
 # Forager Characteristics
 explore_probability = 0.2           # probability a forager does not choose a known cell, but picks a random cell
@@ -34,7 +48,7 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 duration = 50                       # amount of time steps in the model
 choice_set_size = 100               # amount of discrete alternatives in the choice set
 amount_of_agents = 20               # amount of foragers in the model
-number_of_iterations = 500           # amount of iterations the model runs for
+number_of_iterations = 10           # amount of iterations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------

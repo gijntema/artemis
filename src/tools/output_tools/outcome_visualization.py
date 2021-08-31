@@ -14,7 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-import pandas as pd
+
+"""
+This Module is aimed at defining all parameter values and scenarios used in the model,
+
+this module is read by ARTEMIS.py to determine all parameter variables and scenarios.
+
+Module inputs:
+-   None
+
+Module Usage:
+-   all defined variables are input for module ARTEMIS.py
+
+"""
 
 
 class GraphConstructor:

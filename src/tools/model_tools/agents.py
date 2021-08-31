@@ -15,6 +15,29 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+This Module is used to define the individual agents used in the model (ForagerAgent object and it's derivatives
+FishermanAgent and PredatorAgent) as well as the overarching object AgentSet, containing all ForagerAgent objects
+and overarching trackers/functionality
+
+All agent specific functionality and tracking is contained in methods and attributes of the ForagerAgent
+(and it's derivatives FishermanAgent and PredatorAgent). Additionally tracking and more general operations concerning
+all agents are in the AgentSet object
+
+Module inputs:
+-   ChoiceMaker object from choice_making.py as an attribute of ForagerAgents (and it's derivatives)
+-   the ChoiceSet object (and its content, including the DiscreteAlternative object) to have a memory of the options for
+    making choices regarding foraging
+
+Module Usage:
+-   init_objects.py uses the module to initialize all objects needed at any later stage in the model
+-   run_model.py uses the module to execute agent operations
+-   choice_making.py loads parts of the ForagerAgent object as input for the ChoiceMaker object
+
+"""
+
+
+
 import random
 from collections import defaultdict  # TODO: --STRUCTURAL-- Replace difficult initialisation
 from src.tools.model_tools.choice_making import ChoiceMaker
@@ -150,15 +173,16 @@ class ForagerAgent:
         return alternative_index, corrected_catch
 
     def basic_heatmap_optimalization(self, choice_set):
-        optimal_catch = 0
-        optimal_alternative = 'choice_none'
-        for alternative in self.heatmap:
+        # optimal_catch = 0
+        # optimal_alternative = 'choice_none'
+        # for alternative in self.heatmap:
             # discern the catch you would gain according to the information/memory an agent has
-            expected_catch = self.heatmap[alternative]
-            if expected_catch > optimal_catch:
-                optimal_catch = expected_catch
-                optimal_alternative = alternative
+        #    expected_catch = self.heatmap[alternative]
+        #    if expected_catch > optimal_catch:
+        #        optimal_catch = expected_catch
+        #        optimal_alternative = alternative
 
+        optimal_alternative = max(self.heatmap, key=self.heatmap.get)
         actual_catch = choice_set.discrete_alternatives[optimal_alternative].resource_stock\
                        * self.catchability_coefficient
 
@@ -245,7 +269,7 @@ class ForagerAgent:
 
             received_counter += 1
 
-        self.update_list_of_knowns()  # update list of known alternatives
+        self.update_list_of_knowns()  # update list of known alternatives -TODO: Functionality for Knowledge degradation
 
 
 # ----------------------------------------------------------------------------------------------------------------------

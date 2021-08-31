@@ -15,6 +15,21 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+This Module contains all functionality to set up the objects needed in further simulations. Specifically, these include
+the agents and the choice sets at the core of the model.
+
+Module inputs:
+-   the AgentSet and ForagerAgent objects (from agents.py),
+-   the ChoiceSet and DiscreteAlternative objects (choice_set.py)
+-   the parameters as defined/loaded in init_param.py
+
+Module Usage:
+-   this module is used by ARTEMIS.py as the main module needed for initialization of the model
+
+"""
+
+
 from src.tools.model_tools.agents import AgentSet, ForagerAgent
 from src.tools.model_tools.choice_set import ChoiceSet, DiscreteAlternative
 
