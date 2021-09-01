@@ -40,6 +40,11 @@ Module Usage:
 -   run_model.py uses the module to execute choice set operations
 -   agents.py uses the module to create a mirror of the choice set to map acquired information on
 
+Last Updated:
+    01-09-2021
+
+Version Number:
+    0.1
 """
 
 import numpy as np

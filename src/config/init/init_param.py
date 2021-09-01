@@ -26,6 +26,11 @@ Module inputs:
 Module Usage:
 -   all defined variables are input for module ARTEMIS.py
 
+Last Updated:
+    01-09-2021
+
+Version Number:
+    0.1
 """
 
 # Module usable to define the exogenous variables of any ARTEMIS run
@@ -48,13 +53,13 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 duration = 50                       # amount of time steps in the model
 choice_set_size = 100               # amount of discrete alternatives in the choice set
 amount_of_agents = 20               # amount of foragers in the model
-number_of_iterations = 10           # amount of iterations the model runs for
+number_of_iterations = 1            # amount of iterations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 growth_type = 'static'              # indicates stock dynamics
-stock_reset_scenario = 'random-repeat' # indicates if an how the stock in a DiscreteAlternative resets/
+stock_reset_scenario = 'random-repeat' # indicates if an how the stock in a DiscreteAlternative resets
 chance_repeat_stock = 0.2           # chance the same stock as the previous time step is present
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -64,7 +69,7 @@ information_sharing_scenario = 'Random Sharing'
 # considered functionality: ['No Sharing', Coalition Sharing', 'Random Sharing']
 
 # Indicators 'Random Sharing'
-share_partners = 5       # the amount of agents an agent informs about a (part of) the personal heatmap
+share_partners = 1                      # the amount of agents an agent informs about a (part of) the personal heatmap
 shared_alternatives = 1                 # amount of known alternatives shared at any given time
 
 # ----------------------------------------------------------------------------------------------------------------------

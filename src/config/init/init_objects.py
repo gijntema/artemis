@@ -27,6 +27,11 @@ Module inputs:
 Module Usage:
 -   this module is used by ARTEMIS.py as the main module needed for initialization of the model
 
+Last Updated:
+    01-09-2021
+
+Version Number:
+    0.1
 """
 
 
@@ -78,12 +83,12 @@ class ObjectInitializer:
         # initialize all time dependent tracker variables
         duration_counter = 0
         while duration_counter < duration_model:
-            agent_set.total_yearly_catch_tracker[str(duration_counter)] = 0
-            agent_set.average_yearly_catch_tracker[str(duration_counter)] = 0
+            agent_set.total_time_step_catch_tracker[str(duration_counter)] = 0
+            agent_set.average_time_step_catch_tracker[str(duration_counter)] = 0
             agent_tracker = 0
             while agent_tracker < nb_agents:
                 agent_id = 'agent_' + str(agent_tracker).zfill(4)
-                agent_set.agents[agent_id].yearly_catch[duration_counter] = 0
+                agent_set.agents[agent_id].time_step_catch[duration_counter] = 0
                 agent_tracker += 1
 
             duration_counter += 1

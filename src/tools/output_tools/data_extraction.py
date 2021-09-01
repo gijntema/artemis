@@ -13,6 +13,28 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+"""
+This Module is aimed at extracting data and measures from unusable data formats and currently functions to:
+-   extract raw data from the objects AgentSet, ForagerAgent, ChoiceSet and DiscreteAlternative
+-   calculate aggregate measures based on the raw data extracted from objects
+
+this module is read by ARTEMIS.py to transform the model output into usable (raw) data formats: pandas.Dataframe objects
+
+Module inputs:
+-   No Modules
+-   Module only works on objects defined in the modules agents.py and choice_set.py
+
+Module Usage:
+-   methods of the DataTransformer object are used in ARTEMIS.py
+
+Last Updated:
+    01-09-2021
+
+Version Number:
+    0.1
+"""
 
 # import external packages
 import pandas as pd
@@ -23,7 +45,7 @@ import numpy as np
 # - Total Forage Effort per Alternative (check)
 # - Final Resource Stock per Alternative
 # - Total Catch per Agent
-# - Yearly total industry/population catch
+# - time_step total industry/population catch
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------ Main Functionality Method -------------------------------------------------------------
@@ -33,24 +55,24 @@ class DataTransformer:
     """" Restructures the data outputs from the model to a usable data format (a pandas.Dataframe object)"""
 
     def transform_output_data(self, choice_set, agent_set, duration, iteration_id=1):
-        alternative_specific_data = self.transform_alternative_data(choice_set, iteration_id)
-        choice_set_time_series = self.transform_alternative_time_series_data(choice_set, duration, iteration_id)
-        agent_specific_data = self.transform_agent_data(agent_set, iteration_id)
-        agent_set_time_series = self.transform_agent_time_series_data(agent_set, duration, iteration_id)
+        alternative_specific_data = self.__transform_alternative_data(choice_set, iteration_id)
+        choice_set_time_series = self.__transform_alternative_time_series_data(choice_set, duration, iteration_id)
+        agent_specific_data = self.__transform_agent_data(agent_set, iteration_id)
+        agent_set_time_series = self.__transform_agent_time_series_data(agent_set, duration, iteration_id)
 
         return alternative_specific_data, choice_set_time_series, agent_specific_data, agent_set_time_series
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------ Primary Subsections of the Main Functionality Method ----------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-    def transform_alternative_data(self, choice_set, iteration_id=99):
+    def __transform_alternative_data(self, choice_set, iteration_id=99):
         # extract list of alternatives
         temp_dictionary = dict()
-        temp_dictionary['alternative_id'] = self.extract_list_of_alternatives(choice_set)
+        temp_dictionary['alternative_id'] = self.__extract_list_of_alternatives(choice_set)
 
         # currently implemented extractable data
-        temp_dictionary['alternative_effort'] = self.transform_alternative_effort_data(choice_set)
-        temp_dictionary['alternative_final_stock'] = self.transform_final_stock_data(choice_set)
+        temp_dictionary['alternative_effort'] = self.__transform_alternative_effort_data(choice_set)
+        temp_dictionary['alternative_final_stock'] = self.__transform_final_stock_data(choice_set)
         # add additional functionality HERE
 
         # change to DataFrame format
@@ -62,14 +84,14 @@ class DataTransformer:
 
         return alternative_data
 
-    def transform_alternative_time_series_data(self, choice_set, duration, iteration_id=99):
+    def __transform_alternative_time_series_data(self, choice_set, duration, iteration_id=99):
         # extract list of time_steps
         temp_dictionary = {}
-        temp_dictionary['time_step_id'] = self.extract_list_of_time_steps(duration)
+        temp_dictionary['time_step_id'] = self.__extract_list_of_time_steps(duration)
 
-        # currently implemented extractable data TODO: --FUNCTIONALITY-- implement examples for yearly alternative data
+        # currently implemented extractable data TODO: --FUNCTIONALITY-- implement examples for time_step alternative data
         # add additional functionality HERE
-        # CONSIDERING YEARLY EFFORT GINI COEFFICIENT AS MEASURE FOR EQUALITY IN ENVIRONMENTAL PRESSURE
+        # CONSIDERING TIME_STEP EFFORT GINI COEFFICIENT AS MEASURE FOR EQUALITY IN ENVIRONMENTAL PRESSURE
 
         # change to DataFrame format
         alternative_time_series_data = pd.DataFrame(temp_dictionary)
@@ -80,13 +102,13 @@ class DataTransformer:
 
         return alternative_time_series_data
 
-    def transform_agent_data(self, agent_set, iteration_id=-99):
+    def __transform_agent_data(self, agent_set, iteration_id=-99):
         # extract list of time_steps
         temp_dictionary = dict()
-        temp_dictionary['agent_id'] = self.extract_list_of_agents(agent_set)
+        temp_dictionary['agent_id'] = self.__extract_list_of_agents(agent_set)
 
         # currently implemented extractable data
-        temp_dictionary['agents_catch'] = self.transform_agent_catch_data(agent_set)
+        temp_dictionary['agents_catch'] = self.__transform_agent_catch_data(agent_set)
         # add additional functionality HERE
 
 
@@ -99,16 +121,16 @@ class DataTransformer:
 
         return alternative_time_series_data
 
-    def transform_agent_time_series_data(self, agent_set, duration, iteration_id=99):
+    def __transform_agent_time_series_data(self, agent_set, duration, iteration_id=99):
         # TODO: --STRUCTURAL-- near-duplicate of method transform_alternative_time_series_data, could be merged?
         # extract list of time_steps
         temp_dictionary = dict()
-        temp_dictionary['time_step_id'] = self.extract_list_of_time_steps(duration)
+        temp_dictionary['time_step_id'] = self.__extract_list_of_time_steps(duration)
 
         # currently implemented extractable data
-        temp_dictionary['total_catch'] = self.transform_agent_set_total_catch_data(agent_set)
+        temp_dictionary['total_catch'] = self.__transform_agent_set_total_catch_data(agent_set)
         # add additional functionality HERE
-        # CONSIDERING YEARLY CATCH GINI COEFFICIENT AS MEASURE FOR EQUALITY IN AGENT INCOME
+        # CONSIDERING TIME_STEP CATCH GINI COEFFICIENT AS MEASURE FOR EQUALITY IN AGENT INCOME
 
         # change to DataFrame format
         agent_time_series_data = pd.DataFrame(temp_dictionary)
@@ -123,16 +145,16 @@ class DataTransformer:
 # --------------------------------- Internal Methods to Extract Label Data Series --------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-    def extract_list_of_time_steps(self, duration_model):
-        years = list()
+    def __extract_list_of_time_steps(self, duration_model):
+        time_steps = list()
         duration_counter = 0
         while duration_counter < duration_model:
-            years.append(str(duration_counter))
+            time_steps.append(str(duration_counter))
             duration_counter += 1
 
-        return years
+        return time_steps
 
-    def extract_list_of_alternatives(self, choice_set):
+    def __extract_list_of_alternatives(self, choice_set):
         alternatives = list(choice_set.discrete_alternatives.keys())
         alternative_counter = 0
         while alternative_counter < len(alternatives):
@@ -141,7 +163,7 @@ class DataTransformer:
 
         return alternatives
 
-    def extract_list_of_agents(self, agent_set):
+    def __extract_list_of_agents(self, agent_set):
         agents = list(agent_set.agents.keys())
         agent_counter = 0
         while agent_counter < len(agents):
@@ -153,12 +175,12 @@ class DataTransformer:
 # --------------------------------- Internal Methods to Extract Actual Data Series -------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-    def transform_alternative_effort_data(self, choice_set):
+    def __transform_alternative_effort_data(self, choice_set):
 
         effort_data = list(choice_set.effort_map.values())
         return effort_data
 
-    def transform_agent_catch_data(self, agent_set):
+    def __transform_agent_catch_data(self, agent_set):
         catch_data = agent_set.agents
 
         # extract list of values for each agent
@@ -168,13 +190,13 @@ class DataTransformer:
 
         return catch
 
-    def transform_agent_set_total_catch_data(self, agent_set):
+    def __transform_agent_set_total_catch_data(self, agent_set):
 
-        # extract list of values for every year
-        yearly_catch = list(agent_set.total_yearly_catch_tracker.values())
-        return yearly_catch
+        # extract list of values for every time_step
+        time_step_catch = list(agent_set.total_time_step_catch_tracker.values())
+        return time_step_catch
 
-    def transform_final_stock_data(self, choice_set):
+    def __transform_final_stock_data(self, choice_set):
         final_stock_data = choice_set.discrete_alternatives
 
         final_stock = []
@@ -184,18 +206,16 @@ class DataTransformer:
         return final_stock
 
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------- Methods to Extract Data Related to Distributional Effects --------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-
-    def extract_time_step_catch_data(self, agent_set, time_step):
+    def __extract_time_step_catch_data(self, agent_set, time_step):
         catch_list = []
         data = agent_set.agents
         for agent in data:
-            catch_list.append(data[agent].yearly_catch[time_step])
+            catch_list.append(data[agent].time_steps_catch[time_step])
         return catch_list
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -205,32 +225,32 @@ class DataTransformer:
     def get_average_dataframes(self, alternative_specific_data, alternative_time_series_data,
                                agent_specific_data, agent_time_series_data):
 
-        avg_alternative_specific = self.get_average_alternative_specific(alternative_specific_data)
-        avg_alternative_time = self.get_average_alternative_time_series(alternative_time_series_data)
-        avg_agent_specific = self.get_average_agent_specific(agent_specific_data)
-        avg_agent_time = self.get_average_agent_time_series(agent_time_series_data)
+        avg_alternative_specific = self.__get_average_alternative_specific(alternative_specific_data)
+        avg_alternative_time = self.__get_average_alternative_time_series(alternative_time_series_data)
+        avg_agent_specific = self.__get_average_agent_specific(agent_specific_data)
+        avg_agent_time = self.__get_average_agent_time_series(agent_time_series_data)
 
         return avg_alternative_specific, avg_alternative_time, avg_agent_specific, avg_agent_time
 
-    def get_average_alternative_specific(self, alternative_specific_data):
+    def __get_average_alternative_specific(self, alternative_specific_data):
         temp_data = alternative_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('alternative_id').mean()
         temp_data['alternative_id'] = temp_data.index
         return temp_data
 
-    def get_average_alternative_time_series(self, alternative_time_series_data):
+    def __get_average_alternative_time_series(self, alternative_time_series_data):
         temp_data = alternative_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').mean()
         temp_data['time_step_id'] = temp_data.index
         return temp_data
 
-    def get_average_agent_specific(self, agent_specific_data):
+    def __get_average_agent_specific(self, agent_specific_data):
         temp_data = agent_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('agent_id').mean()
         temp_data['agent_id'] = temp_data.index
         return temp_data
 
-    def get_average_agent_time_series(self, agent_time_series_data):
+    def __get_average_agent_time_series(self, agent_time_series_data):
         temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').mean()
         temp_data['time_step_id'] = temp_data.index

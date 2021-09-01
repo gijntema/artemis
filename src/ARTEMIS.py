@@ -15,6 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# TODO: Remember to check for bugging using Dictionary over OrderedDict
 """
 This Module is used as the main execution of the model, it is divided into six core aspects:
 - Initialize Parameters                         (import init_param.py)
@@ -33,6 +34,11 @@ Module inputs:
 Module Usage:
 -   Since this module is the Main, it is used to execute all other modules and is not used by other modules
 
+Last Updated:
+    01-09-2021
+
+Version Number:
+    0.1
 """
 
 
@@ -59,7 +65,7 @@ from src.tools.output_tools.outcome_visualization import GraphConstructor       
 from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
 
 # TODO: -- MINOR -- Fix time_step naming as plotly does not recognise this well enough
-iteration_counter = 0                                                                                                   # initliazation of counter for iteration loop
+iteration_counter = 0                                                                                                   # initliazation of counter for iteration loops
 alternative_specific_data = pd.DataFrame()                                                                              # intialize object to contain data on the choice options in the model
 choice_set_time_series = pd.DataFrame()                                                                                 # intialize object to contain time series data on the choice options in the model
 agent_specific_data = pd.DataFrame()                                                                                    # intialize object to contain data on the agents in the model
@@ -113,15 +119,16 @@ while iteration_counter < number_of_iterations:
                                                agent_set_output,
                                                duration,
                                                iteration_id=iteration_counter)
-    # TODO: possible duplicate functionality in two different time series dataframes, might be merged
+
+    # TODO: --MINOR-- possible duplicate functionality in two different time series dataframes, might be merged
     alternative_specific_data = alternative_specific_data.append(temp_alternative_specific_data).reset_index(drop=True) # attach iteration specific choice option data to the full dataset and reset indices to prevent index errors
     choice_set_time_series = choice_set_time_series.append(temp_choice_set_time_series).reset_index(drop=True)          # attach iteration specific  choice option time series data to the full dataset and reset indices to prevent index errors
     agent_specific_data = agent_specific_data.append(temp_agent_specific_data).reset_index(drop=True)                   # attach iteration specific  agent data to the full dataset and reset indices to prevent index errors
     agent_set_time_series = agent_set_time_series.append(temp_agent_set_time_series).reset_index(drop=True)             # attach iteration specific  agent time series data to the full dataset and reset indices to prevent index errors
 
-    iteration_counter += 1
+    iteration_counter += 1                                                                                              # progress to the next iteration
 # ----------------------------------------------------------------------------------------------------------------------
-# Exit iteration loop and finish up
+# Exit iteration loop and extract measures (e.g. mean of iterations) from raw data outputs
 # ----------------------------------------------------------------------------------------------------------------------
 avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
     data_transformer.get_average_dataframes(alternative_specific_data,                                                  # extract averages from raw dataset with data from all iterations
@@ -138,6 +145,9 @@ graph_constructor.plot_bar_pandas(avg_alternative_spec, x_values='alternative_id
 graph_constructor.plot_bar_pandas(avg_agent_spec, x_values='agent_id', img_name='avg_agent_spec')                       # make bar graph of the agent specific average data
 graph_constructor.plot_line_pandas(avg_agent_time, x_values='time_step_id', img_name='avg_agent_time')                  # make line graph of the agent time series average data
 # graph_constructor.plot_line_pandas(avg_alternative_time, x_values='time_step_id', img_name = 'avg_alt_time')          # make line graph of the choice option time series average data
+
+graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternative_id', y_values='alternative_effort',
+                                  img_name='raw_alt_spec')                                                              # test to see distributions in the specific alternatives
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce database outputs (e.g. .csv or .json)

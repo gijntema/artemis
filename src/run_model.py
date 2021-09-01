@@ -46,11 +46,12 @@ class ModelRunner:
             for agent in agent_index_list:                              # begin loop for every agent
 
                 # forage event occurs and agents choose an optimal or random alternative
-                if random.random() > agent_set.agents[agent].explore_probability:          # optimalization using heatmap
-                    alternative_index, catch = agent_set.agents[agent].forage_maximalization('BASIC', choice_set)
-
-                else:                                                               # explore a random cell in the grid
-                    alternative_index, catch = agent_set.agents[agent].forage_random(choice_set)
+                alternative_index, catch = agent_set.agents[agent].make_choice(choice_set)
+#                if random.random() > agent_set.agents[agent].explore_probability:          # optimalization using heatmap
+#                    alternative_index, catch = agent_set.agents[agent].forage_maximalization('BASIC', choice_set)
+#
+#                else:                                                               # explore a random cell in the grid
+#                    alternative_index, catch = agent_set.agents[agent].forage_random(choice_set)
 
                 # the stock in the chosen alternative is reduced and tracked using trackers
                 # TODO: --STRUCTURAL-- Add functionality to scale catchability (and resulting catch) by effort

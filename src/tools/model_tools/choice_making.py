@@ -24,11 +24,16 @@ All functionality is contained in methods and attributes of the ChoiceMaker obje
 any ForagerAgent object to choose a forage option
 
 Module inputs:
--   loads parts of an AgentSet Object during the init (PLEASE ALWAYS AVOID CIRCULAR REFERENCES, see module usage)
+-   loads parts of an ForagerAgent Object during the init (PLEASE ALWAYS AVOID CIRCULAR REFERENCES, see module usage)
 
 Module Usage:
 -   Used by the module agents.py as part of the ForagerAgent object
 
+Last Updated:
+    01-09-2021
+
+Version Number:
+    0.1
 """
 
 # TODO: --STRUCTURAL-- implement functionality so optimizers can be outside of the AgentSet/ForagerAgent class
@@ -107,23 +112,25 @@ class ChoiceMaker:
         return chosen
 
     def __make_choice_full_heatmap(self):
-        """method to choose an option based on the maximum catch according to an agent heatmap"""
+        """method to choose an option based on the maximum catch according to an agent heatmap
+        returns the dictionary key of that maximum"""
         heatmap = self.relevant_agent_data['heatmap']
-        chosen = max(heatmap, key=heatmap.get)
+        chosen = max(heatmap, key=heatmap.get)                                                                          # returns key of the maximum value
         return chosen
 
     def __make_choice_explore_heatmap(self):
         """method to choose an option based on either the full_heatmap or random methods,
         according to a fixed probability"""
-        if random < self.relevant_agent_data['explore_probability']:
+        if random < self.relevant_agent_data['explore_probability']:                                                    # if a random number between 0 and 1 is smaller than the explore probability, the ForagerAgent will explore a random cell
             chosen = self.__make_choice_random()
-        else:
+        else:                                                                                                           # if a random number between 0 and 1 is larger than the explore probability, the ForagerAgent will choose based on the heatmap
             chosen = self.__make_choice_full_heatmap()
 
         return chosen
 
     def make_choice(self):
-        """method that chooses the data based on the choice method provided"""
+        """method that chooses the data based on the choice method provided
+        as key for the internal instructions dictionary"""
         chosen = self.choice_instruction[self.choice_method]['choose']()
         return chosen
 

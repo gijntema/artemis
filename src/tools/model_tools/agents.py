@@ -34,6 +34,11 @@ Module Usage:
 -   run_model.py uses the module to execute agent operations
 -   choice_making.py loads parts of the ForagerAgent object as input for the ChoiceMaker object
 
+Last Updated:
+    01-09-2021
+
+Version Number:
+    0.1
 """
 
 
@@ -50,26 +55,33 @@ class AgentSet:                                         # to be implemented, not
     and global data on all agents in the model """
     def __init__(self):
         self.agents = {}                                # dictionary with all agents as ForagerAgent objects
-        self.total_catch = 0                            # Tracker for total catch of all agents and years combined
-        self.total_yearly_catch_tracker = {}            # tracker for total catch each year
-        self.average_yearly_catch_tracker = {}          # tracker for average catch each year
-        self.yearly_catch_distribution = {}             # tracker to save distribution of catch over the agents for every year
+        self.total_catch = 0                            # Tracker for total catch of all agents and time_steps combined
+        self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
+        self.average_time_step_catch_tracker = {}       # tracker for average catch each time_step
+        self.time_step_catch_distribution = {}          # tracker to save distribution of catch over the agents for every time_step
 
     def update_agent_trackers(self, agent_id, catch, alternative_index, time_tracker):
-        self.agents[agent_id].update_agent_trackers(alternative_index=alternative_index, catch=catch,
-                                                   year_counter=time_tracker)
+        """" updates the data contained in a single ForagerAgent
+        as well as the more general agent trackers in AgentSet"""
 
-        self.__update_total_catch(catch)
-        self.__update_total_yearly_catch(catch, time_tracker)
+        self.agents[agent_id].update_agent_trackers(alternative_index=alternative_index, catch=catch,                   # update single agent trackers
+                                                   time_step_counter=time_tracker)
+
+        self.__update_total_catch(catch)                                                                                # update overall catch
+        self.__update_total_time_step_catch(catch, time_tracker)                                                        # updates the catch per time_step
 
     def __update_total_catch(self, catch):
+        """updates the total catch by the given amount from a single catch event"""
         self.total_catch += catch
 
-    def __update_average_yearly_catch(self):
+    def __update_average_time_step_catch(self):
+        """" average tracker not yet implemented
+        -- could represent the average catch of all agents in a given time_step  in future functionality--"""
         pass
 
-    def __update_total_yearly_catch(self, catch, time_tracker):
-        self.total_yearly_catch_tracker[str(time_tracker)] += catch
+    def __update_total_time_step_catch(self, catch, time_tracker):
+        """updates the total catch in a given time step by the given amount from a single catch event"""
+        self.total_time_step_catch_tracker[str(time_tracker)] += catch
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -79,22 +91,24 @@ class AgentSet:                                         # to be implemented, not
 class ForagerAgent:
     """general class to define objects as agents that may forage from a resource and their attributes"""
     def __init__(self, choice_set, choice_method):
-        self.forage_catch_tracker = {}                  # tracker variable for total catch gained from each alternative
-        self.forage_effort_tracker = {}                 # tracker variable for effort exerted on each alternative
-        self.heatmap = {}                               # agents memory on the last forage event in each alternative
-        self.total_catch = 0                            # tracker variable to track total catch for this agent
-        self.catchability_coefficient = 0               # efficiency of resource uptake of the agent
-        self.explore_probability = 0                    # chance an agent chooses a random alternative (when allowed)
-        self.id = "no_id"                               # id consistent with other indices used in the rest of the model
-        self.yearly_catch = {}                          # tracker variable to check yearly fluctuations in catch
-        self.list_of_known_alternatives = []            # list of alternatives that an agent has information on
+        self.forage_catch_tracker = {}                                                                                  # tracker variable for total catch gained from each alternative
+        self.forage_effort_tracker = {}                                                                                 # tracker variable for effort exerted on each alternative
+        self.heatmap = {}                                                                                               # agents memory on the last forage event in each alternative
+        self.total_catch = 0                                                                                            # tracker variable to track total catch for this agent
+        self.catchability_coefficient = 0                                                                               # efficiency of resource uptake of the agent
+        self.explore_probability = 0                                                                                    # chance an agent chooses a random alternative (when allowed)
+        self.id = "no_id"                                                                                               # id consistent with other indices used in the rest of the model
+        self.time_step_catch = {}                                                                                       # tracker variable to check time_step fluctuations in catch
+        self.list_of_known_alternatives = []                                                                            # list of alternatives that an agent has information on
 
         # TODO: --STRUCTURAL-- Migrate methods and make compatible
-        self.choice_maker = ChoiceMaker(choice_set=choice_set,          # object that identifies/loads the relevant data
-                                        choice_method=choice_method,    # from ForagerAgents and can make foraging
-                                        agent=self)                     # decisions for ForagerAgents based on that data
+        self.choice_maker = ChoiceMaker(choice_set=choice_set,                                                          # object that identifies/loads the relevant data from ForagerAgents and can make foraging decisions for ForagerAgents based on that data
+                                        choice_method=choice_method,
+                                        agent=self)
 
 # --------------------------------------Method to initialize agents before running the main model ----------------------
+    # TODO: STRUCTURAL: currently initialization method is called in the ObjectInitializer (init_objects.py)
+    #  however this should be migrated to ForagerAgent.__init__() since this in explicitly meant for this purpose
 
     def initialize_content(self,
                            choice_set,
@@ -102,105 +116,76 @@ class ForagerAgent:
                            catchability_coefficient,
                            nb_of_alternatives_known,
                            explore_probability):
+        """"Method to initialize the ForagerAgent based on input data"""
 
         # initialise all maps containing data on expectations and results of forage events
-        choice_set_length = len(choice_set.discrete_alternatives)
-        alternative_indices = self.__initialize_choice_set_mirrors(choice_set_length)
+        choice_set_length = len(choice_set.discrete_alternatives)                                                       # identify number of choice options
+        alternative_indices = self.__initialize_choice_set_mirrors(choice_set_length)                                   # generate list of all choice option indices
 
-        # fill heatmap will initial known alternatives
-        list_of_knowns = self.__initialize_list_of_knowns(nb_of_alternatives_known, alternative_indices)
+        # fill heatmap with initial known alternatives
+        list_of_knowns = self.__initialize_list_of_knowns(nb_of_alternatives_known, alternative_indices)                # choose a random nb_of_alternatives_known number as initial data a ForagerAgent has memory on at the start of a simulation
         # add the heatmap data for each cell initially known as the catch they would get when fishing there at t=0
-        self.__initialize_fill_heatmap(list_of_knowns, choice_set, catchability_coefficient)
+        self.__initialize_fill_heatmap(list_of_knowns, choice_set, catchability_coefficient)                            # read the choice set to acquire stock values for the choice options a ForagerAgent knows and enter these in the ForagerAgent memory (self.heatmap)
 
         # include final internal measures of the agent
-        self.id = agent_id
-        self.catchability_coefficient = catchability_coefficient
-        self.explore_probability = explore_probability
-        self.list_of_known_alternatives = list_of_knowns
+        self.id = agent_id                                                                                              # set agent id
+        self.catchability_coefficient = catchability_coefficient                                                        # set catchability coefficient
+        self.explore_probability = explore_probability                                                                  # set chance to explore a random cell if the scenario allows this
+        self.list_of_known_alternatives = list_of_knowns                                                                # attach list of indices with choice options the ForagerAgent has a memory on at the start of the model - INDICES can be duplicates and Agents may therefore not know nb_of alternatives_known at the start
 
     def __initialize_choice_set_mirrors(self, choice_set_length):
+        """build a list of choice option indices to serve as a basis
+        to initialise the ForagerAgent memory and data trackers with"""
         alternative_indices = []
         alternative_tracker = 0
         while alternative_tracker < choice_set_length:
-            alternative_id = "alternative_" + str(alternative_tracker).zfill(4)
-            self.forage_catch_tracker[alternative_id] = 0           # map with previous yield per alternative
-            self.forage_effort_tracker[alternative_id] = 0          # map with previous effort per alternative
-            self.heatmap[alternative_id] = 0                        # map with expectations per alternative
-            alternative_indices.append(alternative_id)              # construct index list for later use
-            alternative_tracker += 1                                # proceed to the next alternative
+            alternative_id = "alternative_" + str(alternative_tracker).zfill(4)                                         # add 0s before the index number until it has a length of four digits
+            self.forage_catch_tracker[alternative_id] = 0                                                               # load index in map with previous yield per alternative
+            self.forage_effort_tracker[alternative_id] = 0                                                              # load index in map with previous effort per alternative
+            self.heatmap[alternative_id] = 0                                                                            # load index in map with expectations per alternative
+            alternative_indices.append(alternative_id)                                                                  # construct list of indeces list for later (external) use
+            alternative_tracker += 1                                                                                    # proceed to the next alternative
 
-        return alternative_indices
+        return alternative_indices                                                                                      # return list of all choice options in the model
 
     def __initialize_list_of_knowns(self, nb_of_alternatives_known, alternative_indices):
+        """initialises a list of #(nb_of_alternatives_known) choice option indices to
+        simulate what choice options have already been foraged in before the start of a simulation"""
         list_of_knowns = []
-        i = 0
-        while i < nb_of_alternatives_known:
+        i = 0                                                                                                           # counter to track loop with
+        while i < nb_of_alternatives_known:                                                                             # loop to generate all knowns choice options
             # choose a random alternatives that the agent will know
-            list_of_knowns.append(random.choice(alternative_indices))
-            i += 1                                                  # proceed to generate the next known
+            list_of_knowns.append(random.choice(alternative_indices))                                                   # choose a random
+            i += 1                                                                                                      # proceed to generate the next known choice option
 
-        return list_of_knowns
+        return list_of_knowns                                                                                           # return list of initial known choice options of an Agent
 
     def __initialize_fill_heatmap(self, list_of_knowns, choice_set, catchability_coefficient):
+        """use the list of known choice options to fill the expected catches in the memory of the agent"""
         for known_cell in list_of_knowns:
             self.heatmap[known_cell] = \
                 choice_set.discrete_alternatives[known_cell].resource_stock * catchability_coefficient
 
-
 # ----------------------------- Methods to prompt foraging events ------------------------------------------------------
-# TODO: --STRUCTURAL-- Migrate Functionality to ChoiceMaker() object (in optimizer.py)
-    def forage_maximalization(self, optimalization_method, choice_set, number_of_competitors=1):
-        # method containing the actual choice of foraging alternative
-        if optimalization_method == "BASIC":
-            choice_alternative, choice_catch = self.basic_heatmap_optimalization(choice_set)
-        elif optimalization_method == "CROWD-CORRECTED":
-            choice_alternative, choice_catch = self.crowded_heatmap_optimalization(choice_set, number_of_competitors)
 
-        else:                                               # Give Error when an unknown optimalization option is chosen
-            raise NotImplementedError('optimalization option not yet implemented')
+    def make_choice(self, choice_set):
+        """Uses the ChoiceMaker object from choice_making.py to choose a forage choice option
+        and gets the actual catch from the choice options"""
+        choice_alternative = self.choice_maker.make_choice()                                                            # prompt the ChoiceMaker to choose a choice option based oi the agent memory
+        actual_catch = choice_set.discrete_alternatives[choice_alternative].resource_stock \
+                       * self.catchability_coefficient                                                                  # read the actual catch an Agent would catch from the choice options themselves rather than and expectation from their memory
 
-        return choice_alternative, choice_catch
+        return choice_alternative, actual_catch                                                                         # return the chosen choice option and the real catch as seen from the choice options
 
-    def forage_random(self, choice_set):
-        # forage using a random alternative from the choice set
-        alternative_index = random.choice(list(self.heatmap.keys()))
-        catch = choice_set.discrete_alternatives[alternative_index].resource_stock * self.catchability_coefficient
-        return alternative_index, catch
-
-    def forage_random_crowded(self, choice_set, number_of_competitors):
-        alternative_index, uncorrected_catch = self.forage_random(choice_set)
-        corrected_catch = uncorrected_catch / number_of_competitors  # quick and dirty fix
-        return alternative_index, corrected_catch
-
-    def basic_heatmap_optimalization(self, choice_set):
-        # optimal_catch = 0
-        # optimal_alternative = 'choice_none'
-        # for alternative in self.heatmap:
-            # discern the catch you would gain according to the information/memory an agent has
-        #    expected_catch = self.heatmap[alternative]
-        #    if expected_catch > optimal_catch:
-        #        optimal_catch = expected_catch
-        #        optimal_alternative = alternative
-
-        optimal_alternative = max(self.heatmap, key=self.heatmap.get)
-        actual_catch = choice_set.discrete_alternatives[optimal_alternative].resource_stock\
-                       * self.catchability_coefficient
-
-        return optimal_alternative, actual_catch
-
-    def crowded_heatmap_optimalization(self, choice_set, number_of_competitors):
-        optimal_alternative, uncorrected_catch = self.basic_heatmap_optimalization(choice_set)
-        corrected_catch = uncorrected_catch / number_of_competitors # dirty fix of simply divindg catch by number of competitors
-        return optimal_alternative, corrected_catch
 
 # ------------------------------- Methods to update internal parameters and trackers -----------------------------------
 
-    def update_agent_trackers(self, alternative_index, catch, year_counter):
+    def update_agent_trackers(self, alternative_index, catch, time_step_counter):
         self.update_heatmap(alternative_index, catch)
         self.update_forage_effort_tracker(alternative_index, catch)
         self.update_forage_catch_tracker(alternative_index, catch)
         self.update_catch(catch)
-        self.update_yearly_catch(year_counter, catch)
+        self.update_time_step_catch(time_step_counter, catch)
 
     def update_heatmap(self, alternative_index, catch):
         self.heatmap[alternative_index] = catch
@@ -214,8 +199,8 @@ class ForagerAgent:
     def update_catch(self, catch):
         self.total_catch += catch
 
-    def update_yearly_catch(self, year_counter, catch):
-        self.yearly_catch[year_counter] += catch
+    def update_time_step_catch(self, time_step_counter, catch):
+        self.time_step_catch[time_step_counter] += catch
 
     def update_list_of_knowns(self):  # Quick and dirty way of finding all knowns instead of only adding new ones
         for alternative in self.heatmap:  # unknowns are alternatives with an integer (0) as catch estimate, not a float

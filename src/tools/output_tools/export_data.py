@@ -26,6 +26,11 @@ Module inputs:
 Module Usage:
 -   ARTEMIS.py uses this module as Data writer
 
+Last Updated:
+    01-09-2021
+
+Version Number:
+    0.1
 """
 
 import pandas as pd
