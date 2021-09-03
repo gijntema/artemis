@@ -30,7 +30,7 @@ Module Usage:
 -   methods of the DataTransformer object are used in ARTEMIS.py
 
 Last Updated:
-    01-09-2021
+    03-09-2021
 
 Version Number:
     0.1
@@ -182,6 +182,7 @@ class DataTransformer:
     def __transform_alternative_effort_data(self, choice_set):
 
         effort_data = list(choice_set.effort_map.values())
+
         return effort_data
 
     def __transform_agent_catch_data(self, agent_set):
@@ -198,6 +199,7 @@ class DataTransformer:
 
         # extract list of values for every time_step
         time_step_catch = list(agent_set.total_time_step_catch_tracker.values())
+
         return time_step_catch
 
     def __transform_final_stock_data(self, choice_set):
@@ -220,6 +222,7 @@ class DataTransformer:
         data = agent_set.agents
         for agent in data:
             catch_list.append(data[agent].time_steps_catch[time_step])
+
         return catch_list
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -240,22 +243,26 @@ class DataTransformer:
         temp_data = alternative_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('alternative_id').mean()
         temp_data['alternative_id'] = temp_data.index
+
         return temp_data
 
     def __get_average_alternative_time_series(self, alternative_time_series_data):
         temp_data = alternative_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').mean()
         temp_data['time_step_id'] = temp_data.index
+
         return temp_data
 
     def __get_average_agent_specific(self, agent_specific_data):
         temp_data = agent_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('agent_id').mean()
         temp_data['agent_id'] = temp_data.index
+
         return temp_data
 
     def __get_average_agent_time_series(self, agent_time_series_data):
         temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').mean()
         temp_data['time_step_id'] = temp_data.index
+
         return temp_data
