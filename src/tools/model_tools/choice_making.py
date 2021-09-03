@@ -36,7 +36,6 @@ Version Number:
     0.1
 """
 
-# TODO: --STRUCTURAL-- implement functionality so optimizers can be outside of the AgentSet/ForagerAgent class
 from random import choice, random
 
 
@@ -47,13 +46,17 @@ class ChoiceMaker:
         self.choice_method = choice_method                                                                              # indication of the functionality this specific instance of ChoiceMaker should have
         self.relevant_agent_data = self.__init_relevant_data(agent)                                                     # using self.choice method, acquire references to the specific parts of an agent that this specific instance of ChoiceMaker should have access to
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Methods that initialise the functionality of the ChoiceMaker
+# ----------------------------------------------------------------------------------------------------------------------
+
     def __init_instructions(self):
         """define a dictionary containing entries for all supported choice making methods, providing instructions
         on the initialization of the ChoiceMaker Object and how to make a choice from provided options for foraging,
         based on a 'choice_method' name as indication of the way to choose options"""
 
-        # all entries are REFERENCES to method object, which are only executed when () are added (see line 77)
         instructions = {
+            # all entries are REFERENCES to method object, which are only executed when () are added (see line 82)
 
             "random": {
                 'init': self.__init_relevant_random,
@@ -102,6 +105,7 @@ class ChoiceMaker:
         relevant_data['explore_probability'] = agent.explore_probability                                                # load explore probability
         relevant_data['heatmap'] = agent.heatmap                                                                        # load agent heatmap
         return relevant_data
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Methods that make the actual choice for the ForagerAgent
 # ----------------------------------------------------------------------------------------------------------------------

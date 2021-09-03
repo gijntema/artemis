@@ -181,28 +181,36 @@ class ForagerAgent:
 # ------------------------------- Methods to update internal parameters and trackers -----------------------------------
 
     def update_agent_trackers(self, alternative_index, catch, time_step_counter):
-        self.update_heatmap(alternative_index, catch)
-        self.update_forage_effort_tracker(alternative_index, catch)
-        self.update_forage_catch_tracker(alternative_index, catch)
-        self.update_catch(catch)
-        self.update_time_step_catch(time_step_counter, catch)
+        """Method to simultaneously update all internal tracker variables of the agent"""
+        self.__update_heatmap(alternative_index, catch)                                                                 # update the agent memory of content of a choice options based on catch event
+        self.__update_forage_effort_tracker(alternative_index)                                                          # update the agents memory of what choice options were visitied during a simulation
+        self.__update_forage_catch_tracker(alternative_index, catch)                                                    # update the agents memory of all catch ever extracted from a choice option
+        self.__update_catch(catch)                                                                                      # update the total catch of an agent
+        self.__update_time_step_catch(time_step_counter, catch)                                                         # update the catch per time step
 
-    def update_heatmap(self, alternative_index, catch):
+    def __update_heatmap(self, alternative_index, catch):
+        """overwrites a heatmap choice option entry using the last catch event of the agent"""
         self.heatmap[alternative_index] = catch
 
-    def update_forage_catch_tracker(self, alternative_index, catch):
+    def __update_forage_catch_tracker(self, alternative_index, catch):
+        """adds the last catch event of the agent to the choice option total catch gained by the agent considered"""
         self.forage_catch_tracker[alternative_index] += catch
 
-    def update_forage_effort_tracker(self, alternative_index, catch):
+    def __update_forage_effort_tracker(self, alternative_index):
+        """updates the effort tracker with the last chosen choice option"""
         self.forage_effort_tracker[alternative_index] += 1
 
-    def update_catch(self, catch):
+    def __update_catch(self, catch):
+        """update agents total catch with last catch event"""
         self.total_catch += catch
 
-    def update_time_step_catch(self, time_step_counter, catch):
+    def __update_time_step_catch(self, time_step_counter, catch):
+        """update agents time_step specific catch with last catch event"""
         self.time_step_catch[time_step_counter] += catch
 
-    def update_list_of_knowns(self):  # Quick and dirty way of finding all knowns instead of only adding new ones
+    def __update_list_of_knowns(self):  # Quick and dirty way of finding all knowns instead of only adding new ones
+        """"make sure the list of knowns is up to date by checking if all choice option indices
+        with an entry in the heatmap are also in the list_of_knowns"""
         for alternative in self.heatmap:  # unknowns are alternatives with an integer (0) as catch estimate, not a float
             if isinstance(self.heatmap[alternative], float):
                 if alternative not in self.list_of_known_alternatives:
@@ -213,48 +221,49 @@ class ForagerAgent:
     def share_heatmap_knowledge(self, number_of_alternatives=1):
         """method that returns a given number of alternatives the ForagerAgent has knowledge on
         to be shared with other ForagerAgents"""
-        self.update_list_of_knowns()  # make sure the list of known alternatives is up to date
-        shared_alternatives_indices = []
-        shared_alternatives_data = []
-        if not isinstance(number_of_alternatives, int) and number_of_alternatives != 'ALL':
+        self.__update_list_of_knowns()                                                                                  # make sure the list of known alternatives is up to date
+        shared_alternatives_indices = []                                                                                # empty list for later attchment of choice option indices to be shared
+        shared_alternatives_data = []                                                                                   # empty list for later attchment of choice option contens to be shared
+        if not isinstance(number_of_alternatives, int) and number_of_alternatives != 'ALL':                             # check if amount of choice options to be shared is an integer or all
             raise TypeError("number can only be an integer or ALL")
 
-        elif number_of_alternatives == 'ALL':
-            shared_alternatives_indices = self.list_of_known_alternatives
+        elif number_of_alternatives == 'ALL':                                                                           # share all data
+            shared_alternatives_indices = self.list_of_known_alternatives                                               # to be shared indices are all indices memory has an entry on
             for alternative in shared_alternatives_indices:
-                shared_alternatives_data.append(self.heatmap[alternative])
+                shared_alternatives_data.append(self.heatmap[alternative])                                              # attach all contents of the known choice options 1 by 1 to an empty list
 
         else:
             alternative_counter = 0
             while alternative_counter < number_of_alternatives:
-                shared_alternative = random.choice(self.list_of_known_alternatives)
-                if shared_alternative not in shared_alternatives_indices:
-                    shared_alternatives_indices.append(shared_alternative)
-                    shared_alternatives_data.append(self.heatmap[shared_alternative])
+                shared_alternative = random.choice(self.list_of_known_alternatives)                                     # pick a random choice option index the agents memory has an entry on
+                if shared_alternative not in shared_alternatives_indices:                                               # check if we are not already sharing this choice option
+                    shared_alternatives_indices.append(shared_alternative)                                              # attach the choice option index from the randomly chosen entry
+                    shared_alternatives_data.append(self.heatmap[shared_alternative])                                   # attach the choice option contents from the randmloy chosen entry
                 alternative_counter += 1
 
-        return tuple((shared_alternatives_indices, shared_alternatives_data))
+        return tuple((shared_alternatives_indices, shared_alternatives_data))                                           # return a tuple with choice option indices to be shared and the corresponding contents of those choice options
 
     def receive_heatmap_knowledge(self, shared_data):
         """updates personal heatmap based on the output from a ForagerAgent().share_heatmap_knowledge() method """
-        received_alternative_indices = shared_data[0]
-        received_alternative_data = shared_data[1]
+        received_alternative_indices = shared_data[0]                                                                   # get index of shared choice options
+        received_alternative_data = shared_data[1]                                                                      # get content of shared choice options
 
         received_counter = 0
         while received_counter < len(received_alternative_indices):
             # add knowledge if the alternative is unknown
-            received_index = received_alternative_indices[received_counter]
-            received_data = received_alternative_data[received_counter]
-            if isinstance(self.heatmap[received_index], int):
-                self.heatmap[received_index] = received_data
+            received_index = received_alternative_indices[received_counter]                                             # get index of a single shared choice option
+            received_data = received_alternative_data[received_counter]                                                 # get contents of a single shared choice option
+            if isinstance(self.heatmap[received_index], int):                                                           # check if the receiving agent already has an entry for that choice: NO
+                self.heatmap[received_index] = received_data                                                            # fill the empty choice option entry with the received data
 
             # When the receiving agent already has knowledge on the shared knowledge, take the average of both
-            elif isinstance(self.heatmap[received_index], float):
-                self.heatmap[received_index] = (received_data + self.heatmap[received_index])/2
+            elif isinstance(self.heatmap[received_index], float):                                                       # check if the receiving agent already has an entry for that choice: YES
+                self.heatmap[received_index] = (received_data + self.heatmap[received_index])/2                         # take average of newly shared data and the information already known from other data
 
-            received_counter += 1
+            received_counter += 1                                                                                       # proceed to next shared choice option
 
-        self.update_list_of_knowns()  # update list of known alternatives -TODO: Functionality for Knowledge degradation
+        self.__update_list_of_knowns()                                                                                  # update list of known choice options
+        # TODO: Functionality for Knowledge degradation
 
 
 # ----------------------------------------------------------------------------------------------------------------------

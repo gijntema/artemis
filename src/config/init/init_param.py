@@ -40,26 +40,26 @@ Version Number:
 # Forager Characteristics
 explore_probability = 0.2           # probability a forager does not choose a known cell, but picks a random cell
 catchability_coefficient = 0.2      # proportional uptake of the resource stock in one foraging event
-init_number_of_alternatives_known = 4   # number of alternatives each agents knows at initialisation
+init_number_of_alternatives_known = 4   # number of choice options each agents has information on at initialisation
 choice_method = 'explore_heatmap'   # defines the way an agent chooses what forage option to forage from
 
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present
 sd_init_stock = 25                  # standard deviation of initial stock present
-growth_factor = 1                   # per time step growth of stock (1 represents a static population currently)
+growth_factor = 1                   # per time step growth of stock (1 represents a static population in current Deafutl settings)
 
 
 # model characteristics
 duration = 50                       # amount of time steps in the model
 choice_set_size = 100               # amount of discrete alternatives in the choice set
 amount_of_agents = 20               # amount of foragers in the model
-number_of_iterations = 1            # amount of iterations the model runs for
+number_of_iterations = 1            # amount of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-growth_type = 'static'              # indicates stock dynamics
-stock_reset_scenario = 'random-repeat' # indicates if an how the stock in a DiscreteAlternative resets
+growth_type = 'static'              # indicates stock dynamics -- placeholder, currently not implemented
+stock_reset_scenario = 'random-repeat' # indicates if an how the stock in a DiscreteAlternative objects resets
 chance_repeat_stock = 0.2           # chance the same stock as the previous time step is present
 
 # ----------------------------------------------------------------------------------------------------------------------

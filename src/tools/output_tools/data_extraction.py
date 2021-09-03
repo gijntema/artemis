@@ -38,7 +38,6 @@ Version Number:
 
 # import external packages
 import pandas as pd
-import numpy as np
 
 
 # TODO: --FUNCTIONALITY-- add desired functionality, only some examples of data are implemented for now:
@@ -46,6 +45,9 @@ import numpy as np
 # - Final Resource Stock per Alternative
 # - Total Catch per Agent
 # - time_step total industry/population catch
+
+# TODO:  --STRUCTURAL -- make flexible to choose desired reporter measures more easily
+#  (e.g. make a library dictionary to call on)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------ Main Functionality Method -------------------------------------------------------------
@@ -55,6 +57,8 @@ class DataTransformer:
     """" Restructures the data outputs from the model to a usable data format (a pandas.Dataframe object)"""
 
     def transform_output_data(self, choice_set, agent_set, duration, iteration_id=1):
+        """main functionality method, extracts data (currently hardcoded) from agents and choice options,
+        producing pandas.Dataframe objects"""
         alternative_specific_data = self.__transform_alternative_data(choice_set, iteration_id)
         choice_set_time_series = self.__transform_alternative_time_series_data(choice_set, duration, iteration_id)
         agent_specific_data = self.__transform_agent_data(agent_set, iteration_id)
