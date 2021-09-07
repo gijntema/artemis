@@ -30,7 +30,7 @@ Module Usage:
 -   Used by the module agents.py as part of the ForagerAgent object
 
 Last Updated:
-    03-09-2021
+    06-09-2021
 
 Version Number:
     0.1

@@ -27,7 +27,7 @@ Module Usage:
 -   all defined variables are input for module ARTEMIS.py
 
 Last Updated:
-    03-09-2021
+    06-09-2021
 
 Version Number:
     0.1
@@ -35,7 +35,6 @@ Version Number:
 
 # Module usable to define the exogenous variables of any ARTEMIS run
 # TODO: eventually change this module to read the specified information form a configuration file (e.g. .json file)
-# TODO: amount = number
 
 # Forager Characteristics
 explore_probability = 0.2           # probability a forager does not choose a known cell, but picks a random cell
@@ -50,10 +49,10 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 
 
 # model characteristics
-duration = 50                       # amount of time steps in the model
-choice_set_size = 100               # amount of discrete alternatives in the choice set
-amount_of_agents = 20               # amount of foragers in the model
-number_of_iterations = 1            # amount of iterations/simulations the model runs for
+duration = 50                       # number of time steps in the model
+choice_set_size = 100               # number of discrete alternatives in the choice set
+number_of_agents = 20               # number of foragers in the model
+number_of_iterations = 1            # number of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
@@ -69,8 +68,15 @@ information_sharing_scenario = 'Random Sharing'
 # considered functionality: ['No Sharing', Coalition Sharing', 'Random Sharing']
 
 # Indicators 'Random Sharing'
-share_partners = 1                      # the amount of agents an agent informs about a (part of) the personal heatmap
-shared_alternatives = 1                 # amount of known alternatives shared at any given time
+share_partners = 1                      # the number of agents an agent informs about a (part of) the personal heatmap
+shared_alternatives = 1                 # number of known alternatives shared at any given time
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------- COMPETITION PARAMETERS ------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+# TODO: Functionaloty for competition not yet implemented
+competition_scenario = 'interference-simple'  # indicate the way competition is modelled in the model
+# room for future functionality in competition
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- UNIMPLEMENTED FUNCTIONALITY PLANNED FOR FUTURE --------------------------
@@ -85,5 +91,5 @@ shared_alternatives = 1                 # amount of known alternatives shared at
 
 # Indicators 'Coalition Forming'
 coalition_cheaters = False              # indicates the existence of cheaters (agents that are part of multiple groups)
-coalition_size = amount_of_agents/10    # indicates the size of the coalition (in number of agent members)
+coalition_size = number_of_agents/10    # indicates the size of the coalition (in number of agent members)
 # TODO: Implement Coalitions in Knowledge Sharing

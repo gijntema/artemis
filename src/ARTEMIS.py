@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# TODO: Remember to check for bugging using Dictionary over OrderedDict
+# TODO: Remember to check for bugging using Dictionary over OrderedDict (and consider collections.DefaultDict objects)
 """
 This Module is used as the main execution of the model, it is divided into six core aspects:
 - Initialize Parameters                         (import init_param.py)
@@ -43,10 +43,7 @@ Version Number:
 
 
 
-# TODO: Header What is the function this Script? maybe date, version number etc.
-
 # TODO: --MINOR-- replace 'alternatives' with 'choices' or 'options' in all variable, method and function nomenclature
-# TODO: --MINOR-- Write consistent block comments and explanation at ALL classes and Methods in ALL modules
 # TODO: --STRUCTURAL-- Clean up Main Script
 
 import timeit                                                                                                           # import module to track runtime
@@ -87,7 +84,7 @@ while iteration_counter < number_of_iterations:
 # initialize choice set and forager agents
 # ----------------------------------------------------------------------------------------------------------------------
     choice_set = object_initializer.initialize_choice_set(choice_set_size, init_stock, sd_init_stock, growth_factor)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
-    agent_set = object_initializer.initialize_forager_agents(amount_of_agents, choice_set,                              # initialize the forager agents in the model (e.g. fishermen)
+    agent_set = object_initializer.initialize_forager_agents(number_of_agents, choice_set,                              # initialize the forager agents in the model (e.g. fishermen)
                                                              catchability_coefficient,
                                                              init_number_of_alternatives_known,
                                                              explore_probability, duration, choice_method)
@@ -110,11 +107,7 @@ while iteration_counter < number_of_iterations:
 # Transform the outcome objects of the model into usable data
 # ----------------------------------------------------------------------------------------------------------------------
     # TODO -- FUNCTIONALITY -- identify functionality wanted in output data
-    temp_alternative_specific_data, \
-    temp_choice_set_time_series, \
-    temp_agent_specific_data, \
-    temp_agent_set_time_series \
-        = \
+    temp_alternative_specific_data, temp_choice_set_time_series, temp_agent_specific_data, temp_agent_set_time_series = \
         data_transformer.transform_output_data(choice_set_output,                                                       # extract four types of data from the output agents and choice options
                                                agent_set_output,
                                                duration,

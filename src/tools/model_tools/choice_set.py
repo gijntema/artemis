@@ -41,7 +41,7 @@ Module Usage:
 -   agents.py uses the module to create a mirror of the choice set to map acquired information on
 
 Last Updated:
-    03-09-2021
+    06-09-2021
 
 Version Number:
     0.1

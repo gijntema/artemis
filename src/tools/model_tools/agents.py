@@ -35,7 +35,7 @@ Module Usage:
 -   choice_making.py loads parts of the ForagerAgent object as input for the ChoiceMaker object
 
 Last Updated:
-    01-09-2021
+    06-09-2021
 
 Version Number:
     0.1
@@ -101,12 +101,13 @@ class ForagerAgent:
         self.time_step_catch = {}                                                                                       # tracker variable to check time_step fluctuations in catch
         self.list_of_known_alternatives = []                                                                            # list of alternatives that an agent has information on
 
-        # TODO: --STRUCTURAL-- Migrate methods and make compatible
         self.choice_maker = ChoiceMaker(choice_set=choice_set,                                                          # object that identifies/loads the relevant data from ForagerAgents and can make foraging decisions for ForagerAgents based on that data
                                         choice_method=choice_method,
                                         agent=self)
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------Method to initialize agents before running the main model --------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
-# --------------------------------------Method to initialize agents before running the main model ----------------------
     # TODO: STRUCTURAL: currently initialization method is called in the ObjectInitializer (init_objects.py)
     #  however this should be migrated to ForagerAgent.__init__() since this in explicitly meant for this purpose
 
@@ -139,7 +140,7 @@ class ForagerAgent:
         alternative_indices = []
         alternative_tracker = 0
         while alternative_tracker < choice_set_length:
-            alternative_id = "alternative_" + str(alternative_tracker).zfill(4)                                         # add 0s before the index number until it has a length of four digits
+            alternative_id = "alternative_" + str(alternative_tracker).zfill(len(str(choice_set_length)))               # add 0s before the index number until it has a length of four digits
             self.forage_catch_tracker[alternative_id] = 0                                                               # load index in map with previous yield per alternative
             self.forage_effort_tracker[alternative_id] = 0                                                              # load index in map with previous effort per alternative
             self.heatmap[alternative_id] = 0                                                                            # load index in map with expectations per alternative
@@ -166,7 +167,9 @@ class ForagerAgent:
             self.heatmap[known_cell] = \
                 choice_set.discrete_alternatives[known_cell].resource_stock * catchability_coefficient
 
+# ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------- Methods to prompt foraging events ------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def make_choice(self, choice_set):
         """Uses the ChoiceMaker object from choice_making.py to choose a forage choice option
@@ -177,8 +180,9 @@ class ForagerAgent:
 
         return choice_alternative, actual_catch                                                                         # return the chosen choice option and the real catch as seen from the choice options
 
-
+# ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------- Methods to update internal parameters and trackers -----------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def update_agent_trackers(self, alternative_index, catch, time_step_counter):
         """Method to simultaneously update all internal tracker variables of the agent"""
@@ -216,7 +220,9 @@ class ForagerAgent:
                 if alternative not in self.list_of_known_alternatives:
                     self.list_of_known_alternatives.append(alternative)
 
+# ----------------------------------------------------------------------------------------------------------------------
 # --------------------------- Methods for information sharing scenarios ------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def share_heatmap_knowledge(self, number_of_alternatives=1):
         """method that returns a given number of alternatives the ForagerAgent has knowledge on
@@ -224,7 +230,7 @@ class ForagerAgent:
         self.__update_list_of_knowns()                                                                                  # make sure the list of known alternatives is up to date
         shared_alternatives_indices = []                                                                                # empty list for later attchment of choice option indices to be shared
         shared_alternatives_data = []                                                                                   # empty list for later attchment of choice option contens to be shared
-        if not isinstance(number_of_alternatives, int) and number_of_alternatives != 'ALL':                             # check if amount of choice options to be shared is an integer or all
+        if not isinstance(number_of_alternatives, int) and number_of_alternatives != 'ALL':                             # check if number of choice options to be shared is an integer or all
             raise TypeError("number can only be an integer or ALL")
 
         elif number_of_alternatives == 'ALL':                                                                           # share all data

@@ -25,7 +25,7 @@ Module Usage:
 -   module is used by ARTEMIS.py
 
 Last Updated:
-03-09-2021
+06-09-2021
 
 Version Number:
 0.1
@@ -60,23 +60,24 @@ class ModelRunner:
                   )
             random.shuffle(agent_index_list)                            # shuffle agent order for equal opportunities
             # loop for every agent
-            for agent in agent_index_list:                              # begin loop for every agent
+            for agent in agent_index_list:                              # begin choice loop for every agent
 
                 # forage event occurs and agents choose an optimal or random alternative
                 alternative_index, catch = agent_set.agents[agent].make_choice(choice_set)
 
+  #          for agent in agent_index_list:                                                                              # Second agent loop to execute choices --> second loop is needed to account for competition
                 # the stock in the chosen alternative is reduced and tracked using trackers
                 # TODO: --FUNCTIONAL-- Add functionality to scale catchability (and resulting catch) by effort
-                # TODO: --STURCTURAL-- change quick and dirty fix blcoked out one line below as parameter in init_param.py
+                # TODO: --STRUCTURAL-- change quick and dirty fix blcoked out one line below as parameter in init_param.py
                 # choice_set.discrete_alternatives[alternative_index].resource_stock_harvest(catch)                     # quick and dirty fix of blocking out the piece of code that reduces the resource stock, should be possible to define in init_param.py
                 choice_set.catch_map[alternative_index] += catch                                                        # update tracker of the choice set for total catch in a choice option
                 choice_set.effort_map[alternative_index] += 1                                                           # update tracker of the choice set for total effort in a choice option
                 agent_set.update_agent_trackers(agent, catch, alternative_index, time_tracker)                          # update agent and agent_set tracker variables
 
                 # operations specific to a sharing scenario
-                # TODO: probably possible to migrate into a library dictionary to avoid endless if amd elif statements
+                # TODO: probably possible to migrate into a library dictionary to avoid endless if and elif statements
                 if information_sharing_scenario == 'Random Sharing':                                                    # identify sharing scenarios
-                    share_partner_counter = 0                                                                           # initialise counter to loop over the amount fo agents a data will be shared to
+                    share_partner_counter = 0                                                                           # initialise counter to loop over the agents data will be shared to
                     while share_partner_counter < share_partners:                                                       # loop over all agents that are picked to receive data
                         shared_heatmap_data = agent_set.agents[agent].share_heatmap_knowledge(                          # identify what data will be shared with another agent
                             number_of_alternatives=shared_alternatives)
@@ -92,15 +93,15 @@ class ModelRunner:
                 choice_set.discrete_alternatives[alternative].stock_growth()
 
             # reset the stocks if chosen for a static stock format - otherwise keep old stock
-            # TODO: probably possible to migrate if statement functionality to library dictionary with functions
+            # TODO: probably possible to migrate if-statement functionality to library dictionary with functions
             if stock_reset_scenario == 'random-repeat':                                                                 # if statement for repeating stocks
-                # TODO: --STRUCTURAL-- change hardcoded chance at stock reset/repetition to adaptable
+                # TODO: --STRUCTURAL-- hardcoded chance at stock reset/repetition --> adaptable (migrate to init_param)
                 # TODO: --BUG-- : FAULTY coding ensures either all choice options reset or none
                 if random.random() < 0.9:                                                                               # 90% chance of resetting the stock/10% chance at same stock
                     alternative_tracker = 0                                                                             # initialise counter for loop functionality
                     nb_alternatives = len(choice_set.discrete_alternatives)                                             # extract a list of choice option IDs
                     while alternative_tracker < nb_alternatives:                                                        # Loop over all choice options
-                        alternative_id = "alternative_" + str(alternative_tracker).zfill(4)                             # transform counter variable into actual choice option ID.
+                        alternative_id = "alternative_" + str(alternative_tracker).zfill(len(str(nb_alternatives)))     # transform counter variable into actual choice option ID.
                         choice_set.discrete_alternatives[alternative_id].\
                             initialize_standard_stock(init_stock=init_stock, sd_init_stock=sd_init_stock)               # reinitialise stock drawn from a normal distribution with goven mean and init stock
                         alternative_tracker += 1                                                                        # proceed to next choice option

@@ -28,7 +28,7 @@ Module Usage:
 -   this module is used by ARTEMIS.py as the main module needed for initialization of the model
 
 Last Updated:
-    03-09-2021
+    06-09-2021
 
 Version Number:
     0.1
@@ -56,7 +56,7 @@ class ObjectInitializer:
         alternative_tracker = 0
         while alternative_tracker < nb_alternatives:                                                                    # loop the creation of a alternative for the full size of the considered set of choices possibel
             # TODO: migrate functionality to __init__ in the object itself
-            alternative_id = "alternative_" + str(alternative_tracker).zfill(4)                                         # assign ID
+            alternative_id = "alternative_" + str(alternative_tracker).zfill(len(str(nb_alternatives)))                 # assign ID
             choice_set.discrete_alternatives[alternative_id] = DiscreteAlternative()                                    # define a single choice option
             choice_set.effort_map[alternative_id] = 0                                                                   # define a tracker with 0 effort on each choice option
             choice_set.catch_map[alternative_id] = 0                                                                    # define a tracker with 0 catch on every effort
@@ -79,9 +79,8 @@ class ObjectInitializer:
         agent_set = AgentSet()                                                                                          # create an instance of the object agent set to contain trackers and agents in
         agent_tracker = 0                                                                                               # make counter for following while loop functioning
 
-        # TODO: replace .zfill(4) with more robust options (e.g. .zfill(len(str(nb_agents))
         while agent_tracker < nb_agents:
-            agent_id = 'agent_' + str(agent_tracker).zfill(4)                                                           # construct agent ID
+            agent_id = 'agent_' + str(agent_tracker).zfill(len(str(nb_agents)))                                         # construct agent ID
             agent_set.agents[agent_id] = ForagerAgent(choice_set=choice_set, choice_method=choice_method)               # initialise a ForagerAgent and set up the necessary functioning of attribute ChoiceMaker
             agent_set.agents[agent_id].initialize_content(choice_set=choice_set,                                        # initialise the other attributes of ForagerAgent
                                                           agent_id=agent_id,
@@ -99,7 +98,7 @@ class ObjectInitializer:
 
             agent_tracker = 0                                                                                           # make counter for all time_steps in the model for While loop functioning
             while agent_tracker < nb_agents:                                                                            # loop over all agents
-                agent_id = 'agent_' + str(agent_tracker).zfill(4)                                                       # set ID of the agent to be modified
+                agent_id = 'agent_' + str(agent_tracker).zfill(len(str(nb_agents)))                                     # set ID of the agent to be modified
                 agent_set.agents[agent_id].time_step_catch[duration_counter] = 0                                        # for the considered agent, initialise the catch in the given time_step as 0
                 agent_tracker += 1                                                                                      # proceed to next agent
 
