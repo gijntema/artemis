@@ -35,10 +35,10 @@ Module Usage:
 -   Since this module is the Main, it is used to execute all other modules and is not used by other modules
 
 Last Updated:
-    03-09-2021
+    07-09-2021
 
 Version Number:
-    0.1
+    0.2
 """
 
 
@@ -60,6 +60,7 @@ from src.run_model import ModelRunner                                           
 from src.tools.output_tools.data_extraction import DataTransformer                                                      # module to generate output data from the objects in the model
 from src.tools.output_tools.outcome_visualization import GraphConstructor                                               # module to make graphs from the output data
 from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
+from src.tools.model_tools.competition import CompetitionHandler
 
 # TODO: -- MINOR -- Fix time_step naming as plotly does not recognise this well enough
 iteration_counter = 0                                                                                                   # initliazation of counter for iteration loops
@@ -74,6 +75,7 @@ model_runner = ModelRunner()                                                    
 data_transformer = DataTransformer()                                                                                    # initialize the object with the functionality to extract output data from model objects
 graph_constructor = GraphConstructor()                                                                                  # initialize the object with the functionality to make graphs from output data
 data_writer = DataWriter()                                                                                              # initialize the object with the functionality to export data files from output data
+competition_handler = CompetitionHandler(competition_method=competition_scenario)                                       # object that will ensure competition feedbacks are executed for in the model
 
 while iteration_counter < number_of_iterations:
     print('-----------------------------------------------------------------------------------------------------------',# print statement for user to idnetify the progression of th emodel
@@ -101,7 +103,8 @@ while iteration_counter < number_of_iterations:
                                shared_alternatives=shared_alternatives,
                                stock_reset_scenario=stock_reset_scenario,
                                init_stock=init_stock,
-                               sd_init_stock=sd_init_stock)
+                               sd_init_stock=sd_init_stock,
+                               competition_handler=competition_handler)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Transform the outcome objects of the model into usable data

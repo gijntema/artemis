@@ -25,10 +25,10 @@ Module Usage:
 -   module is used by ARTEMIS.py
 
 Last Updated:
-06-09-2021
+07-09-2021
 
 Version Number:
-0.1
+0.2
 """
 
 import random
@@ -48,7 +48,9 @@ class ModelRunner:
                   duration=10,
                   stock_reset_scenario='no-reset',                      # default is a dynamics stock
                   init_stock=100,                                       # default if a non dynamic stock is 100 units
-                  sd_init_stock=25):                                    # default sd if a non-dynamic stock is sd=25
+                  sd_init_stock=25,                                     # default sd if a non-dynamic stock is sd=25
+                  competition_handler=None                              # object that ensures the effects of competition are implemented
+                  ):
 
         agent_index_list = list(agent_set.agents.keys())                # identify the id of every agent in a list
         # loop for every time step
@@ -63,16 +65,15 @@ class ModelRunner:
             for agent in agent_index_list:                              # begin choice loop for every agent
 
                 # forage event occurs and agents choose an optimal or random alternative
-                alternative_index, catch = agent_set.agents[agent].make_choice(choice_set)
+                alternative_index = agent_set.agents[agent].make_choice(choice_set)
 
-  #          for agent in agent_index_list:                                                                              # Second agent loop to execute choices --> second loop is needed to account for competition
-                # the stock in the chosen alternative is reduced and tracked using trackers
-                # TODO: --FUNCTIONAL-- Add functionality to scale catchability (and resulting catch) by effort
-                # TODO: --STRUCTURAL-- change quick and dirty fix blcoked out one line below as parameter in init_param.py
-                # choice_set.discrete_alternatives[alternative_index].resource_stock_harvest(catch)                     # quick and dirty fix of blocking out the piece of code that reduces the resource stock, should be possible to define in init_param.py
-                choice_set.catch_map[alternative_index] += catch                                                        # update tracker of the choice set for total catch in a choice option
-                choice_set.effort_map[alternative_index] += 1                                                           # update tracker of the choice set for total effort in a choice option
-                agent_set.update_agent_trackers(agent, catch, alternative_index, time_tracker)                          # update agent and agent_set tracker variables
+                #load the chosen alternative
+                competition_handler.load_competition_data(alternative_index, agent)
+
+            for agent in agent_index_list:                                                                              # Second agent loop to execute choices --> second loop is needed to account for competition
+                # Catch is corrected for competition effects and trackers are updated
+                # if harvest removal is on, the stock is also reduced
+                competition_handler.competition_correction(choice_set, agent_set, agent, time_id=time_tracker)
 
                 # operations specific to a sharing scenario
                 # TODO: probably possible to migrate into a library dictionary to avoid endless if and elif statements
@@ -93,7 +94,7 @@ class ModelRunner:
                 choice_set.discrete_alternatives[alternative].stock_growth()
 
             # reset the stocks if chosen for a static stock format - otherwise keep old stock
-            # TODO: probably possible to migrate if-statement functionality to library dictionary with functions
+            # TODO: migrate if-statement functionality to library dictionary with functions
             if stock_reset_scenario == 'random-repeat':                                                                 # if statement for repeating stocks
                 # TODO: --STRUCTURAL-- hardcoded chance at stock reset/repetition --> adaptable (migrate to init_param)
                 # TODO: --BUG-- : FAULTY coding ensures either all choice options reset or none
@@ -106,6 +107,7 @@ class ModelRunner:
                             initialize_standard_stock(init_stock=init_stock, sd_init_stock=sd_init_stock)               # reinitialise stock drawn from a normal distribution with goven mean and init stock
                         alternative_tracker += 1                                                                        # proceed to next choice option
 
+            competition_handler.reset_relevant_data()                                                                   # ensure the competition_handler is reset to default to start next time_step fresh
             time_tracker += 1                                                                                           # proceed to the next time step
 
         return choice_set, agent_set                                                                                    # return the final choice options and agents as simulation results

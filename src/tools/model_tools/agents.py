@@ -35,10 +35,10 @@ Module Usage:
 -   choice_making.py loads parts of the ForagerAgent object as input for the ChoiceMaker object
 
 Last Updated:
-    06-09-2021
+    07-09-2021
 
 Version Number:
-    0.1
+    0.2
 """
 
 
@@ -174,11 +174,11 @@ class ForagerAgent:
     def make_choice(self, choice_set):
         """Uses the ChoiceMaker object from choice_making.py to choose a forage choice option
         and gets the actual catch from the choice options"""
-        choice_alternative = self.choice_maker.make_choice()                                                            # prompt the ChoiceMaker to choose a choice option based oi the agent memory
-        actual_catch = choice_set.discrete_alternatives[choice_alternative].resource_stock \
-                       * self.catchability_coefficient                                                                  # read the actual catch an Agent would catch from the choice options themselves rather than and expectation from their memory
+        choice_alternative = self.choice_maker.make_choice()                                                            # prompt the ChoiceMaker to choose a choice option and retrun the ID of the chosen choice option
+        #actual_catch = choice_set.discrete_alternatives[choice_alternative].resource_stock \
+        #               * self.catchability_coefficient                                                                  # read the actual catch an Agent would catch from the choice options themselves rather than and expectation from their memory
 
-        return choice_alternative, actual_catch                                                                         # return the chosen choice option and the real catch as seen from the choice options
+        return choice_alternative #, actual_catch                                                                         # return the chosen choice option and the real catch as seen from the choice options
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------- Methods to update internal parameters and trackers -----------------------------------
