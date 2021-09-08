@@ -15,8 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# TODO: Module currently not functional, finish at least one possible competition mechanism
-# TODO: module not currently called in other modules, implement functionality outside of current script
+# TODO: Implement further functionality, only interference and absent competition supported now
 """
 This Module is aimed at handling and executing any corrections or effects of competition
 using the CompetitionHandler object
@@ -24,10 +23,10 @@ using the CompetitionHandler object
 this module is read by run_model.py to be used to correct any profits or catches through competition
 
 Module inputs:
-depending on the method of competition (expected)
--   outputs from choice_maker.py, specifically the ChoiceMaker.make_choice method (interference methods)
--   outputs from agents.py, specifically the ForagerAgent.make_choice module (interference and uptake methods)
--   pooled outputs from the above (price methods)
+depending on the method of competition
+-   outputs from choice_maker.py, specifically the ChoiceMaker.make_choice method
+-   outputs from agents.py, specifically the ForagerAgent.make_choice module
+-   pooled outputs from the above
 
 Module Usage:
 -   the module will be used in run_model.py to introduce competition in simulations
@@ -44,7 +43,7 @@ from math import exp
 
 
 class CompetitionHandler:
-    """class to handle competition mechanisms in the model"""   # TODO: expand description
+    """class to implement competition mechanisms / feedbacks in the model"""   # TODO: expand description
 # TODO: init and load are now for all methods duplicates of each other for quick fix, consider if this is needed
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------ Dictionary dictating all functionality ------------------------------------------
@@ -56,7 +55,7 @@ class CompetitionHandler:
         self.relevant_data = self.__init_relevant()
 
     def __init_instructions(self):
-        """define a dictionary with instruction on all possible functionality for"""
+        """define a dictionary with instruction on all possible functionality for including competition"""
 
         instructions = {
             'absent':                                                                                                   # competition is not modelled
@@ -80,13 +79,13 @@ class CompetitionHandler:
 
                 },
             'uptake':                                                                                                   # competition is modelled through resource uptake, leaving less for other agents
-                {
+                {   # UNSUPPORTED
                     "init": self.__init_uptake,
                     "load": self.__load_uptake,
                     "correct": self.__correct_uptake
                 },
             'price-simple':                                                                                             # competition is modelled for human agents by correcting the sale prices with the total catch
-                {
+                {   # UNSUPPORTED
                     "init": self.__init_price,
                     "load": self.__load_price,
                     "correct": self.__correct_price_simple
@@ -100,10 +99,10 @@ class CompetitionHandler:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __init_relevant(self):
-        """method to initialise the relevant attributes needed for future competition corrections"""
+        """method to initialise the relevant attributes needed for competition corrections"""
         if isinstance(self.competition_method, str):                                                                    # if only a single competition type is specified
             relevant = self.__init_relevant_single()
-        elif isinstance(self.competition_method, tuple):                                                                # if multiple competition types are specified
+        elif isinstance(self.competition_method, tuple):                                                                # if multiple competition types are specified - currently not supported
             relevant = self.__init_relevant_multiple()
         else:
             raise TypeError("competition definition is only allowed as string or tuple")                                # if competition is specified in an unsupported format
@@ -111,60 +110,64 @@ class CompetitionHandler:
         return relevant
 
     def __init_relevant_single(self):
+        """method to initialise the relevant attributes needed for competition corrections (when only 1 scenario)"""
         relevant = self.competition_instruction[self.competition_method]['init']()
         return relevant
 
     def __init_relevant_multiple(self):
-        # TODO -- FUTURE -- allow functionality for multiple scenarios simultaneously
+        """method to initialise the relevant attributes needed for competition corrections (when multiple scenarios)"""
+        # TODO -- FUTURE -- allow functionality for multiple scenarios simultaneously - METHOD UNFINISHED
         relevant = {}
         # Include loop here to ensure relevant data for all considered competition are added
         return relevant
 
     def __init_absent(self):
-        """method to define empty relevant data, as an absent competition does not need any data"""
-        relevant_data = dict()                                                                                          # dictionary that creates and returns an integer 0 if a key is called that is not already in
-        relevant_data['effort_tracker'] = defaultdict(int)
-        relevant_data['agent_choices'] = OrderedDict()
-        return relevant_data                                                                               # dictionary that creates and returns an empty string if a key is called that is not already in
+        """method to define relevant data, as an absent competition does not need any data,
+         only present to fix bugging"""
+        relevant_data = dict()
+        relevant_data['effort_tracker'] = defaultdict(int)                                                              # dictionary that creates and returns an integer 0 if a key is called that is not already in
+        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
+        return relevant_data
 
     def __init_interference(self):
         """method to initialise a tracker for effort, as effort is used a basis to correct catch for interference"""
-        relevant_data = dict()                                                                                          # dictionary that creates and returns an integer 0 if a key is called that is not already in
-        relevant_data['effort_tracker'] = defaultdict(int)
-        relevant_data['agent_choices'] = OrderedDict()
+        relevant_data = dict()
+        relevant_data['effort_tracker'] = defaultdict(int)                                                              # dictionary that creates and returns an integer 0 if a key is called that is not already in
+        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
         return relevant_data
 
     def __init_uptake(self):
         """method to initialise an ordered tracker for catch, as catch is used to reduce the resource stock"""
-        relevant_data = dict()                                                                                          # dictionary that creates and returns a float 0.0 if a key is called that is not already in
-        relevant_data['effort_tracker'] = defaultdict(int)                                                              # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
-        relevant_data['agent_choices'] = OrderedDict()
+        relevant_data = dict()
+        relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
+        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
         return relevant_data
 
     def __init_price(self):
         """method to initialise a tracker for catch of the current time_unit,
         as catch is used a basis to correct the price of foraged goods. making this competition method only applicable
         to human forager agents"""
-        relevant_data = dict()                                                                                          # dictionary that creates and returns a float 0.0 if a key is called that is not already in
-        relevant_data['effort_tracker'] = defaultdict(float)
-        relevant_data['agent_choices'] = OrderedDict()
+        relevant_data = dict()
+        relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
+        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
         return relevant_data
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------- Methods to load relevant agent choices functionality ------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
     def load_competition_data(self, chosen_alternative_id, agent_id):
+        """loads data on the agent and chosen choice option"""
         self.competition_instruction[self.competition_method]['load'](chosen_alternative_id, agent_id)
 
     def __load_absent(self, chosen_alternative_id, agent_id):
-        """empty function to prevent bugging"""
-        self.relevant_data['effort_tracker'][chosen_alternative_id] += 1
-        self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id
+        """loads data on the agent and chosen choice option"""
+        self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
+        self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id                                           # remember what agent choose which choice option
 
     def __load_interference(self, chosen_alternative_id, agent_id):
-        """Method to attach the effort data to the """
-        self.relevant_data['effort_tracker'][chosen_alternative_id] += 1
-        self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id
+        """loads data on the agent and chosen choice option"""
+        self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
+        self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id                                           # remember what agent choose which choice option
 
     def __load_uptake(self, chosen_alternative_id, agent_id):
         """Placeholder --> Functionality currently not supported"""
@@ -184,29 +187,33 @@ class CompetitionHandler:
         choice_id = self.relevant_data['agent_choices'][agent_id]
 
         uncorrected_catch = choice_set.discrete_alternatives[choice_id].resource_stock \
-                            * agent_set.agents[agent_id].catchability_coefficient                                               # extract hypothetical catch if competition was absent
+                            * agent_set.agents[agent_id].catchability_coefficient                                       # extract hypothetical catch if competition was absent
 
         corrected_catch, correction_tag = \
-            self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the
+            self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the competition methods specified
 
-        print("{} is foraging in {} and is hindered by interference with {}".format(agent_id, choice_id, correction_tag))
-        agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)
+        print(
+            "{} is foraging in {} and is hindered by interference with {}".format(agent_id, choice_id, correction_tag)  # report on interference to user
+            )
+
+        agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents
         choice_set.catch_map[choice_id] += corrected_catch                                                              # update tracker of the choice set for total catch in a choice option
-        choice_set.effort_map[choice_id] += 1
+        choice_set.effort_map[choice_id] += 1                                                                           # update tracker of the choice set for effort in a choice option
 
         if 'uptake' in self.competition_method:
             choice_set.discrete_alternatives[choice_id].resource_stock_harvest(corrected_catch)                         # quick and dirty fix of blocking out the piece of code that reduces the resource stoc
 
     def __correct_absent(self, choice_id, uncorrected_catch):
-        corrected_catch = uncorrected_catch
-        correction_tag = "<absent_interference>"
+        """empty function to prevent errors, does not correct catch in any way but adds a tag"""
+        corrected_catch = uncorrected_catch                                                                             # don't correct data, purely for visual aid to what happens
+        correction_tag = "<absent_interference>"                                                                        # output expects a tag for interference, default given as interference is not presnet in this scenario
         return corrected_catch, correction_tag
 
     def __correct_interference_simple(self, choice_id, uncorrected_catch):
         """method to correct catch using interference by dividing over the number of competitors"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
         corrected_catch = uncorrected_catch / number_of_competitors                                                     # prone to DividedByZeroError, but as this method should never be called if no foraging occurs in a choice option, this should be a nice test for functioning
-        correction_tag =str(number_of_competitors - 1) + " other foragers"
+        correction_tag = str(number_of_competitors - 1) + " other foragers"                                             # generate interference tag for later use in reporting
         return corrected_catch, correction_tag
 
     def __correct_interference_natural(self, choice_id, uncorrected_catch):
@@ -230,6 +237,8 @@ class CompetitionHandler:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def reset_relevant_data(self):
-        self.relevant_data = self.__init_relevant()
+        """full reset of the relevant data trackers to ensure this will not interfere
+        with competition handling in the next time_step"""
+        self.relevant_data = self.__init_relevant()                                                                     # Reinitialise relevant data
 
 
