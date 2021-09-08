@@ -59,7 +59,7 @@ number_of_iterations = 50           # number of iterations/simulations the model
 # ----------------------------------------------------------------------------------------------------------------------
 growth_type = 'static'              # indicates stock dynamics -- placeholder, currently not implemented
 stock_reset_scenario = 'random-repeat' # indicates if an how the stock in a DiscreteAlternative objects resets
-chance_repeat_stock = 0.2           # chance the same stock as the previous time step is present
+chance_reset_stock = 0.2           # chance the stock is reset at the end of a time_step
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- INFORMATION SHARING PARAMETERS -------------------------------------------
@@ -76,7 +76,6 @@ shared_alternatives = 10                 # number of known alternatives shared a
 # ----------------------------------------------------------------------------------------------------------------------
 
 competition_scenario = 'interference-simple'  # indicate the way competition is modelled in the model
-# competition_scenario = 'absent'
 # room for future functionality in competition
 
 # ----------------------------------------------------------------------------------------------------------------------

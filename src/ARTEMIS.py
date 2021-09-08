@@ -57,10 +57,11 @@ pd.options.plotting.backend = "plotly"                                          
 from src.config.init.init_param import *                                                                                # module containing parameter and scenario settings
 from src.config.init.init_objects import ObjectInitializer                                                              # module to initialize the objects in the module (agents and choices)
 from src.run_model import ModelRunner                                                                                   # module to run the model using initialized agents and choices
+from src.tools.model_tools.competition import CompetitionHandler                                                        # module that handles model feedbacks as a result of competition between agents
 from src.tools.output_tools.data_extraction import DataTransformer                                                      # module to generate output data from the objects in the model
 from src.tools.output_tools.outcome_visualization import GraphConstructor                                               # module to make graphs from the output data
 from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
-from src.tools.model_tools.competition import CompetitionHandler
+
 
 # TODO: -- MINOR -- Fix time_step naming as plotly does not recognise this well enough
 iteration_counter = 0                                                                                                   # initliazation of counter for iteration loops
@@ -89,7 +90,8 @@ while iteration_counter < number_of_iterations:
     agent_set = object_initializer.initialize_forager_agents(number_of_agents, choice_set,                              # initialize the forager agents in the model (e.g. fishermen)
                                                              catchability_coefficient,
                                                              init_number_of_alternatives_known,
-                                                             explore_probability, duration, choice_method)
+                                                             explore_probability, duration, choice_method
+                                                             )
 
 # ----------------------------------------------------------------------------------------------------------------------
 # RUN SIMULATION
@@ -104,7 +106,8 @@ while iteration_counter < number_of_iterations:
                                stock_reset_scenario=stock_reset_scenario,
                                init_stock=init_stock,
                                sd_init_stock=sd_init_stock,
-                               competition_handler=competition_handler)
+                               competition_handler=competition_handler,
+                               stock_reset_chance=chance_reset_stock)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Transform the outcome objects of the model into usable data
