@@ -90,7 +90,7 @@ class ObjectInitializer:
             agent_tracker += 1                                                                                          # proceed to next agent
 
         # initialize all time dependent tracker variables
-        # TODO: much of the functioning here can be simplified using collections.DefaultDict() objects
+        # TODO: much of the functioning here can be simplified using collections.defaultdict() objects
         duration_counter = 0                                                                                            # make counter for all time_steps in the model for While loop functioning
         while duration_counter < duration_model:                                                                        # loop over all time steps in the model
             agent_set.total_time_step_catch_tracker[str(duration_counter)] = 0                                          # make entry in time_step specific catch tracker for the specified time step

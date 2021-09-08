@@ -67,7 +67,7 @@ class ModelRunner:
                 # forage event occurs and agents choose an optimal or random alternative
                 alternative_index = agent_set.agents[agent].make_choice(choice_set)
 
-                #load the chosen alternative
+                # load the chosen alternative
                 competition_handler.load_competition_data(alternative_index, agent)
 
             for agent in agent_index_list:                                                                              # Second agent loop to execute choices --> second loop is needed to account for competition

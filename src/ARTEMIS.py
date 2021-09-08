@@ -163,7 +163,7 @@ data_writer.write_json(agent_specific_data, "agent_data.json")                  
 data_writer.write_json(agent_set_time_series, "agent_set_time_series.json")                                             # write raw, choice option data for each specific iteration to .json file
 
 # TODO: --FUNCTIONALITY-- Writing average data outcomes not supported yet (only templates given below)
-# data_writer.write_json(alternative_specific_data, "average_alternative_data.json")
+data_writer.write_json(alternative_specific_data, "average_alternative_data.json")
 # data_writer.write_json(choice_set_time_series, "average_choice_set_time_series.json")
 # data_writer.write_json(agent_specific_data, "average_agent_data.json")
 # data_writer.write_json(agent_set_time_series, "average_choice_set_time_series.json")

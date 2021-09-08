@@ -43,7 +43,7 @@ from math import exp
 
 
 class CompetitionHandler:
-    """class to implement competition mechanisms / feedbacks in the model"""   # TODO: expand description
+    """class to implement competition mechanisms / feedbacks in the model"""
 # TODO: init and load are now for all methods duplicates of each other for quick fix, consider if this is needed
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------ Dictionary dictating all functionality ------------------------------------------

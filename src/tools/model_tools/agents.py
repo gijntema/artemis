@@ -48,8 +48,6 @@ from collections import defaultdict  # TODO: --STRUCTURAL-- Replace difficult in
 from src.tools.model_tools.choice_making import ChoiceMaker
 
 
-# TODO: --MINOR-- hide internal functions
-
 class AgentSet:                                         # to be implemented, not yet included in the other scripts
     """Class to contain both the agents in ForagerAgent objects (or a more specified version of it)
     and global data on all agents in the model """
