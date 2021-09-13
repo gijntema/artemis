@@ -63,7 +63,7 @@ class ChoiceSet:
         self.discrete_alternatives = {}                                                                                 # dictionary with all choice options as DiscreteAlternative objects
         self.effort_map = {}                                                                                            # tracker variable for effort (effort = 1 -> a single forage event) exerted to each choice options
         self.catch_map = {}                                                                                             # tracker variable for total catch gained from each choice options
-        self.resource_uptake = False                                                                                    # measure to change if a foraging event changes the cells properties aka resource stocks
+
 
     def load_observed_alternatives(self, dataset):      # placeholder for later use in loading real world data
         pass
@@ -91,14 +91,16 @@ class DiscreteAlternative:
     """Class to contain the choice option specific aspects and modifications,
     for now only resource stock is included"""
 
-    def __init__(self):
+    def __init__(self, alternative_id=None, init_stock=100, sd_init_stock=25, growth_factor=1):
         """"function defining the content of a choice options (e.g. a single grid cell in spatial considerations)"""
+        self.alternative_id = alternative_id                                                                            # id consistent with other indices used in the rest of the model
         self.resource_stock = 0                                                                                         # contains the value(s) for the stock present
-        self.growth_factor = 2                                                                                          # fraction of population that is added through growth - needs to be added in initialisation
+        self.growth_factor = 0                                                                                          # initialise value for growth factor
+        self.initialize_standard_stock(init_stock, sd_init_stock, growth_factor)                                        # loads proper initialization, overwriting the stock and growth factor with specified values
         self.stock_type = 'singular'                                                                                    # indicates the structure of the stock (e.g. singular/age class)
-        self.alternative_id = None                                                                                      # id consistent with other indices used in the rest of the model
         self.stock_growth_type = 'exponential'                                                                          # indicator for the way the stock grows
 
+    # TODO: Call below method to initialise over current roundabout way
     def initialize_standard_stock(self, init_stock, sd_init_stock, growth_factor=1):
         """draws and sets an initial stock size in the choice option drawn from
         a normal distribution with a given  mean and sd"""
@@ -107,7 +109,8 @@ class DiscreteAlternative:
 
     def stock_growth(self):
         """Method placeholder for future implementation of dynamic stock, currently not great executed"""
-        # TODO: Assess if this hopelessly outdated and incomplete method needs to be removed or salvaged for later use
+        # TODO: Assess if this hopelessly outdated and incomplete method needs to be removed or salvaged for later us.
+        #  functionality probably should be contained in a functionality dictionary (see CompetitionHandler object)
         if self.stock_type == 'singular' and self.stock_growth_type == 'exponential':                                   # placeholder for stock growth, hopelessly outdated for now
             self.__resource_stock_growth_exp()
 
