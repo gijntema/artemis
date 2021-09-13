@@ -40,18 +40,18 @@ Version Number:
 explore_probability = 0.2           # probability a forager does not choose a known cell, but picks a random cell
 catchability_coefficient = 0.2      # proportional uptake of the resource stock in one foraging event
 init_number_of_alternatives_known = 4   # number of choice options each agents has information on at initialisation
-choice_method = 'explore_heatmap'   # defines the way an agent chooses what forage option to forage from
+choice_method = 'full_heatmap'   # defines the way an agent chooses what forage option to forage from
 
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present
 sd_init_stock = 25                  # standard deviation of initial stock present
-growth_factor = 1                   # per time step growth of stock (1 represents a static population in current Deafutl settings)
+growth_factor = 1                   # per time step growth of stock (1 represents a static population in current Default settings)
 
 
 # model characteristics
 duration = 50                       # number of time steps in the model
-choice_set_size = 100                # number of discrete alternatives in the choice set
-number_of_agents = 20               # number of foragers in the model
+choice_set_size = 20                # number of discrete alternatives in the choice set
+number_of_agents = 100               # number of foragers in the model
 number_of_iterations = 50           # number of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ number_of_iterations = 50           # number of iterations/simulations the model
 # ----------------------------------------------------------------------------------------------------------------------
 growth_type = 'static'              # indicates stock dynamics -- placeholder, currently not implemented
 stock_reset_scenario = 'random-repeat' # indicates if an how the stock in a DiscreteAlternative objects resets
-chance_reset_stock = 0.2           # chance the stock is reset at the end of a time_step
+chance_reset_stock = 0.95           # chance the stock is repeated at the end of a time_step
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- INFORMATION SHARING PARAMETERS -------------------------------------------
