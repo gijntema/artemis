@@ -181,4 +181,4 @@ stop = timeit.default_timer()                                                   
 execution_time = stop - start                                                                                           # calculate occured runtime
 
 print("Model Runtime: \t{} seconds".format(str(execution_time)))                                                        # report runtime in second
-print('Average Yearly Catch = {}'.format(str(agent_set_output.total_catch/duration)))
+print('Average Yearly Catch of Final Simulation = {}'.format(str(agent_set_output.total_catch/duration)))
