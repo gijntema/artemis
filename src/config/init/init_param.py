@@ -40,7 +40,7 @@ Version Number:
 explore_probability = 0.2           # probability a forager does not choose a known cell, but picks a random cell
 catchability_coefficient = 0.2      # proportional uptake of the resource stock in one foraging event
 init_number_of_alternatives_known = 4   # number of choice options each agents has information on at initialisation
-choice_method = 'full_heatmap'   # defines the way an agent chooses what forage option to forage from
+choice_method = 'explore_heatmap'   # defines the way an agent chooses what forage option to forage from
 
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present
@@ -58,7 +58,7 @@ number_of_iterations = 50           # number of iterations/simulations the model
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 growth_type = 'static'              # indicates stock dynamics -- placeholder, currently not implemented
-stock_reset_scenario = 'random-repeat' # indicates if an how the stock in a DiscreteAlternative objects resets
+stock_reset_scenario = 'random-repeat' # indicates if and how the stock in a DiscreteAlternative objects resets
 chance_reset_stock = 0.95           # chance the stock is repeated at the end of a time_step
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -76,6 +76,7 @@ shared_alternatives = 10                 # number of known alternatives shared a
 # ----------------------------------------------------------------------------------------------------------------------
 
 competition_scenario = 'interference-simple'  # indicate the way competition is modelled in the model
+interference_factor = 0.8                     # factor for interference-simple scenario only
 # room for future functionality in competition
 
 # ----------------------------------------------------------------------------------------------------------------------

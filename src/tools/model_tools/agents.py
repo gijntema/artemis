@@ -115,7 +115,7 @@ class ForagerAgent:
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# ----------------------------Method to initialize agents before running the main model --------------------------------
+# --------------------------- Method to initialize agents before running the main model --------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
     # TODO Potential to make more efficient using collections.defaultdict()?
     def __initialize_choice_set_mirrors(self, choice_set_length):

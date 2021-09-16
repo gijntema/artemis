@@ -36,3 +36,14 @@ for choice_option in choice_set.effort_map:
 print(competition_handler.relevant_data)
 competition_handler.reset_relevant_data()
 print(competition_handler.relevant_data)
+
+
+# For furture reference to use a class type as key in dictionaries
+from src.config.init.init_objects import ObjectInitializer
+from collections import defaultdict
+
+test_dictionary = defaultdict(int)
+test_class = ObjectInitializer()
+test_key = str(type(test_class)).split("'")[1].split(".")[-1]
+
+print(test_key, " : ", test_dictionary[test_key])

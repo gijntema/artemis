@@ -89,6 +89,13 @@ class CompetitionHandler:
                     "init": self.__init_price,
                     "load": self.__load_price,
                     "correct": self.__correct_price_simple
+                },
+            'fixed-catch':
+                {
+                    # relic code= obsolete
+                    "init": self.__init_fixed_catch,
+                    "load": self.__load_fixed_catch,
+                    "correct": self.__correct_fixed_catch
                 }
             # Enter future functionality HERE
         }
@@ -152,24 +159,31 @@ class CompetitionHandler:
         relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
         return relevant_data
 
+    def __init_fixed_catch(self):
+        relevant_data = dict()
+        relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
+        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
+        return relevant_data
+
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------- Methods to load relevant agent choices functionality ------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-    def load_competition_data(self, chosen_alternative_id, agent_id):
+    def load_competition_data(self, chosen_alternative_id, agent_id, interference_factor=0):
         """loads data on the agent and chosen choice option"""
-        self.competition_instruction[self.competition_method]['load'](chosen_alternative_id, agent_id)
+        self.competition_instruction[self.competition_method]['load'](chosen_alternative_id, agent_id, interference_factor)
 
-    def __load_absent(self, chosen_alternative_id, agent_id):
-        """loads data on the agent and chosen choice option"""
-        self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
-        self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id                                           # remember what agent choose which choice option
-
-    def __load_interference(self, chosen_alternative_id, agent_id):
+    def __load_absent(self, chosen_alternative_id, agent_id, interference_factor=0):
         """loads data on the agent and chosen choice option"""
         self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id                                           # remember what agent choose which choice option
 
-    def __load_uptake(self, chosen_alternative_id, agent_id):
+    def __load_interference(self, chosen_alternative_id, agent_id, interference_factor=0.8):
+        """loads data on the agent and chosen choice option"""
+        self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
+        self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id                                           # remember what agent choose which choice option
+        self.relevant_data['interference_factor'] = interference_factor
+
+    def __load_uptake(self, chosen_alternative_id, agent_id, interference_factor=0):
         """Placeholder --> Functionality currently not supported"""
         pass
 
@@ -177,6 +191,10 @@ class CompetitionHandler:
         """Placeholder --> Functionality currently not supported"""
         pass
 
+    def __load_fixed_catch(self, chosen_alternative_id, agent_id, interference_factor=0):
+        """loads data on the agent and chosen choice option"""
+        self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
+        self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------- Methods to return any corrections needed to account for competition ---------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -206,11 +224,19 @@ class CompetitionHandler:
     def __correct_absent(self, choice_id, uncorrected_catch):
         """empty function to prevent errors, does not correct catch in any way but adds a tag"""
         corrected_catch = uncorrected_catch                                                                             # don't correct data, purely for visual aid to what happens
-        correction_tag = "<absent_interference>"                                                                        # output expects a tag for interference, default given as interference is not presnet in this scenario
+        correction_tag = "<absent_competition>"                                                                         # output expects a tag for interference, default given as interference is not presnet in this scenario
         return corrected_catch, correction_tag
 
     def __correct_interference_simple(self, choice_id, uncorrected_catch):
-        """method to correct catch using interference by dividing over the number of competitors"""
+        """method to correct catch using interference by using the interference factor
+        as percentual decline of catch per competitor"""
+        number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
+        corrected_catch = uncorrected_catch * (self.relevant_data['interference_factor']^(number_of_competitors-1))     # correct using e^-(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
+        correction_tag = str(number_of_competitors-1) + " other foragers"
+        return corrected_catch, correction_tag
+
+    def __correct_fixed_catch(self, choice_id, uncorrected_catch):
+        """method to correct catch by dividing over the number of competitors"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
         corrected_catch = uncorrected_catch / number_of_competitors                                                     # prone to DividedByZeroError, but as this method should never be called if no foraging occurs in a choice option, this should be a nice test for functioning
         correction_tag = str(number_of_competitors - 1) + " other foragers"                                             # generate interference tag for later use in reporting
