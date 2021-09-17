@@ -136,7 +136,7 @@ avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
                                             agent_specific_data,
                                             agent_set_time_series)
 #TODO KW where is the averaging taking place???
-# TODO create files with raw data, not averaged over the number of simulations
+# TODO create files with raw data:catch per agent per time step (1 iteration) not averaged over the number of simulations
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce graphical outputs

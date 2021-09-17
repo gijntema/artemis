@@ -19,15 +19,14 @@
 This Module is aimed at extracting data and measures from unusable data formats and currently functions to:
 -   extract raw data from the objects AgentSet, ForagerAgent, ChoiceSet and DiscreteAlternative
 -   calculate aggregate measures based on the raw data extracted from objects
-
-this module is read by ARTEMIS.py to transform the model output into usable (raw) data formats: pandas.Dataframe objects
+-   transform the model output into usable (raw) data formats: pandas.Dataframe objects for plotting and saving
 
 Module inputs:
 -   No Modules
 -   Module only works on objects defined in the modules agents.py and choice_set.py
 
 Module Usage:
--   methods of the DataTransformer object are used in ARTEMIS.py
+-   methods of the DataTransformer object are used in export_data.py through a call in ARTEMIS.py
 
 Last Updated:
     06-09-2021
@@ -66,24 +65,25 @@ class DataTransformer:
 
         return alternative_specific_data, choice_set_time_series, agent_specific_data, agent_set_time_series
 # ----------------------------------------------------------------------------------------------------------------------
-# ------------------------------ Primary Subsections of the Main Functionality Method ----------------------------------
+# ------------------------------ Primary Subsections of the Main Functionality Method  TODO: ADD INFORMATIVE HEADER----------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __transform_alternative_data(self, choice_set, iteration_id=99):
-        # extract list of alternatives
+        """"function to retrieve data per time step for each grid cell and transform to usuable format"""
+        # extract list of alternatives TODO add unit, is this per timestep for a given simulation?
         temp_dictionary = dict()
-        temp_dictionary['alternative_id'] = self.__extract_list_of_alternatives(choice_set)
+        temp_dictionary['alternative_id'] = self.__extract_list_of_alternatives(choice_set) #TODO get gridcell ID
 
         # currently implemented extractable data
-        temp_dictionary['alternative_effort'] = self.__transform_alternative_effort_data(choice_set)
-        temp_dictionary['alternative_final_stock'] = self.__transform_final_stock_data(choice_set)
+        temp_dictionary['alternative_effort'] = self.__transform_alternative_effort_data(choice_set)#TODO get agents effort in the cell
+        temp_dictionary['alternative_final_stock'] = self.__transform_final_stock_data(choice_set)  #TODO get ??
         # add additional functionality HERE
 
         # change to DataFrame format
         alternative_data = pd.DataFrame(temp_dictionary)
 
         # add iteration_id to dataframe
-        iteration_id = ['iteration_' + str(iteration_id)] * len(temp_dictionary['alternative_id'])
+        iteration_id = ['iteration_' + str(iteration_id)] * len(temp_dictionary['alternative_id']) #TODO get number of iteration
         alternative_data.insert(0, 'iteration_id', iteration_id)
 
         return alternative_data
@@ -107,12 +107,13 @@ class DataTransformer:
         return alternative_time_series_data
 
     def __transform_agent_data(self, agent_set, iteration_id=-99):
+        """"function to retrieve data per time step for each agent and transform to usuable format"""
         # extract list of time_steps
         temp_dictionary = dict()
         temp_dictionary['agent_id'] = self.__extract_list_of_agents(agent_set)
 
         # currently implemented extractable data
-        temp_dictionary['agents_catch'] = self.__transform_agent_catch_data(agent_set)
+        temp_dictionary['agents_catch'] = self.__transform_agent_catch_data(agent_set) #TODO get catch for an agent (for that time step, or is this cumulative?)
         # add additional functionality HERE
 
 
@@ -132,7 +133,7 @@ class DataTransformer:
         temp_dictionary['time_step_id'] = self.__extract_list_of_time_steps(duration)
 
         # currently implemented extractable data
-        temp_dictionary['total_catch'] = self.__transform_agent_set_total_catch_data(agent_set)
+        temp_dictionary['total_catch'] = self.__transform_agent_set_total_catch_data(agent_set)#TODO get agents total catch so far
         # add additional functionality HERE
         # CONSIDERING TIME_STEP CATCH GINI COEFFICIENT AS MEASURE FOR EQUALITY IN AGENT INCOME
 
@@ -146,7 +147,7 @@ class DataTransformer:
         return agent_time_series_data
 
 # ----------------------------------------------------------------------------------------------------------------------
-# --------------------------------- Internal Methods to Extract Label Data Series --------------------------------------
+# --------------------------------- Internal Methods to Extract Label Data Series TODO no clue what that means--------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __extract_list_of_time_steps(self, duration_model):

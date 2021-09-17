@@ -22,6 +22,7 @@ All functionality is contained in methods and attributes of the DataWriter objec
 
 Module inputs:
 -   any data formatted as pandas.DataFrame Object
+-   output data is defined and pre-processed in data_extraction.py
 
 Module Usage:
 -   ARTEMIS.py uses this module as Data writer
