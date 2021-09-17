@@ -152,6 +152,12 @@ class CompetitionHandler:
         relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
         return relevant_data
 
+    def __init_fixed_catch(self):
+        relevant_data = dict()
+        relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
+        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
+        return relevant_data
+
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------- Methods to load relevant agent choice functionality ------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -220,7 +226,7 @@ class CompetitionHandler:
         """method to correct catch using interference by using e,
         rather strong correction, even a few competitors already greatly reduce your catch"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
-        corrected_catch = uncorrected_catch * exp(-(number_of_competitors-1))          #TODO KW ik snap deze functie niet; dit was toch effort*interference_factor^(-competitors) NB exp(0)=1                           # correct using e^-(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
+        corrected_catch = uncorrected_catch * exp(-(number_of_competitors-1))                                           # correct using e^-(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
         correction_tag = str(number_of_competitors - 1) + " other foragers"
         return corrected_catch, correction_tag
 

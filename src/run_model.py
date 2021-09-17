@@ -40,17 +40,17 @@ class ModelRunner:
         pass
 
     def run_model(self,
-                  choice_set,
-                  agent_set,
-                  information_sharing_scenario,
-                  shared_alternatives,
-                  share_partners,
-                  duration=10,
+                  choice_set,                                           # the choice options in the model
+                  agent_set,                                            # the agents in the model
+                  information_sharing_scenario,                         # the scenario for what and how an agent shares data
+                  shared_alternatives,                                  # amount of choice options datapoints an agent shares with anothe agent in a given time step
+                  share_partners,                                       # amount of partners an agent shares dat with in a given time step
+                  duration=10,                                          # duration of the model (no. time steps)
                   stock_reset_scenario='no-reset',                      # default is a dynamics stock
                   init_stock=100,                                       # default if a non dynamic stock is 100 units
                   sd_init_stock=25,                                     # default sd if a non-dynamic stock is sd=25
                   competition_handler=None,                             # object that ensures the effects of competition are implemented
-                  stock_reset_chance=0.9):                                   #
+                  stock_reset_chance=0.9):                              # change at the same stock being present next time step
 
         agent_index_list = list(agent_set.agents.keys())                # identify the id of every agent in a list
         # loop for every time step
@@ -77,6 +77,7 @@ class ModelRunner:
 
                 # operations specific to a sharing scenario
                 # TODO: probably possible to migrate into a library dictionary to avoid endless if and elif statements
+                #  and make this more flexible for heterogeneity in sharing data (e.g. Asymmetric data exchange)
                 if information_sharing_scenario == 'Random Sharing':                                                    # identify sharing scenarios
                     share_partner_counter = 0                                                                           # initialise counter to loop over the agents data will be shared to
                     while share_partner_counter < share_partners:                                                       # loop over all agents that are picked to receive data
@@ -94,7 +95,7 @@ class ModelRunner:
                 choice_set.discrete_alternatives[alternative].stock_growth()
 
             # reset the stocks if chosen for a static stock format - otherwise keep old stock
-            # TODO: migrate if-statement functionality to library dictionary with functions
+            # TODO: migrate if-statement functionality to library dictionary with functions for flexibility
             if stock_reset_scenario == 'random-repeat':                                                                 # if statement for repeating stocks
                 alternative_tracker = 0                                                                                 # initialise counter for loop functionality
                 nb_alternatives = len(choice_set.discrete_alternatives)                                                 # extract a list of choice option IDs

@@ -54,6 +54,7 @@ start = timeit.default_timer()                                                  
 import pandas as pd                                                                                                     # pandas daytaframe as data structure tool
 pd.options.plotting.backend = "plotly"                                                                                  # set a different, preffered over default,  style of plottting
 
+# Other Modules in the ARTEMIS model
 from src.config.init.init_param import *                                                                                # module containing parameter and scenario settings
 from src.config.init.init_objects import ObjectInitializer                                                              # module to initialize the objects in the module (agents and choices)
 from src.run_model import ModelRunner                                                                                   # module to run the model using initialized agents and choices
@@ -180,3 +181,4 @@ stop = timeit.default_timer()                                                   
 execution_time = stop - start                                                                                           # calculate occured runtime
 
 print("Model Runtime: \t{} seconds".format(str(execution_time)))                                                        # report runtime in second
+print('Average Yearly Catch of Final Simulation = {}'.format(str(agent_set_output.total_catch/duration)))

@@ -45,21 +45,21 @@ choice_method = 'explore_heatmap'   # defines the way an agent chooses what fora
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present
 sd_init_stock = 25                  # standard deviation of initial stock present
-growth_factor = 1                   # per time step growth of stock (1 represents a static population in current Deafutl settings)
+growth_factor = 1                   # per time step growth of stock (1 represents a static population in current Default settings)
 
 
 # model characteristics
 duration = 50                       # number of time steps in the model
-choice_set_size = 100                # number of discrete alternatives in the choice set
-number_of_agents = 20               # number of foragers in the model
+choice_set_size = 20                # number of discrete alternatives in the choice set
+number_of_agents = 100               # number of foragers in the model
 number_of_iterations = 50           # number of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 growth_type = 'static'              # indicates stock dynamics -- placeholder, currently not implemented
-stock_reset_scenario = 'random-repeat' # indicates if an how the stock in a DiscreteAlternative objects resets
-chance_reset_stock = 0.2           # chance the stock is reset at the end of a time_step
+stock_reset_scenario = 'random-repeat' # indicates if and how the stock in a DiscreteAlternative objects resets
+chance_reset_stock = 0.95           # chance the stock is repeated at the end of a time_step
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- INFORMATION SHARING PARAMETERS -------------------------------------------
@@ -76,6 +76,7 @@ shared_alternatives = 10                 # number of known alternatives shared a
 # ----------------------------------------------------------------------------------------------------------------------
 
 competition_scenario = 'interference-simple'  # indicate the way competition is modelled in the model
+interference_factor = 0.8                     # factor for interference-simple scenario only
 # room for future functionality in competition
 
 # ----------------------------------------------------------------------------------------------------------------------
