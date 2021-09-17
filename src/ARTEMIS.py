@@ -120,7 +120,7 @@ while iteration_counter < number_of_iterations:
                                                duration,
                                                iteration_id=iteration_counter)
 
-    # TODO: --MINOR-- possible duplicate functionality in two different time series dataframes, might be merged
+    # TODO: --MINOR-- possible duplicate functionality in two different time series dataframes, might be merged TODO add specific comments on the content written to the db!
     alternative_specific_data = alternative_specific_data.append(temp_alternative_specific_data).reset_index(drop=True) # attach iteration specific choice option data to the full dataset and reset indices to prevent index errors
     choice_set_time_series = choice_set_time_series.append(temp_choice_set_time_series).reset_index(drop=True)          # attach iteration specific  choice option time series data to the full dataset and reset indices to prevent index errors
     agent_specific_data = agent_specific_data.append(temp_agent_specific_data).reset_index(drop=True)                   # attach iteration specific  agent data to the full dataset and reset indices to prevent index errors
@@ -128,23 +128,24 @@ while iteration_counter < number_of_iterations:
 
     iteration_counter += 1                                                                                              # progress to the next iteration
 # ----------------------------------------------------------------------------------------------------------------------
-# Exit iteration loop and extract measures (e.g. mean of iterations) from raw data outputs
+# Exit iteration loop?? TODO remove this exist statement from this header because it happens in the section above and extract measures (e.g. mean of iterations) from raw data outputs
 # ----------------------------------------------------------------------------------------------------------------------
 avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
     data_transformer.get_average_dataframes(alternative_specific_data,                                                  # extract averages from raw dataset with data from all iterations
                                             choice_set_time_series,
                                             agent_specific_data,
                                             agent_set_time_series)
-
+#TODO KW where is the averaging taking place???
+# TODO create files with raw data, not averaged over the number of simulations
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce graphical outputs
 # ----------------------------------------------------------------------------------------------------------------------
 
-graph_constructor.plot_bar_pandas(avg_alternative_spec, x_values='alternative_id', img_name='avg_alt_spec')             # make bar graph of the choice option specific average data
-graph_constructor.plot_bar_pandas(avg_agent_spec, x_values='agent_id', img_name='avg_agent_spec')                       # make bar graph of the agent specific average data
-graph_constructor.plot_line_pandas(avg_agent_time, x_values='time_step_id', img_name='avg_agent_time')                  # make line graph of the agent time series average data
-# graph_constructor.plot_line_pandas(avg_alternative_time, x_values='time_step_id', img_name = 'avg_alt_time')          # make line graph of the choice option time series average data
+graph_constructor.plot_bar_pandas(avg_alternative_spec, x_values='alternative_id', img_name='avg_alt_spec')             # make bar graph of the choice option specific average data: TODO expliciet maken
+graph_constructor.plot_bar_pandas(avg_agent_spec, x_values='agent_id', img_name='avg_agent_spec')                       # make bar graph of the agent specific average data: TODO total catch per agent averaged over the given number of simulations
+graph_constructor.plot_line_pandas(avg_agent_time, x_values='time_step_id', img_name='avg_agent_time')                  # make line graph of the agent time series average data: TODO expliciet maken
+# graph_constructor.plot_line_pandas(avg_alternative_time, x_values='time_step_id', img_name = 'avg_alt_time')          # make line graph of the choice option time series average data: TODO expliciet maken
 
 graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternative_id', y_values='alternative_effort',
                                   img_name='raw_alt_spec')                                                              # test to see distributions in the specific alternatives
@@ -152,11 +153,11 @@ graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternati
 # ----------------------------------------------------------------------------------------------------------------------
 # produce database outputs (e.g. .csv or .json)
 # ----------------------------------------------------------------------------------------------------------------------
-
+# TODO omschrijving per file wat er precies wordt weggeschreven (grootheden eenheden)!
 data_writer.write_csv(alternative_specific_data, "alternative_data.csv")                                                # write raw, choice option data for each specific iteration to .csv file
 data_writer.write_csv(choice_set_time_series, "choice_set_time_series.csv")                                             # write raw, choice option data for each specific iteration to .csv file
-data_writer.write_csv(agent_specific_data, "agent_data.csv")                                                            # write raw, choice option data for each specific iteration to .csv file
-data_writer.write_csv(agent_set_time_series, "agent_set_time_series.csv")                                               # write raw, choice option data for each specific iteration to .csv file
+data_writer.write_csv(agent_specific_data, "agent_data.csv")   # TODO omschrijving wat er wordt weggeschreven! header kolom 1 ontbreekt: timestep? agents_catch = total catch? noem het dan zo of maak in de file name duidelijk dat het total catch is.                                                        # write raw, choice option data for each specific iteration to .csv file
+data_writer.write_csv(agent_set_time_series, "agent_set_time_series.csv")   #TODO komt hier meer in of kan dit dan gewoon mean_catch_per_timestep oid heten?                                            # write raw, choice option data for each specific iteration to .csv file
 
 data_writer.write_json(alternative_specific_data, "alternative_data.json")                                              # write raw, choice option data for each specific iteration to .json file
 data_writer.write_json(choice_set_time_series, "choice_set_time_series.json")                                           # write raw, choice option data for each specific iteration to .json file
