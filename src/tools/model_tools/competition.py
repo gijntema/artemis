@@ -65,14 +65,14 @@ class CompetitionHandler:
                     "correct": self.__correct_absent,
 
                 },
-            'interference-simple':                                                                                      # competition through interference in accounted for by correcting the catch for the amount agents that have chosen that choice option
-                {
+            'interference-simple':                                                                                      # competition through interference accounted for by correcting the TODO effort for the number agents that have chosen that choice option
+                {                                                                                                       # TODO KW beschrijf hoe 'simle' werkt
                     "init": self.__init_interference,
                     "load": self.__load_interference,
                     "correct": self.__correct_interference_simple
                 },
-            'interference-natural':                                                                                     # competition through interference in accounted for by correcting the catch for the amount agents that have chosen that choice option
-                {
+            'interference-natural':                                                                                     # competition through interference accounted for by correcting the TODO effort for the number agents that have chosen that choice option
+                {                                                                                                       # TODO KW beschrijf hoe 'natural' werkt
                     "init": self.__init_interference,
                     "load": self.__load_interference,
                     "correct": self.__correct_interference_natural
@@ -99,7 +99,7 @@ class CompetitionHandler:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __init_relevant(self):
-        """method to initialise the relevant attributes needed for competition corrections"""
+        """method to initialise the relevant attributes needed for competition corrections TODO KW dit is nogal criptisch: ... needed when accounting for competition"""
         if isinstance(self.competition_method, str):                                                                    # if only a single competition type is specified
             relevant = self.__init_relevant_single()
         elif isinstance(self.competition_method, tuple):                                                                # if multiple competition types are specified - currently not supported
@@ -110,19 +110,19 @@ class CompetitionHandler:
         return relevant
 
     def __init_relevant_single(self):
-        """method to initialise the relevant attributes needed for competition corrections (when only 1 scenario)"""
+        """method to initialise the relevant attributes needed needed when accounting for competition (when only 1 scenario)"""
         relevant = self.competition_instruction[self.competition_method]['init']()
         return relevant
 
     def __init_relevant_multiple(self):
-        """method to initialise the relevant attributes needed for competition corrections (when multiple scenarios)"""
+        """method to initialise the relevant attributes needed needed when accounting for competition (when multiple scenarios)"""
         # TODO -- FUTURE -- allow functionality for multiple scenarios simultaneously - METHOD UNFINISHED
         relevant = {}
-        # Include loop here to ensure relevant data for all considered competition are added
+        # Include loop here to ensure relevant data for all considered types of competition are added
         return relevant
 
     def __init_absent(self):
-        """method to define relevant data, as an absent competition does not need any data,
+        """method to define relevant data, as an absence of competition does not need any data,
          only present to fix bugging"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(int)                                                              # dictionary that creates and returns an integer 0 if a key is called that is not already in
@@ -153,7 +153,7 @@ class CompetitionHandler:
         return relevant_data
 
 # ----------------------------------------------------------------------------------------------------------------------
-# ---------------------------- Methods to load relevant agent choices functionality ------------------------------------
+# ---------------------------- Methods to load relevant agent choice functionality ------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
     def load_competition_data(self, chosen_alternative_id, agent_id):
         """loads data on the agent and chosen choice option"""
@@ -178,11 +178,11 @@ class CompetitionHandler:
         pass
 
 # ----------------------------------------------------------------------------------------------------------------------
-# ---------------------- Methods to return any corrections needed to account for competition ---------------------------
+# ---------------------- Methods to return any adjustments needed to account for competition ---------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def competition_correction(self, choice_set, agent_set, agent_id, time_id):
-        """returns the real catch a ForagerAgent gains, when corrected for competition"""
+        """returns the real catch a ForagerAgent gains, when adjusted for competition"""
 
         choice_id = self.relevant_data['agent_choices'][agent_id]
 
@@ -190,7 +190,7 @@ class CompetitionHandler:
                             * agent_set.agents[agent_id].catchability_coefficient                                       # extract hypothetical catch if competition was absent
 
         corrected_catch, correction_tag = \
-            self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the competition methods specified
+            self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # adjust hypothetical catch using the competition methods specified
 
         print(
             "{} is foraging in {} and is hindered by interference with {}".format(agent_id, choice_id, correction_tag)  # report on interference to user
@@ -209,7 +209,7 @@ class CompetitionHandler:
         correction_tag = "<absent_interference>"                                                                        # output expects a tag for interference, default given as interference is not presnet in this scenario
         return corrected_catch, correction_tag
 
-    def __correct_interference_simple(self, choice_id, uncorrected_catch):
+    def __correct_interference_simple(self, choice_id, uncorrected_catch): #TODO KW dit is geen interference competitie maar directe competitie.
         """method to correct catch using interference by dividing over the number of competitors"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
         corrected_catch = uncorrected_catch / number_of_competitors                                                     # prone to DividedByZeroError, but as this method should never be called if no foraging occurs in a choice option, this should be a nice test for functioning
@@ -220,7 +220,7 @@ class CompetitionHandler:
         """method to correct catch using interference by using e,
         rather strong correction, even a few competitors already greatly reduce your catch"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
-        corrected_catch = uncorrected_catch * exp(-(number_of_competitors-1))                                           # correct using e^-(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
+        corrected_catch = uncorrected_catch * exp(-(number_of_competitors-1))          #TODO KW ik snap deze functie niet; dit was toch effort*interference_factor^(-competitors) NB exp(0)=1                           # correct using e^-(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
         correction_tag = str(number_of_competitors - 1) + " other foragers"
         return corrected_catch, correction_tag
 
