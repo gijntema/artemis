@@ -143,8 +143,10 @@ class ForagerAgent:
         i = 0                                                                                                           # counter to track loop with
         while i < nb_of_alternatives_known:                                                                             # loop to generate all knowns choice options
             # choose a random alternatives that the agent will know
-            list_of_knowns.append(random.choice(alternative_indices))                                                   # choose a random
-            i += 1                                                                                                      # proceed to generate the next known choice option
+            new_known = random.choice(alternative_indices)                                                              # choose a random
+            if new_known not in list_of_knowns:                                                                         # check if the option is not already in the list of knowns to ensure each agents gets to know 4 options
+                list_of_knowns.append(new_known)                                                                        # attach the new known to the list of knowns
+                i += 1                                                                                                  # proceed to generate the next known choice option, only happens if the random generated known is really attached
 
         return list_of_knowns                                                                                           # return list of initial known choice options of an Agent
 

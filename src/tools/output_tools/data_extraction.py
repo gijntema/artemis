@@ -55,6 +55,12 @@ import pandas as pd
 
 class DataTransformer:
     """" Restructures the data outputs from the model to a usable data format (a pandas.Dataframe object)"""
+    def __init__(self):
+        self.functionality = \
+            {
+                'avg': self.get_average_dataframes,
+                'sd': self.get_sd_dataframes
+            }
 
     def transform_output_data(self, choice_set, agent_set, duration, iteration_id=1):
         """main functionality method, extracts data (currently hardcoded) from agents and choice options,
@@ -225,6 +231,7 @@ class DataTransformer:
 
         return catch_list
 
+# TODo: quick and dirty fix for some basic measures, needs better flexibility through functionality dictionary
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------- Methods to Extract Average Data Series ---------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -263,6 +270,47 @@ class DataTransformer:
     def __get_average_agent_time_series(self, agent_time_series_data):
         temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').mean()
+        temp_data['time_step_id'] = temp_data.index
+
+        return temp_data
+
+# ----------------------------------------------------------------------------------------------------------------------
+# --------------------------- Methods to Extract standard deviation Data Series ----------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    def get_sd_dataframes(self, alternative_specific_data, alternative_time_series_data,
+                               agent_specific_data, agent_time_series_data):
+
+        avg_alternative_specific = self.__get_sd_alternative_specific(alternative_specific_data)
+        avg_alternative_time = self.__get_sd_alternative_time_series(alternative_time_series_data)
+        avg_agent_specific = self.__get_sd_agent_specific(agent_specific_data)
+        avg_agent_time = self.__get_sd_agent_time_series(agent_time_series_data)
+
+        return avg_alternative_specific, avg_alternative_time, avg_agent_specific, avg_agent_time
+
+    def __get_sd_alternative_specific(self, alternative_specific_data):
+        temp_data = alternative_specific_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('alternative_id').std()
+        temp_data['alternative_id'] = temp_data.index
+
+        return temp_data
+
+    def __get_sd_alternative_time_series(self, alternative_time_series_data):
+        temp_data = alternative_time_series_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('time_step_id').std()
+        temp_data['time_step_id'] = temp_data.index
+
+        return temp_data
+
+    def __get_sd_agent_specific(self, agent_specific_data):
+        temp_data = agent_specific_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('agent_id').std()
+        temp_data['agent_id'] = temp_data.index
+
+        return temp_data
+
+    def __get_sd_agent_time_series(self, agent_time_series_data):
+        temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('time_step_id').std()
         temp_data['time_step_id'] = temp_data.index
 
         return temp_data

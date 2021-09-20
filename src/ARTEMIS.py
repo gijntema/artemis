@@ -64,7 +64,7 @@ from src.tools.output_tools.outcome_visualization import GraphConstructor       
 from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
 
 
-# TODO: -- MINOR -- Fix time_step naming as plotly does not recognise this well enough
+# TODO: -- MINOR -- Fix time_step naming as plotly organises by first digit rather than full number
 iteration_counter = 0                                                                                                   # initliazation of counter for iteration loops
 alternative_specific_data = pd.DataFrame()                                                                              # intialize object to contain data on the choice options in the model
 choice_set_time_series = pd.DataFrame()                                                                                 # intialize object to contain time series data on the choice options in the model
@@ -136,6 +136,11 @@ avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
                                             agent_specific_data,
                                             agent_set_time_series)
 
+sd_alternative_spec, sd_alternative_time, sd_agent_spec, sd_agent_time = \
+    data_transformer.get_sd_dataframes( alternative_specific_data,                                                      # extract standard deviation from raw dataset with data from all iterations
+                                        choice_set_time_series,
+                                        agent_specific_data,
+                                        agent_set_time_series)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce graphical outputs
@@ -182,3 +187,4 @@ execution_time = stop - start                                                   
 
 print("Model Runtime: \t{} seconds".format(str(execution_time)))                                                        # report runtime in second
 print('Average Yearly Catch of Final Simulation = {}'.format(str(agent_set_output.total_catch/duration)))
+print('Average Yearly Catch = {}'.format(str(avg_agent_time['total_catch'].mean())))

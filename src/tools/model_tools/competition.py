@@ -71,13 +71,6 @@ class CompetitionHandler:
                     "load": self.__load_interference,
                     "correct": self.__correct_interference_simple
                 },
-            'interference-natural':                                                                                     # competition through interference in accounted for by correcting the catch for the amount agents that have chosen that choice option
-                {
-                    "init": self.__init_interference,
-                    "load": self.__load_interference,
-                    "correct": self.__correct_interference_natural
-
-                },
             'uptake':                                                                                                   # competition is modelled through resource uptake, leaving less for other agents
                 {   # UNSUPPORTED
                     "init": self.__init_uptake,
@@ -231,23 +224,15 @@ class CompetitionHandler:
         """method to correct catch using interference by using the interference factor
         as percentual decline of catch per competitor"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
-        corrected_catch = uncorrected_catch * (self.relevant_data['interference_factor']^(number_of_competitors-1))     # correct using e^-(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
+        corrected_catch = uncorrected_catch * (self.relevant_data['interference_factor']^(number_of_competitors-1))     # correct using interference fatctro^(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
         correction_tag = str(number_of_competitors-1) + " other foragers"
         return corrected_catch, correction_tag
 
     def __correct_fixed_catch(self, choice_id, uncorrected_catch):
-        """method to correct catch by dividing over the number of competitors"""
+        """method to correct catch by dividing over the number of competitors, creates very strong competition"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
         corrected_catch = uncorrected_catch / number_of_competitors                                                     # prone to DividedByZeroError, but as this method should never be called if no foraging occurs in a choice option, this should be a nice test for functioning
         correction_tag = str(number_of_competitors - 1) + " other foragers"                                             # generate interference tag for later use in reporting
-        return corrected_catch, correction_tag
-
-    def __correct_interference_natural(self, choice_id, uncorrected_catch):
-        """method to correct catch using interference by using e,
-        rather strong correction, even a few competitors already greatly reduce your catch"""
-        number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
-        corrected_catch = uncorrected_catch * exp(-(number_of_competitors-1))                                           # correct using e^-(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
-        correction_tag = str(number_of_competitors - 1) + " other foragers"
         return corrected_catch, correction_tag
 
     def __correct_uptake(self, choice_id, uncorrected_catch):

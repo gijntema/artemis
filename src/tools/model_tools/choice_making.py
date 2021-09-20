@@ -36,7 +36,7 @@ Version Number:
     0.1
 """
 
-from random import choice, random
+from random import choice, random, choices
 
 
 class ChoiceMaker:
@@ -71,6 +71,14 @@ class ChoiceMaker:
             "explore_heatmap": {
                 'init': self.__init_relevant_explore_heatmap,
                 'choose': self.__make_choice_explore_heatmap
+            },
+            "full_weighted_heatmap": {
+                'init': self.__init_relevant_full_weighted_heatmap,
+                'choose': self.__make_choice_full_weighted_heatmap
+            },
+            "explore_weighted_heatmap": {
+                'init': self.__init_relevant_explore_weighted_heatmap,
+                'choose': self.__make_choice_explore_weighted_heatmap
             }
 
             # include further decision making options HERE (and as methods below)
@@ -106,6 +114,23 @@ class ChoiceMaker:
         relevant_data['heatmap'] = agent.heatmap                                                                        # load agent heatmap
         return relevant_data
 
+    def __init_relevant_full_weighted_heatmap(self, agent):
+        """" initialises the data needed for the 'full_weighted_heatmap' choice method: a reference to:
+        - the agent heatmap"""
+        relevant_data = dict()
+        relevant_data['heatmap'] = agent.heatmap                                                                        # load agent heatmap
+        return relevant_data
+
+    def __init_relevant_explore_weighted_heatmap(self, agent):
+        """" initialises the data needed for the 'explore_weighted_heatmap' choice method: a reference to:
+        - the agent heatmap and
+        - the agent explore probability"""
+        relevant_data = dict()                                                                                          # initialise data dictionary
+        relevant_data['explore_probability'] = agent.explore_probability                                                # load explore probability
+        relevant_data['heatmap'] = agent.heatmap                                                                        # load agent heatmap
+        return relevant_data
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Methods that make the actual choice for the ForagerAgent
 # ----------------------------------------------------------------------------------------------------------------------
@@ -122,6 +147,17 @@ class ChoiceMaker:
         chosen = max(heatmap, key=heatmap.get)                                                                          # returns key of the maximum value
         return chosen
 
+    def __make_choice_full_weighted_heatmap(self):
+        """method to choose an option based on weighted probabilities according to an agent heatmap
+        returns the dictionary key of that maximum"""
+        heatmap = self.relevant_agent_data['heatmap']                                                                   # get a reference to heatmap
+        catch_weights = list(heatmap.values())                                                                          # get catches as the agent has recorded them in ints heatmap
+        total_expectation = sum(catch_weights)                                                                          # get total expectated catch (on the heatmap) as sum of all entries in the heatmap
+        probability_weights = [x / total_expectation for x in catch_weights]                                            # use total expected catch to make proportional weights from the heatmap catch data
+        chosen = choices(list(heatmap.keys()), weights=probability_weights, k=1)[0]                                     # returns key based on the probabilities weight given as the catch events in memory
+        # chosen = choices(list(heatmap.keys()), weights=heatmap.values(), k=1)[0]                                      # simpler version of the above that does not give erros, but has not been thoroughly tested for proper functioning - not sure if non-proportional weight work properly
+        return chosen
+
     def __make_choice_explore_heatmap(self):
         """method to choose an option based on either the full_heatmap or random methods,
         according to a fixed probability"""
@@ -129,6 +165,16 @@ class ChoiceMaker:
             chosen = self.__make_choice_random()
         else:                                                                                                           # if a random number between 0 and 1 is larger than the explore probability, the ForagerAgent will choose based on the heatmap
             chosen = self.__make_choice_full_heatmap()
+
+        return chosen
+
+    def __make_choice_explore_weighted_heatmap(self):
+        """method to choose an option based on either the full_heatmap or random methods,
+        according to a fixed probability"""
+        if random < self.relevant_agent_data['explore_probability']:                                                    # if a random number between 0 and 1 is smaller than the explore probability, the ForagerAgent will explore a random cell
+            chosen = self.__make_choice_random()
+        else:                                                                                                           # if a random number between 0 and 1 is larger than the explore probability, the ForagerAgent will choose based on the heatmap
+            chosen = self.__make_choice_full_weighted_heatmap()
 
         return chosen
 
