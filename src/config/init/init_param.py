@@ -37,10 +37,10 @@ Version Number:
 # TODO: eventually change this module to read the specified information form a configuration file (e.g. .json file)
 
 # Forager Characteristics
-explore_probability = 0.2           # probability a forager does not choose a known cell, but picks a random cell
-catchability_coefficient = 0.2      # proportional uptake of the resource stock in one foraging event
-init_number_of_alternatives_known = 4   # number of choice options each agents has information on at initialisation
-choice_method = 'explore_weighted_heatmap'   # defines the way an agent chooses what forage option to forage from
+explore_probability = 0.2                   # probability a forager does not choose a known cell, but picks a random cell
+catchability_coefficient = 0.2              # proportional uptake of the resource stock in one foraging event
+init_number_of_alternatives_known = 4       # number of choice options each agents has information on at initialisation
+choice_method = 'explore_weighted_heatmap'  # defines the way an agent chooses what forage option to forage from
 
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present
@@ -52,7 +52,7 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 duration = 50                       # number of time steps in the model
 choice_set_size = 20                # number of discrete alternatives in the choice set
 number_of_agents = 100               # number of foragers in the model
-number_of_iterations = 10           # number of iterations/simulations the model runs for
+number_of_iterations = 100           # number of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
@@ -68,8 +68,8 @@ information_sharing_scenario = 'Random Sharing'
 # considered functionality: ['No Sharing', Coalition Sharing', 'Random Sharing']
 
 # Indicators 'Random Sharing'
-share_partners = 3                      # the number of agents an agent informs about a (part of) the personal heatmap
-shared_alternatives = 3                 # number of known alternatives shared at any given time
+share_partners = 1                      # the number of agents an agent informs about a (part of) the personal heatmap
+shared_alternatives = 1                 # number of known alternatives shared at any given time
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------- COMPETITION PARAMETERS ------------------------------------------------

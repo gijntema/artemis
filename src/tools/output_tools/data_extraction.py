@@ -19,15 +19,15 @@
 This Module is aimed at extracting data and measures from unusable data formats and currently functions to:
 -   extract raw data from the objects AgentSet, ForagerAgent, ChoiceSet and DiscreteAlternative
 -   calculate aggregate measures based on the raw data extracted from objects
-
-this module is read by ARTEMIS.py to transform the model output into usable (raw) data formats: pandas.Dataframe objects
+-   transform the model output into usable (raw) data formats: pandas.Dataframe objects for plotting and saving
 
 Module inputs:
 -   No Modules
 -   Module only works on objects defined in the modules agents.py and choice_set.py
 
 Module Usage:
--   methods of the DataTransformer object are used in ARTEMIS.py
+-   methods of the DataTransformer object are used in ARTEMIS.py,
+    outputs generated there are then used as input for export_data.py and outcome_visualization.py
 
 Last Updated:
     06-09-2021
@@ -64,33 +64,34 @@ class DataTransformer:
 
     def transform_output_data(self, choice_set, agent_set, duration, iteration_id=1):
         """main functionality method, extracts data (currently hardcoded) from agents and choice options,
-        producing pandas.Dataframe objects"""
+        producing pandas.Dataframe objects for a single iteration/simulation"""
         alternative_specific_data = self.__transform_alternative_data(choice_set, iteration_id)
         choice_set_time_series = self.__transform_alternative_time_series_data(choice_set, duration, iteration_id)
         agent_specific_data = self.__transform_agent_data(agent_set, iteration_id)
         agent_set_time_series = self.__transform_agent_time_series_data(agent_set, duration, iteration_id)
 
         return alternative_specific_data, choice_set_time_series, agent_specific_data, agent_set_time_series
+
 # ----------------------------------------------------------------------------------------------------------------------
-# ------------------------------ Primary Subsections of the Main Functionality Method ----------------------------------
+# ------------------------------ Primary Subsections of the transform_output_data Method -------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __transform_alternative_data(self, choice_set, iteration_id=99):
-        # extract list of alternatives
+        """ Method to extract data related to specific choice options to a usable format"""
         temp_dictionary = dict()
-        temp_dictionary['alternative_id'] = self.__extract_list_of_alternatives(choice_set)
+        temp_dictionary['alternative_id'] = self.__extract_list_of_alternatives(choice_set)                             # attach choice option IDs as independent variables
 
         # currently implemented extractable data
-        temp_dictionary['alternative_effort'] = self.__transform_alternative_effort_data(choice_set)
-        temp_dictionary['alternative_final_stock'] = self.__transform_final_stock_data(choice_set)
+        temp_dictionary['alternative_effort'] = self.__transform_alternative_effort_data(choice_set)                    # add response variable total effort exerted by agents over all time steps given to each specific choice option
+        temp_dictionary['alternative_final_stock'] = self.__transform_final_stock_data(choice_set)                      # add data of final resource stock at the end of a simulation (as diagnostic data) for each choice option specific
         # add additional functionality HERE
 
         # change to DataFrame format
         alternative_data = pd.DataFrame(temp_dictionary)
 
         # add iteration_id to dataframe
-        iteration_id = ['iteration_' + str(iteration_id)] * len(temp_dictionary['alternative_id'])
-        alternative_data.insert(0, 'iteration_id', iteration_id)
+        iteration_id = ['iteration_' + str(iteration_id)] * len(temp_dictionary['alternative_id'])                      # add a tag for the iteration an a data point originates from to each data point
+        alternative_data.insert(0, 'iteration_id', iteration_id)                                                        # insert itertaion ID as first column in the new data format
 
         return alternative_data
 
@@ -113,12 +114,13 @@ class DataTransformer:
         return alternative_time_series_data
 
     def __transform_agent_data(self, agent_set, iteration_id=-99):
+        """"function to retrieve data per time step for each agent and transform to usable format"""
         # extract list of time_steps
         temp_dictionary = dict()
         temp_dictionary['agent_id'] = self.__extract_list_of_agents(agent_set)
 
         # currently implemented extractable data
-        temp_dictionary['agents_catch'] = self.__transform_agent_catch_data(agent_set)
+        temp_dictionary['agents_catch'] = self.__transform_agent_catch_data(agent_set)                                  # get agent specific total catch data (over all iteration time_steps) for each specific agent
         # add additional functionality HERE
 
 
@@ -231,7 +233,7 @@ class DataTransformer:
 
         return catch_list
 
-# TODo: quick and dirty fix for some basic measures, needs better flexibility through functionality dictionary
+# TODO: quick and dirty fix for some basic measures, needs better flexibility through functionality dictionary
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------- Methods to Extract Average Data Series ---------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -280,12 +282,12 @@ class DataTransformer:
     def get_sd_dataframes(self, alternative_specific_data, alternative_time_series_data,
                                agent_specific_data, agent_time_series_data):
 
-        avg_alternative_specific = self.__get_sd_alternative_specific(alternative_specific_data)
-        avg_alternative_time = self.__get_sd_alternative_time_series(alternative_time_series_data)
-        avg_agent_specific = self.__get_sd_agent_specific(agent_specific_data)
-        avg_agent_time = self.__get_sd_agent_time_series(agent_time_series_data)
+        sd_alternative_specific = self.__get_sd_alternative_specific(alternative_specific_data)
+        sd_alternative_time = self.__get_sd_alternative_time_series(alternative_time_series_data)
+        sd_agent_specific = self.__get_sd_agent_specific(agent_specific_data)
+        sd_agent_time = self.__get_sd_agent_time_series(agent_time_series_data)
 
-        return avg_alternative_specific, avg_alternative_time, avg_agent_specific, avg_agent_time
+        return sd_alternative_specific, sd_alternative_time, sd_agent_specific, sd_agent_time
 
     def __get_sd_alternative_specific(self, alternative_specific_data):
         temp_data = alternative_specific_data.drop('iteration_id', axis=1, inplace=False)
@@ -312,5 +314,104 @@ class DataTransformer:
         temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').std()
         temp_data['time_step_id'] = temp_data.index
+
+        return temp_data
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ------------------------- Methods to Extract Quantile values for Data Series -----------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+    def get_qt_dataframes(self, alternative_specific_data, alternative_time_series_data,
+                          agent_specific_data, agent_time_series_data, quantile=0.95):
+
+        qt_alternative_specific = self.__get_qt_alternative_specific(alternative_specific_data, quantile)
+        qt_alternative_time = self.__get_qt_alternative_time_series(alternative_time_series_data, quantile)
+        qt_agent_specific = self.__get_qt_agent_specific(agent_specific_data, quantile)
+        qt_agent_time = self.__get_qt_agent_time_series(agent_time_series_data, quantile)
+
+        return qt_alternative_specific, qt_alternative_time, qt_agent_specific, qt_agent_time
+
+    def __get_qt_alternative_specific(self, alternative_specific_data, quantile):
+        temp_data = alternative_specific_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('alternative_id').quantile(q=quantile)
+        temp_data['alternative_id'] = temp_data.index
+
+        return temp_data
+
+    def __get_qt_alternative_time_series(self, alternative_time_series_data, quantile):
+        temp_data = alternative_time_series_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('time_step_id').quantile(q=quantile)
+        temp_data['time_step_id'] = temp_data.index
+
+        return temp_data
+
+    def __get_qt_agent_specific(self, agent_specific_data, quantile):
+        temp_data = agent_specific_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('agent_id').quantile(q=quantile)
+        temp_data['agent_id'] = temp_data.index
+
+        return temp_data
+
+    def __get_qt_agent_time_series(self, agent_time_series_data, quantile):
+        temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('time_step_id').quantile(q=quantile)
+        temp_data['time_step_id'] = temp_data.index
+
+        return temp_data
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ------------------------- Methods to Extract SEM values for Data Series ----------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+    def attach_sem_dataframes(self, alternative_specific_data, alternative_time_series_data,
+                              agent_specific_data, agent_time_series_data,
+                              target_alt_spec=None, target_alt_time=None,
+                              target_agent_spec=None, target_agent_time=None):
+
+        sem_alternative_specific = self.__attach_sem_alternative_specific(alternative_specific_data, target_alt_spec)
+        sem_alternative_time = self.__attach_sem_alternative_time_series(alternative_time_series_data, target_alt_time)
+        sem_agent_specific = self.__attach_sem_agent_specific(agent_specific_data, target_agent_spec)
+        sem_agent_time = self.__attach_sem_agent_time_series(agent_time_series_data, target_agent_time)
+
+        return sem_alternative_specific, sem_alternative_time, sem_agent_specific, sem_agent_time
+
+    def __attach_sem_alternative_specific(self, alternative_specific_data, target_dataframe):
+        temp_data = alternative_specific_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('alternative_id').sem()
+        temp_data['alternative_id'] = temp_data.index
+
+        if isinstance(target_dataframe, pd.DataFrame):
+            temp_data = target_dataframe.join(temp_data.drop('alternative_id', axis='columns').add_suffix('_sem'))
+
+        return temp_data
+
+    def __attach_sem_alternative_time_series(self, alternative_time_series_data, target_dataframe):
+        temp_data = alternative_time_series_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('time_step_id').sem()
+        temp_data['time_step_id'] = temp_data.index
+
+        if isinstance(target_dataframe, pd.DataFrame):
+            temp_data = target_dataframe.join(temp_data.drop('time_step_id', axis='columns').add_suffix('_sem'))
+
+        return temp_data
+
+    def __attach_sem_agent_specific(self, agent_specific_data, target_dataframe):
+        temp_data = agent_specific_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('agent_id').sem()
+        temp_data['agent_id'] = temp_data.index
+
+        if isinstance(target_dataframe, pd.DataFrame):
+            temp_data = target_dataframe.join(temp_data.drop('agent_id', axis='columns').add_suffix('_sem'))
+
+        return temp_data
+
+    def __attach_sem_agent_time_series(self, agent_time_series_data, target_dataframe):
+        temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
+        temp_data = temp_data.groupby('time_step_id').sem()
+        temp_data['time_step_id'] = temp_data.index
+
+        if isinstance(target_dataframe, pd.DataFrame):
+            temp_data = target_dataframe.join(temp_data.drop('time_step_id', axis='columns').add_suffix('_sem'))
 
         return temp_data

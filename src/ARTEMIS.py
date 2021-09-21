@@ -131,28 +131,111 @@ while iteration_counter < number_of_iterations:
 # Exit iteration loop and extract measures (e.g. mean of iterations) from raw data outputs
 # ----------------------------------------------------------------------------------------------------------------------
 avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
-    data_transformer.get_average_dataframes(alternative_specific_data,                                                  # extract averages from raw dataset with data from all iterations
+    data_transformer.get_average_dataframes(alternative_specific_data,                                                  # extract averages from raw dataset with data from all iterations using methods from export_data.py functionality
                                             choice_set_time_series,
                                             agent_specific_data,
                                             agent_set_time_series)
 
+
+# TODO: Make the underlying methods in DataTransformer more efficient, are all quick and dirty fixes now
 sd_alternative_spec, sd_alternative_time, sd_agent_spec, sd_agent_time = \
-    data_transformer.get_sd_dataframes( alternative_specific_data,                                                      # extract standard deviation from raw dataset with data from all iterations
+    data_transformer.get_sd_dataframes(alternative_specific_data,                                                       # extract standard deviation from raw dataset with data from all iterations
                                         choice_set_time_series,
                                         agent_specific_data,
                                         agent_set_time_series)
 
+qt75_alternative_spec, qt75_alternative_time, qt75_agent_spec, qt75_agent_time = \
+    data_transformer.get_qt_dataframes(alternative_specific_data,
+                                       choice_set_time_series,
+                                       agent_specific_data,
+                                       agent_set_time_series, quantile=0.75)
+
+qt50_alternative_spec, qt50_alternative_time, qt50_agent_spec, qt50_agent_time = \
+    data_transformer.get_qt_dataframes(alternative_specific_data,
+                                       choice_set_time_series,
+                                       agent_specific_data,
+                                       agent_set_time_series, quantile=0.50)
+
+qt25_alternative_spec, qt25_alternative_time, qt25_agent_spec, qt25_agent_time = \
+    data_transformer.get_qt_dataframes(alternative_specific_data,
+                                       choice_set_time_series,
+                                       agent_specific_data,
+                                       agent_set_time_series, quantile=0.25)
+
+
+qt_alternative_spec = qt25_alternative_spec\
+    .join(qt50_alternative_spec.drop('alternative_id', axis='columns'), lsuffix='_qt25', rsuffix='_med')\
+    .join(qt75_alternative_spec.drop('alternative_id', axis='columns').add_suffix('_qt75'))
+
+qt_alternative_time = qt25_alternative_time \
+    .join(qt50_alternative_time.drop('time_step_id', axis='columns'), lsuffix='_qt25', rsuffix='_med') \
+    .join(qt75_alternative_time.drop('time_step_id', axis='columns').add_suffix('_qt75'))
+
+qt_agent_spec = qt25_agent_spec \
+    .join(qt50_agent_spec.drop('agent_id', axis='columns'), lsuffix='_qt25', rsuffix='_med') \
+    .join(qt75_agent_spec.drop('agent_id', axis='columns').add_suffix('_qt75'))
+
+qt_agent_time = qt25_agent_time \
+    .join(qt50_agent_time.drop('time_step_id', axis='columns'), lsuffix='_qt25', rsuffix='_med') \
+    .join(qt75_agent_time.drop('time_step_id', axis='columns').add_suffix('_qt75'))
+qt_agent_time['total_catch_err_min'] = \
+    abs(qt_agent_time['total_catch_med'] - qt_agent_time['total_catch_qt25'])
+qt_agent_time['total_catch_err_plus'] = \
+    abs(qt_agent_time['total_catch_med'] - qt_agent_time['total_catch_qt75'])
+
+
+avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
+    data_transformer.attach_sem_dataframes(
+        alternative_specific_data, choice_set_time_series,
+        agent_specific_data, agent_set_time_series,
+        target_alt_spec=avg_alternative_spec, target_alt_time=avg_alternative_time,
+        target_agent_spec=avg_agent_spec, target_agent_time=avg_agent_time)
+
+
+# TODO: TODO create files with raw data:catch per agent per time step (1 iteration)
+#  not averaged over the number of simulations - data found below after graphical outputs (currently line 164+)
+
 # ----------------------------------------------------------------------------------------------------------------------
-# produce graphical outputs
+# produce graphical outputs - average values
 # ----------------------------------------------------------------------------------------------------------------------
 
 graph_constructor.plot_bar_pandas(avg_alternative_spec, x_values='alternative_id', img_name='avg_alt_spec')             # make bar graph of the choice option specific average data
 graph_constructor.plot_bar_pandas(avg_agent_spec, x_values='agent_id', img_name='avg_agent_spec')                       # make bar graph of the agent specific average data
-graph_constructor.plot_line_pandas(avg_agent_time, x_values='time_step_id', img_name='avg_agent_time')                  # make line graph of the agent time series average data
+
+graph_constructor.plot_line_pandas(avg_agent_time, x_values='time_step_id',
+                                   y_values='total_catch', yerr_plus='total_catch_sem',
+                                   img_name='avg_agent_time')                                                           # make line graph of the agent time series average data
+
 # graph_constructor.plot_line_pandas(avg_alternative_time, x_values='time_step_id', img_name = 'avg_alt_time')          # make line graph of the choice option time series average data
 
 graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternative_id', y_values='alternative_effort',
                                   img_name='raw_alt_spec')                                                              # test to see distributions in the specific alternatives
+
+# ----------------------------------------------------------------------------------------------------------------------
+# produce graphical outputs - median and quantile values
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ERROR Code, needs to be fixed, quick and dirty fixes below
+# graph_constructor.plot_bar_pandas(qt_alternative_spec, x_values='alternative_id',
+#                                  y_values=[col for col in qt_alternative_spec.columns if 'med' in col],
+#                                  yerr_plus=[col for col in qt_alternative_spec.columns if 'qt75' in col],
+#                                  yerr_min=[col for col in qt_alternative_spec.columns if 'qt25' in col],
+#                                  img_name='qt_alt_spec')                                                               # make bar graph of the choice option specific average data
+
+# graph_constructor.plot_bar_pandas(qt_agent_spec, x_values='agent_id',
+#                                  y_values=[col for col in qt_alternative_spec.columns if 'med' in col],
+#                                  yerr_plus=[col for col in qt_alternative_spec.columns if 'qt75' in col],
+#                                  yerr_min=[col for col in qt_alternative_spec.columns if 'qt25' in col],
+#                                  img_name='qt_agent_spec')                                                             # make bar graph of the agent specific average data
+
+graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id',
+                                   y_values='total_catch_med',
+                                   yerr_plus='total_catch_err_plus',
+                                   yerr_min='total_catch_err_min',
+                                   img_name='qt_agent_time')                                                            # make line graph of the agent time series average data
+
+# graph_constructor.plot_line_pandas(qt_alternative_time, x_values='time_step_id', img_name = 'qt_alt_time')            # make line graph of the choice option time series average data
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce database outputs (e.g. .csv or .json)
@@ -160,16 +243,16 @@ graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternati
 
 data_writer.write_csv(alternative_specific_data, "alternative_data.csv")                                                # write raw, choice option data for each specific iteration to .csv file
 data_writer.write_csv(choice_set_time_series, "choice_set_time_series.csv")                                             # write raw, choice option data for each specific iteration to .csv file
-data_writer.write_csv(agent_specific_data, "agent_data.csv")                                                            # write raw, choice option data for each specific iteration to .csv file
-data_writer.write_csv(agent_set_time_series, "agent_set_time_series.csv")                                               # write raw, choice option data for each specific iteration to .csv file
+data_writer.write_csv(agent_specific_data, "agent_data.csv")                                                            # write raw, agent data for each specific iteration to .csv file
+data_writer.write_csv(agent_set_time_series, "agent_set_time_series.csv")                                               # write raw, agent data for each specific iteration to .csv file
 
 data_writer.write_json(alternative_specific_data, "alternative_data.json")                                              # write raw, choice option data for each specific iteration to .json file
 data_writer.write_json(choice_set_time_series, "choice_set_time_series.json")                                           # write raw, choice option data for each specific iteration to .json file
-data_writer.write_json(agent_specific_data, "agent_data.json")                                                          # write raw, choice option data for each specific iteration to .json file
-data_writer.write_json(agent_set_time_series, "agent_set_time_series.json")                                             # write raw, choice option data for each specific iteration to .json file
+data_writer.write_json(agent_specific_data, "agent_data.json")                                                          # write raw, agent data for each specific iteration to .json file
+data_writer.write_json(agent_set_time_series, "agent_set_time_series.json")                                             # write raw, agent data for each specific iteration to .json file
 
 # TODO: --FUNCTIONALITY-- Writing average data outcomes not supported yet (only templates given below)
-data_writer.write_json(alternative_specific_data, "average_alternative_data.json")
+# data_writer.write_json(alternative_specific_data, "average_alternative_data.json")
 # data_writer.write_json(choice_set_time_series, "average_choice_set_time_series.json")
 # data_writer.write_json(agent_specific_data, "average_agent_data.json")
 # data_writer.write_json(agent_set_time_series, "average_choice_set_time_series.json")
@@ -188,3 +271,7 @@ execution_time = stop - start                                                   
 print("Model Runtime: \t{} seconds".format(str(execution_time)))                                                        # report runtime in second
 print('Average Yearly Catch of Final Simulation = {}'.format(str(agent_set_output.total_catch/duration)))
 print('Average Yearly Catch = {}'.format(str(avg_agent_time['total_catch'].mean())))
+
+# check to see the knowledge an agent has at the end of the final simulation
+for agent in agent_set.agents:
+    print(agent, " knowns", "\t:\t", len(agent_set.agents[agent].list_of_known_alternatives))

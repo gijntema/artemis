@@ -47,17 +47,33 @@ class GraphConstructor:
 # Methods using a different way of plotting
 # ----------------------------------------------------------------------------------------------------------------------
 
-    def plot_bar_pandas(self, pd_dataframe, x_values, y_values=None, img_name='unnamed'):
+    def plot_bar_pandas(self, pd_dataframe, x_values, y_values=None, yerr_plus=None, yerr_min=None, img_name='unnamed'):
         if y_values is None:
             y_values = list(pd_dataframe)                                                                               # if y values are not specified take all data series in the data
-        fig = pd_dataframe.plot.bar(x=x_values, y=y_values)
+
+        if yerr_plus is not None and yerr_min is not None:
+            yerr_plus = pd_dataframe[yerr_plus]
+            yerr_min = pd_dataframe[yerr_min]
+
+        fig = pd_dataframe.plot.bar(x=x_values, y=y_values,
+                                    error_y=yerr_plus,
+                                    error_y_minus=yerr_min)
         # fig.show()                                                                                                    # line to immediatly show graphs, turned off for now
         fig.write_image("{}.png".format(img_name))
 
-    def plot_line_pandas(self, pd_dataframe, x_values, y_values=None, img_name='unnamed'):
+    def plot_line_pandas(self, pd_dataframe, x_values, y_values=None, yerr_plus=None, yerr_min=None, img_name='unnamed'):
         if y_values is None:
             y_values = list(pd_dataframe)                                                                               # if y values are not specified take all data series in the data
 
-        fig = pd_dataframe.plot.line(x=x_values, y=y_values)
+        if yerr_plus is not None and yerr_min is not None:
+            yerr_plus = pd_dataframe[yerr_plus]
+            yerr_min = pd_dataframe[yerr_min]
+
+        elif yerr_plus is not None and yerr_min is None:
+            yerr_plus = pd_dataframe[yerr_plus]
+
+        fig = pd_dataframe.plot.line(x=x_values, y=y_values,
+                                     error_y=yerr_plus,
+                                     error_y_minus=yerr_min)
         # fig.show()                                                                                                    # line to immediatly show graphs, turned off for now
         fig.write_image("{}.png".format(img_name))
