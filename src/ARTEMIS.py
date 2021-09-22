@@ -236,6 +236,15 @@ graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id',
 
 # graph_constructor.plot_line_pandas(qt_alternative_time, x_values='time_step_id', img_name = 'qt_alt_time')            # make line graph of the choice option time series average data
 
+# ----------------------------------------------------------------------------------------------------------------------
+# produce graphical outputs - median and quantile values
+# ----------------------------------------------------------------------------------------------------------------------
+single_memory_data = data_transformer.get_single_simulation_memory_evolution(agent_set_output, duration)                # get data on the amount of options with an entry in the agents heatmap in the last simulation for every agent en time step specific
+graph_constructor.plot_line_pandas(single_memory_data, x_values='time_step_id',
+                                   y_values=None,
+                                   yerr_plus=None,
+                                   yerr_min=None,
+                                   img_name='knowledge_evolution_last_simulation')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce database outputs (e.g. .csv or .json)
@@ -262,6 +271,7 @@ data_writer.write_json(agent_set_time_series, "agent_set_time_series.json")     
 # data_writer.write_csv(agent_specific_data, "average_agent_data.csv")
 # data_writer.write_csv(agent_set_time_series, "average_choice_set_time_series.csv")
 
+data_writer.write_csv(single_memory_data, 'last_simulation_memory_evolution.csv')                                       # write knowledge evolution data
 # ----------------------------------------------------------------------------------------------------------------------
 # Runtime tracking
 # ----------------------------------------------------------------------------------------------------------------------

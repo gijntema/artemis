@@ -60,7 +60,10 @@ class ModelRunner:
                   '\nStarting time step no.{} \n'.format(str(time_tracker)),
                   "---------------------------------------------------------------------------------------------------"
                   )
+            time_id = str(time_tracker).zfill(len(str(duration)))
             random.shuffle(agent_index_list)                            # shuffle agent order for equal opportunities
+            agent_set.update_memory_trackers(time_id)                    # record knowledge on the choice options at the start of a time period
+
             # loop for every agent
             for agent in agent_index_list:                              # begin choice loop for every agent
 
@@ -73,7 +76,7 @@ class ModelRunner:
             for agent in agent_index_list:                                                                              # Second agent loop to execute choices --> second loop is needed to account for competition
                 # Catch is corrected for competition effects and trackers are updated
                 # if harvest removal is on, the stock is also reduced
-                competition_handler.competition_correction(choice_set, agent_set, agent, time_id=time_tracker)
+                competition_handler.competition_correction(choice_set, agent_set, agent, time_id=time_id)
 
                 # operations specific to a sharing scenario
                 # TODO: probably possible to migrate into a library dictionary to avoid endless if and elif statements

@@ -56,6 +56,10 @@ import pandas as pd
 class DataTransformer:
     """" Restructures the data outputs from the model to a usable data format (a pandas.Dataframe object)"""
     def __init__(self):
+        """make a functionality dictionary,
+        only for future functionality/flexibility,
+        not implemented in current version"""
+
         self.functionality = \
             {
                 'avg': self.get_average_dataframes,
@@ -161,7 +165,8 @@ class DataTransformer:
         time_steps = list()
         duration_counter = 0
         while duration_counter < duration_model:
-            time_steps.append(str(duration_counter))
+            time_id = str(duration_counter).zfill(len(str(duration_model)))
+            time_steps.append(time_id)
             duration_counter += 1
 
         return time_steps
@@ -415,3 +420,23 @@ class DataTransformer:
             temp_data = target_dataframe.join(temp_data.drop('time_step_id', axis='columns').add_suffix('_sem'))
 
         return temp_data
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ------------------- Methods to Extract values for memory/heatmap related reporter variables---------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+    def get_single_simulation_memory_evolution(self, agent_set, duration):
+        temp_data = pd.DataFrame()                                                                                      # set up output data
+        time_tracker = 0                                                                                                # set up time counter for loop functionality
+        while time_tracker < duration:                                                                                  # loop over all time_steps
+            time_data = {}
+
+            for agent in agent_set.agents:
+                time_data['time_step_id'] = str(time_tracker).zfill(len(str(duration)))
+                time_data[agent] = len(agent_set.agents[agent].knowledge_evolution_tracker[time_data['time_step_id']])  # identify how many entries the heatmap has at a given time
+
+            temp_data = temp_data.append(time_data, ignore_index=True)
+            time_tracker += 1
+
+        return temp_data
+

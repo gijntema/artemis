@@ -92,12 +92,13 @@ class ObjectInitializer:
         # TODO: much of the functioning here can be simplified using collections.defaultdict() objects
         duration_counter = 0                                                                                            # make counter for all time_steps in the model for While loop functioning
         while duration_counter < duration_model:                                                                        # loop over all time steps in the model
-            agent_set.total_time_step_catch_tracker[str(duration_counter)] = 0                                          # make entry in time_step specific catch tracker for the specified time step
+            time_id = str(duration_counter).zfill(len(str(duration_model)))
+            agent_set.total_time_step_catch_tracker[time_id] = 0                                                    # make entry in time_step specific catch tracker for the specified time step
 
             agent_tracker = 0                                                                                           # make counter for all time_steps in the model for While loop functioning
             while agent_tracker < nb_agents:                                                                            # loop over all agents
                 agent_id = 'agent_' + str(agent_tracker).zfill(len(str(nb_agents)))                                     # set ID of the agent to be modified
-                agent_set.agents[agent_id].time_step_catch[duration_counter] = 0                                        # for the considered agent, initialise the catch in the given time_step as 0
+                agent_set.agents[agent_id].time_step_catch[time_id] = 0                                                 # for the considered agent, initialise the catch in the given time_step as 0
                 agent_tracker += 1                                                                                      # proceed to next agent
 
             duration_counter += 1                                                                                       # proceed to next time_step

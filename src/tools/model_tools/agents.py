@@ -80,7 +80,9 @@ class AgentSet:                                         # to be implemented, not
         """updates the total catch in a given time step by the given amount from a single catch event"""
         self.total_time_step_catch_tracker[str(time_tracker)] += catch
 
-
+    def update_memory_trackers(self, time_id):
+        for agent in self.agents:
+            self.agents[agent].update_memory_trackers(time_id)
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------- the ForagerAgent object -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -95,6 +97,7 @@ class ForagerAgent:
         self.forage_catch_tracker = {}                                                                                  # tracker variable for total catch gained from each alternative
         self.forage_effort_tracker = {}                                                                                 # tracker variable for effort exerted on each alternative
         self.time_step_catch = {}                                                                                       # tracker variable to check time_step fluctuations in catch
+        self.knowledge_evolution_tracker = defaultdict(dict)                                                            # tracker to identify how the memory of an agent changes over time
 
         # basic attributes/parameters
         self.id = agent_id                                                                                              # id consistent with other indices used in the rest of the model
@@ -207,6 +210,10 @@ class ForagerAgent:
                 if alternative not in self.list_of_known_alternatives:
                     self.list_of_known_alternatives.append(alternative)
 
+    def update_memory_trackers(self, time_id):
+        for known in self.list_of_known_alternatives:
+            self.knowledge_evolution_tracker[time_id][known] = defaultdict(int)                                         # empty entry for now, can contain such data as age_of_knowledge or discount factor of knowledge (age specific corrections in expectations)
+
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------- Methods for information sharing scenarios ------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -236,7 +243,7 @@ class ForagerAgent:
 
         return tuple((shared_alternatives_indices, shared_alternatives_data))                                           # return a tuple with choice option indices to be shared and the corresponding contents of those choice options
 
-    def receive_heatmap_knowledge(self, shared_data):
+    def receive_heatmap_knowledge(self, shared_data, time_id=99):
         """updates personal heatmap based on the output from a ForagerAgent().share_heatmap_knowledge() method """
         received_alternative_indices = shared_data[0]                                                                   # get index of shared choice options
         received_alternative_data = shared_data[1]                                                                      # get content of shared choice options

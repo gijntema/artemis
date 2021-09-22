@@ -208,6 +208,7 @@ class CompetitionHandler:
             )
 
         agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents
+        # agent_set.update_memory
         choice_set.catch_map[choice_id] += corrected_catch                                                              # update tracker of the choice set for total catch in a choice option
         choice_set.effort_map[choice_id] += 1                                                                           # update tracker of the choice set for effort in a choice option
 
