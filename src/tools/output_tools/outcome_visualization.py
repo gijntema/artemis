@@ -47,7 +47,8 @@ class GraphConstructor:
 # Methods using a different way of plotting
 # ----------------------------------------------------------------------------------------------------------------------
 
-    def plot_bar_pandas(self, pd_dataframe, x_values, y_values=None, yerr_plus=None, yerr_min=None, img_name='unnamed'):
+    def plot_bar_pandas(self, pd_dataframe, x_values, y_values=None, yerr_plus=None, yerr_min=None,
+                        img_name='unnamed', y_label='value', legend_title='values'):
         if y_values is None:
             y_values = list(pd_dataframe)                                                                               # if y values are not specified take all data series in the data
 
@@ -58,10 +59,14 @@ class GraphConstructor:
         fig = pd_dataframe.plot.bar(x=x_values, y=y_values,
                                     error_y=yerr_plus,
                                     error_y_minus=yerr_min)
+        fig.update_layout(yaxis_title=y_label,
+                          legend_title=legend_title)
+
         # fig.show()                                                                                                    # line to immediatly show graphs, turned off for now
         fig.write_image("{}.png".format(img_name))
 
-    def plot_line_pandas(self, pd_dataframe, x_values, y_values=None, yerr_plus=None, yerr_min=None, img_name='unnamed'):
+    def plot_line_pandas(self, pd_dataframe, x_values, y_values=None, yerr_plus=None, yerr_min=None,
+                         img_name='unnamed', y_label='value', legend_title='values'):
         if y_values is None:
             y_values = list(pd_dataframe)                                                                               # if y values are not specified take all data series in the data
 
@@ -75,5 +80,23 @@ class GraphConstructor:
         fig = pd_dataframe.plot.line(x=x_values, y=y_values,
                                      error_y=yerr_plus,
                                      error_y_minus=yerr_min)
+
+        fig.update_layout(yaxis_title=y_label,
+                          legend_title=legend_title)
+
         # fig.show()                                                                                                    # line to immediatly show graphs, turned off for now
+        fig.write_image("{}.png".format(img_name))
+
+    def plot_jaccard(self, pd_dataframe, x_values, y_values=None, group_by=None,
+                     img_name='unnamed', y_label='value', legend_title='values'):
+
+        if y_values is None:
+            y_values = list(pd_dataframe)
+
+        fig = pd_dataframe.plot.bar(facet_row=group_by, x=x_values, y=y_values)
+
+        fig.update_layout(yaxis_title=y_label,
+                          legend_title=legend_title)
+
+        fig.show()                                                                                                      # line to immediatly show graphs, turned off for now
         fig.write_image("{}.png".format(img_name))

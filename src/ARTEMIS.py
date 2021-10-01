@@ -240,11 +240,19 @@ graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id',
 # produce graphical outputs - median and quantile values
 # ----------------------------------------------------------------------------------------------------------------------
 single_memory_data = data_transformer.get_single_simulation_memory_evolution(agent_set_output, duration)                # get data on the amount of options with an entry in the agents heatmap in the last simulation for every agent en time step specific
+single_memory_data_summary = pd.DataFrame()
+single_memory_data_summary['time_step_id'] = single_memory_data['time_step_id']
+single_memory_data_summary['min_knowledge'] = single_memory_data.min(axis=1)
+single_memory_data_summary['med_knowledge'] = single_memory_data.median(axis=1)
+single_memory_data_summary['max_knowledge'] = single_memory_data.max(axis=1)
+
 graph_constructor.plot_line_pandas(single_memory_data, x_values='time_step_id',
-                                   y_values=None,
-                                   yerr_plus=None,
-                                   yerr_min=None,
-                                   img_name='knowledge_evolution_last_simulation')
+                                   img_name='knowledge_evolution_last_simulation',
+                                   y_label=' # of entries in heatmap', legend_title='Agents')
+
+graph_constructor.plot_line_pandas(single_memory_data_summary, x_values='time_step_id',
+                                   img_name='summary_knowledge_evolution_last_simulation',
+                                   y_label=' # of entries in heatmap', legend_title='Agents')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce database outputs (e.g. .csv or .json)
@@ -272,6 +280,26 @@ data_writer.write_json(agent_set_time_series, "agent_set_time_series.json")     
 # data_writer.write_csv(agent_set_time_series, "average_choice_set_time_series.csv")
 
 data_writer.write_csv(single_memory_data, 'last_simulation_memory_evolution.csv')                                       # write knowledge evolution data
+
+
+# jaccard_agent_knowledge = data_transformer.get_single_simulation_jaccard_matrices(agent_set_output)                     # get jaccard indices similarity matrices for last simulation - not working properly
+# data_writer.write_csv(jaccard_agent_knowledge, 'last_simulation_jaccard_agents.csv')
+# data_writer.write_json(jaccard_agent_knowledge, 'last_simulation_jaccard_agents.json')
+# graph_constructor.plot_jaccard(jaccard_agent_knowledge.drop('iteration_id', axis=1),
+#                                x_values='agent_i',
+#                                group_by='time_step_id',
+#                                img_name='jaccard_agents',
+#                                y_label='Jaccard Index Value',
+#                                legend_title='agent_j')
+
+competitor_df = pd.DataFrame(agent_set_output.average_expected_competitor_tracker).transpose()
+competitor_df['time_step_id'] = competitor_df.index
+graph_constructor.plot_line_pandas(competitor_df,
+                                   x_values='time_step_id', y_values=None,
+                                   img_name='test_average_competitors_SA{}_SP{}'.format(shared_alternatives, share_partners),
+                                   y_label='average expected number of competitors'
+                                   , legend_title='Agents')
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Runtime tracking
 # ----------------------------------------------------------------------------------------------------------------------
@@ -283,5 +311,5 @@ print('Average Yearly Catch of Final Simulation = {}'.format(str(agent_set_outpu
 print('Average Yearly Catch = {}'.format(str(avg_agent_time['total_catch'].mean())))
 
 # check to see the knowledge an agent has at the end of the final simulation
-for agent in agent_set.agents:
+for agent in agent_set_output.agents:
     print(agent, " knowns", "\t:\t", len(agent_set.agents[agent].list_of_known_alternatives))

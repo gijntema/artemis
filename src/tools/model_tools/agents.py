@@ -44,6 +44,7 @@ Version Number:
 
 
 import random
+import copy
 from collections import defaultdict  # TODO: --STRUCTURAL-- Replace difficult initialisation
 from src.tools.model_tools.choice_making import ChoiceMaker
 
@@ -55,7 +56,9 @@ class AgentSet:                                         # to be implemented, not
         self.agents = {}                                # dictionary with all agents as ForagerAgent objects
         self.total_catch = 0                            # Tracker for total catch of all agents and time_steps combined
         self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
-#        self.time_step_catch_distribution = {}          # tracker to save distribution of catch over the agents for every time_step - Currently not used
+#        self.time_step_catch_distribution = {}         # tracker to save distribution of catch over the agents for every time_step - Currently not used
+        self.average_expected_competitor_tracker = defaultdict(dict)   # tracker to contain the average expected amount of competitors expected when picking any cell
+        # TODO: implement tracker on line above
 
     def update_agent_trackers(self, agent_id, catch, alternative_index, time_tracker):
         """" updates the data contained in a single ForagerAgent
@@ -83,6 +86,42 @@ class AgentSet:                                         # to be implemented, not
     def update_memory_trackers(self, time_id):
         for agent in self.agents:
             self.agents[agent].update_memory_trackers(time_id)
+
+    def update_average_expected_competitor_tracker(self, time_id):
+        """Method that updates a tracker containing data on the average number of competitors expected
+        in a given time step for every agent -- TODO: NOT IMPLEMENTED YET"""
+
+        temp_probability_dictionary = {}                                                                                # temporary dictionary to store agent specific probability maps fro choosing a option (e.g. grid cell) to forage in/from
+        number_of_options = len(self.agents[next(iter(self.agents))].heatmap)                                           # get total number of options(e.g. the amount of grid cells an agent can choose from) as the number of entries in the first agents heatmap
+
+        for agent in self.agents:                                                                                       # Loop over Agents (1) to transform an agent heatmap into a prbability map --> what is the chance an agent will i each option
+            agent_data = self.agents[agent]                                                                             # define agent data to keep the script visually pleasing
+            sum_heatmap_entries = sum(agent_data.heatmap.values())                                                      # calculate sum of heatmap entries fro later use
+            probability_of_exploration = agent_data.explore_probability                                                 # get probability of picking a random option for late ruse
+
+            probability_map = copy.deepcopy(agent_data.heatmap)                                                         # create copy of heatmap to overwrite with new data (still contains the regular heatmap entries, but ensures same data structure)
+            for entry in probability_map:                                                                               # loop over all entries in an agents heatmap to transform memory catch data into probabilities of choosing that option
+                probability_map[entry] /= sum_heatmap_entries                                                           # divide heatmap entries by sum of entries to gain proportional weights as probability of choosing an option
+                probability_map[entry] *= (1-probability_of_exploration)                                                # correct for the fact that probability of choosing an option based on the heatmap is not 100%
+                probability_map[entry] += probability_of_exploration/number_of_options                                  # add the chance of choosing the option at random through exploration
+
+            temp_probability_dictionary[agent] = copy.deepcopy(probability_map)                                         # make entry for currently considered agent in dictionary of probability maps and load constructed probability map
+
+        for agent_i in temp_probability_dictionary:                                                                     # Loop over Agents (2): calculate the expected encounters for each agent, when considering their choice probabilities-- this is NOT internalised in an agent decision making process, merely used as descriptive statistic
+            cumulative_encounters_expected = 0                                                                          # initialize cumulative tracker for expected encounters in options for foraging
+            for entry in temp_probability_dictionary[agent_i]:                                                          # loop over the newly acquired probabilities of choosing each option
+                for agent_j in temp_probability_dictionary:                                                             # loop over Agents (3): pairwise comparisons of the chance of encountering any potential competitors j (other agents)
+                    if agent_i != agent_j:                                                                              # disregard the chance of meeting oneself
+                        encounter_chance = \
+                            temp_probability_dictionary[agent_i][entry] * \
+                            temp_probability_dictionary[agent_j][entry]                                                 # chance at meeting in the considered option: Pi,k,t,real * Pj,k,t,real
+
+                        cumulative_encounters_expected += encounter_chance                                              # add the pairwise expected encounters to the cumulative expected competitors
+            average_encounters_expected = cumulative_encounters_expected / number_of_options                            # divide cumulative tracker by number of options --> Cexp,i,t
+
+            self.average_expected_competitor_tracker[time_id][agent_i] = average_encounters_expected                    # add the calculated measure to overall tracker in the agent_set as tracker[time=t][agent=i] = Cexp,i,t
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------- the ForagerAgent object -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -95,7 +134,7 @@ class ForagerAgent:
         # Tracker variables
         self.total_catch = 0                                                                                            # tracker variable to track total catch for this agent
         self.forage_catch_tracker = {}                                                                                  # tracker variable for total catch gained from each alternative
-        self.forage_effort_tracker = {}                                                                                 # tracker variable for effort exerted on each alternative
+        self.forage_effort_tracker = {}                                                                                 # tracker variable for total location visits on each alternative (visits per alternative, cumulative for all time_steps)
         self.time_step_catch = {}                                                                                       # tracker variable to check time_step fluctuations in catch
         self.knowledge_evolution_tracker = defaultdict(dict)                                                            # tracker to identify how the memory of an agent changes over time
 
@@ -211,8 +250,19 @@ class ForagerAgent:
                     self.list_of_known_alternatives.append(alternative)
 
     def update_memory_trackers(self, time_id):
+        """currently ERRORS""" #TODo CURRENTLY does not work properly (all knowns for agent x are always an age of x)
         for known in self.list_of_known_alternatives:
-            self.knowledge_evolution_tracker[time_id][known] = defaultdict(int)                                         # empty entry for now, can contain such data as age_of_knowledge or discount factor of knowledge (age specific corrections in expectations)
+
+            try:
+                time_of_origin = self.knowledge_evolution_tracker[time_id][known]
+            except KeyError:
+                time_of_origin = -1
+
+            temp_data = {
+                        'time_of_origin': time_of_origin
+                        }                                                                                               # empty entry for now, can contain such data as age_of_knowledge or discount factor of knowledge (age specific corrections in expectations)
+            temp_data['age_of_knowledge'] = int(time_id) - 1 - temp_data['time_of_origin']
+            self.knowledge_evolution_tracker[time_id][known] = temp_data
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------- Methods for information sharing scenarios ------------------------------------------------
@@ -243,7 +293,7 @@ class ForagerAgent:
 
         return tuple((shared_alternatives_indices, shared_alternatives_data))                                           # return a tuple with choice option indices to be shared and the corresponding contents of those choice options
 
-    def receive_heatmap_knowledge(self, shared_data, time_id=99):
+    def receive_heatmap_knowledge(self, shared_data, time_id=-99):
         """updates personal heatmap based on the output from a ForagerAgent().share_heatmap_knowledge() method """
         received_alternative_indices = shared_data[0]                                                                   # get index of shared choice options
         received_alternative_data = shared_data[1]                                                                      # get content of shared choice options
@@ -260,7 +310,15 @@ class ForagerAgent:
             elif isinstance(self.heatmap[received_index], float):                                                       # check if the receiving agent already has an entry for that choice: YES
                 self.heatmap[received_index] = (received_data + self.heatmap[received_index])/2                         # take average of newly shared data and the information already known from other data
 
+            try:
+                self.knowledge_evolution_tracker[time_id][received_index]['time_of_origin'] = int(time_id)
+
+            except KeyError:
+                self.knowledge_evolution_tracker[time_id][received_index] = dict()
+                self.knowledge_evolution_tracker[time_id][received_index]['time_of_origin'] = int(time_id)
+
             received_counter += 1                                                                                       # proceed to next shared choice option
+
 
         self.__update_list_of_knowns()                                                                                  # update list of known choice options
         # TODO: Functionality for Knowledge degradation

@@ -49,9 +49,9 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 
 
 # model characteristics
-duration = 20                       # number of time steps in the model
+duration = 50                       # number of time steps in the model
 choice_set_size = 20                # number of discrete alternatives in the choice set
-number_of_agents = 100               # number of foragers in the model
+number_of_agents = 50               # number of foragers in the model
 number_of_iterations = 1           # number of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -67,9 +67,10 @@ chance_reset_stock = 0.9       # chance the stock is repeated at the end of a ti
 information_sharing_scenario = 'Random Sharing'
 # considered functionality: ['No Sharing', Coalition Sharing', 'Random Sharing']
 
-# Indicators 'Random Sharing'
-share_partners = 1                      # the number of agents an agent informs about a (part of) the personal heatmap
-shared_alternatives = 1                 # number of known alternatives shared at any given time
+# Indicators 'No Sharing'
+shared_alternatives = 5                 # number of known alternatives shared at any given time
+share_partners = 50                      # the number of agents an agent informs about a (part of) the personal heatmap
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------- COMPETITION PARAMETERS ------------------------------------------------

@@ -38,7 +38,7 @@ Version Number:
 
 # import external packages
 import pandas as pd
-
+from collections import defaultdict
 
 # TODO: --FUNCTIONALITY-- add desired functionality, only some examples of data are implemented for now:
 # - Total Forage Effort per Alternative (check)
@@ -440,3 +440,33 @@ class DataTransformer:
 
         return temp_data
 
+    def get_single_simulation_jaccard_matrices(self, agent_set, simulation_id=99):
+        """constructs a dataframe with pairwise comparisons of amount of options that both agents gave knowledge on
+        ,for all time steps in the model.
+        With the similarity index being the Jaccard Index"""
+        temp_data = pd.DataFrame()                                                                                      # prepare pandas dataframe for output
+        input_data = agent_set.agents                                                                                   # define relevant data to extract from
+
+        for time_id in list(agent_set.agents[next(iter(input_data))].knowledge_evolution_tracker.keys()):               # read from the first agent what time_steps it has logged in his tracker variable and loop over these time steps
+
+            for agent_i in input_data:                                                                                  # loop for all pairwise comparisons involving agent i as compared to other agents
+                temp_dict = defaultdict(str)                                                                            # prepare dictionary to load into pandas dataframe, if a key is accessed that is not present this key is made with a value of an empty list
+                temp_dict['iteration_id'] = 'i_' + str(simulation_id)                                                   # attach iteration_id to row
+                temp_dict['time_step_id'] = time_id                                                                     # attach time_id to row
+                temp_dict['agent_i'] = agent_i                                                                          # attach agent_id of agent i to row
+                heatmap_entries_i = set(list(input_data[agent_i].knowledge_evolution_tracker[time_id].keys()))          # define relevant data of agent i as the keys from the knowledge_evolution_tracker
+
+                for agent_j in input_data:                                                                              # loop for all pairwise comparisons involving agent i as compared to another agent j
+                    heatmap_entries_j = set(list(input_data[agent_j].knowledge_evolution_tracker[time_id].keys()))      # define relevant data of agent j as the keys from the knowledge_evolution_tracker
+
+                    # calculate Jaccard index for similarity between two binary datasets
+                    nb_shared_entries = len(heatmap_entries_i.intersection(heatmap_entries_j))                          # number of entries shared between agent i and j
+                    nb_combined_entries = len(set.union(heatmap_entries_j, heatmap_entries_i))                          # number of entries that would be in the heatmap if agent i and j combined their heatmap
+                    jaccard_i_j = nb_shared_entries/nb_combined_entries                                                 # Jaccard index as shared entries / combined entries
+                    temp_dict[agent_j] = jaccard_i_j                                                                    # attach jaccard_i_j to temporary data
+
+                temp_data = temp_data.append(temp_dict, ignore_index=True)                                              # load data from dictionary in pandas dataframe
+        return temp_data                                                                                                # return pandas dataframe
+
+    def get_average_competitor_data(self): #PLACEHOLDER
+        pass

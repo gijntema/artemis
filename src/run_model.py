@@ -61,11 +61,12 @@ class ModelRunner:
                   "---------------------------------------------------------------------------------------------------"
                   )
             time_id = str(time_tracker).zfill(len(str(duration)))
-            random.shuffle(agent_index_list)                            # shuffle agent order for equal opportunities
-            agent_set.update_memory_trackers(time_id)                    # record knowledge on the choice options at the start of a time period
+            random.shuffle(agent_index_list)                                                                            # shuffle agent order for equal opportunities
+            agent_set.update_memory_trackers(time_id)                                                                   # record knowledge on the choice options at the start of a time period
+            agent_set.update_average_expected_competitor_tracker(time_id)                                               # update tracker for the expected amount of competitors
 
             # loop for every agent
-            for agent in agent_index_list:                              # begin choice loop for every agent
+            for agent in agent_index_list:                                                                              # begin choice loop for every agent
 
                 # forage event occurs and agents choose an optimal or random alternative
                 alternative_index = agent_set.agents[agent].make_choice(choice_set)
@@ -87,7 +88,7 @@ class ModelRunner:
                         shared_heatmap_data = agent_set.agents[agent].share_heatmap_knowledge(                          # identify what data will be shared with another agent
                             number_of_alternatives=shared_alternatives)
                         data_receiver_agent = random.choice(agent_index_list)                                           # pick random agent to share with
-                        agent_set.agents[data_receiver_agent].receive_heatmap_knowledge(shared_heatmap_data)            # picked agent receives data
+                        agent_set.agents[data_receiver_agent].receive_heatmap_knowledge(shared_heatmap_data, time_id)   # picked agent receives data
                         print('{} is now sharing data on stock(s) in {} with {}'.format(str(agent),                     # report on data sharing
                                                                                         str(shared_heatmap_data[0]),
                                                                                         str(data_receiver_agent)))
