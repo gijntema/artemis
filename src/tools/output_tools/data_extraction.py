@@ -30,7 +30,7 @@ Module Usage:
     outputs generated there are then used as input for export_data.py and outcome_visualization.py
 
 Last Updated:
-    06-09-2021
+    01-10-2021
 
 Version Number:
     0.1
@@ -39,6 +39,8 @@ Version Number:
 # import external packages
 import pandas as pd
 from collections import defaultdict
+# TODO: likely some duplicate functions present, future check should identify what is done twice
+
 
 # TODO: --FUNCTIONALITY-- add desired functionality, only some examples of data are implemented for now:
 # - Total Forage Effort per Alternative (check)
@@ -373,7 +375,7 @@ class DataTransformer:
                               agent_specific_data, agent_time_series_data,
                               target_alt_spec=None, target_alt_time=None,
                               target_agent_spec=None, target_agent_time=None):
-
+        """attaches values for the standard error of the mean for four dataframes and types"""
         sem_alternative_specific = self.__attach_sem_alternative_specific(alternative_specific_data, target_alt_spec)
         sem_alternative_time = self.__attach_sem_alternative_time_series(alternative_time_series_data, target_alt_time)
         sem_agent_specific = self.__attach_sem_agent_specific(agent_specific_data, target_agent_spec)
@@ -426,6 +428,9 @@ class DataTransformer:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def get_single_simulation_memory_evolution(self, agent_set, duration):
+        """extracts for the last simulation how the agents heatmaps fill up with data,
+        this is merely Boolean information (0/1) and therefore only indicats if an agent has any knowledge on options,
+        not the quality of these options"""
         temp_data = pd.DataFrame()                                                                                      # set up output data
         time_tracker = 0                                                                                                # set up time counter for loop functionality
         while time_tracker < duration:                                                                                  # loop over all time_steps

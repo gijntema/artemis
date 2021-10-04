@@ -35,7 +35,7 @@ Module Usage:
 -   Since this module is the Main, it is used to execute all other modules and is not used by other modules
 
 Last Updated:
-    08-09-2021
+    01-10-2021
 
 Version Number:
     0.2
@@ -52,7 +52,7 @@ start = timeit.default_timer()                                                  
 
 # import internal modules
 import pandas as pd                                                                                                     # pandas daytaframe as data structure tool
-pd.options.plotting.backend = "plotly"                                                                                  # set a different, preffered over default,  style of plottting
+pd.options.plotting.backend = "plotly"                                                                                  # set a different, preffered over default,  style of plotting
 
 # Other Modules in the ARTEMIS model
 from src.config.init.init_param import *                                                                                # module containing parameter and scenario settings
@@ -127,8 +127,9 @@ while iteration_counter < number_of_iterations:
     agent_set_time_series = agent_set_time_series.append(temp_agent_set_time_series).reset_index(drop=True)             # attach iteration specific  agent time series data to the full dataset and reset indices to prevent index errors
 
     iteration_counter += 1                                                                                              # progress to the next iteration
+
 # ----------------------------------------------------------------------------------------------------------------------
-# Exit iteration loop and extract measures (e.g. mean of iterations) from raw data outputs
+# Exit iteration loop and extract mean and sd) from raw data outputs
 # ----------------------------------------------------------------------------------------------------------------------
 avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
     data_transformer.get_average_dataframes(alternative_specific_data,                                                  # extract averages from raw dataset with data from all iterations using methods from export_data.py functionality
@@ -144,52 +145,56 @@ sd_alternative_spec, sd_alternative_time, sd_agent_spec, sd_agent_time = \
                                         agent_specific_data,
                                         agent_set_time_series)
 
-qt75_alternative_spec, qt75_alternative_time, qt75_agent_spec, qt75_agent_time = \
-    data_transformer.get_qt_dataframes(alternative_specific_data,
-                                       choice_set_time_series,
-                                       agent_specific_data,
-                                       agent_set_time_series, quantile=0.75)
-
-qt50_alternative_spec, qt50_alternative_time, qt50_agent_spec, qt50_agent_time = \
-    data_transformer.get_qt_dataframes(alternative_specific_data,
-                                       choice_set_time_series,
-                                       agent_specific_data,
-                                       agent_set_time_series, quantile=0.50)
-
-qt25_alternative_spec, qt25_alternative_time, qt25_agent_spec, qt25_agent_time = \
-    data_transformer.get_qt_dataframes(alternative_specific_data,
-                                       choice_set_time_series,
-                                       agent_specific_data,
-                                       agent_set_time_series, quantile=0.25)
-
-
-qt_alternative_spec = qt25_alternative_spec\
-    .join(qt50_alternative_spec.drop('alternative_id', axis='columns'), lsuffix='_qt25', rsuffix='_med')\
-    .join(qt75_alternative_spec.drop('alternative_id', axis='columns').add_suffix('_qt75'))
-
-qt_alternative_time = qt25_alternative_time \
-    .join(qt50_alternative_time.drop('time_step_id', axis='columns'), lsuffix='_qt25', rsuffix='_med') \
-    .join(qt75_alternative_time.drop('time_step_id', axis='columns').add_suffix('_qt75'))
-
-qt_agent_spec = qt25_agent_spec \
-    .join(qt50_agent_spec.drop('agent_id', axis='columns'), lsuffix='_qt25', rsuffix='_med') \
-    .join(qt75_agent_spec.drop('agent_id', axis='columns').add_suffix('_qt75'))
-
-qt_agent_time = qt25_agent_time \
-    .join(qt50_agent_time.drop('time_step_id', axis='columns'), lsuffix='_qt25', rsuffix='_med') \
-    .join(qt75_agent_time.drop('time_step_id', axis='columns').add_suffix('_qt75'))
-qt_agent_time['total_catch_err_min'] = \
-    abs(qt_agent_time['total_catch_med'] - qt_agent_time['total_catch_qt25'])
-qt_agent_time['total_catch_err_plus'] = \
-    abs(qt_agent_time['total_catch_med'] - qt_agent_time['total_catch_qt75'])
-
-
 avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
     data_transformer.attach_sem_dataframes(
         alternative_specific_data, choice_set_time_series,
         agent_specific_data, agent_set_time_series,
         target_alt_spec=avg_alternative_spec, target_alt_time=avg_alternative_time,
-        target_agent_spec=avg_agent_spec, target_agent_time=avg_agent_time)
+        target_agent_spec=avg_agent_spec, target_agent_time=avg_agent_time)                                             # add Standard error of the mean (SEM) to dataframes
+
+# ----------------------------------------------------------------------------------------------------------------------
+# extract measures related to median and quantiles from raw data outputs
+# ----------------------------------------------------------------------------------------------------------------------
+# TODO: Migrate all stuff here to data_extraction.DataTransformer object
+qt75_alternative_spec, qt75_alternative_time, qt75_agent_spec, qt75_agent_time = \
+    data_transformer.get_qt_dataframes(alternative_specific_data,
+                                       choice_set_time_series,
+                                       agent_specific_data,
+                                       agent_set_time_series, quantile=0.75)                                            # 75th quantile for four data types
+
+qt50_alternative_spec, qt50_alternative_time, qt50_agent_spec, qt50_agent_time = \
+    data_transformer.get_qt_dataframes(alternative_specific_data,
+                                       choice_set_time_series,
+                                       agent_specific_data,
+                                       agent_set_time_series, quantile=0.50)                                            # 50th quantile AKA median
+
+qt25_alternative_spec, qt25_alternative_time, qt25_agent_spec, qt25_agent_time = \
+    data_transformer.get_qt_dataframes(alternative_specific_data,
+                                       choice_set_time_series,
+                                       agent_specific_data,
+                                       agent_set_time_series, quantile=0.25)                                            # 25th quantile
+
+
+qt_alternative_spec = qt25_alternative_spec\
+    .join(qt50_alternative_spec.drop('alternative_id', axis='columns'), lsuffix='_qt25', rsuffix='_med')\
+    .join(qt75_alternative_spec.drop('alternative_id', axis='columns').add_suffix('_qt75'))                             # merge 25th,50th and 75th into one dataframe for data contained in the DiscreteAlternative objects (AKA the option an agent can choose from)
+
+qt_alternative_time = qt25_alternative_time \
+    .join(qt50_alternative_time.drop('time_step_id', axis='columns'), lsuffix='_qt25', rsuffix='_med') \
+    .join(qt75_alternative_time.drop('time_step_id', axis='columns').add_suffix('_qt75'))                               # merge 25th,50th and 75th into one dataframe for data contained in the ChoiceSet object (overarching data from trackers not specific to one DiscreteAlternative)
+
+qt_agent_spec = qt25_agent_spec \
+    .join(qt50_agent_spec.drop('agent_id', axis='columns'), lsuffix='_qt25', rsuffix='_med') \
+    .join(qt75_agent_spec.drop('agent_id', axis='columns').add_suffix('_qt75'))                                         # merge 25th,50th and 75th into one dataframe for data contained in the ForagerAgent objects (AKA the specific behaviour and success of ForagerAgents)
+
+qt_agent_time = qt25_agent_time \
+    .join(qt50_agent_time.drop('time_step_id', axis='columns'), lsuffix='_qt25', rsuffix='_med') \
+    .join(qt75_agent_time.drop('time_step_id', axis='columns').add_suffix('_qt75'))                                     # merge 25th,50th and 75th into one dataframe for data contained in the AgentSet objects (AKA the more general descriptors of fleets, flocks, packs or whatever group the agents represent)
+qt_agent_time['total_catch_err_min'] = \
+    abs(qt_agent_time['total_catch_med'] - qt_agent_time['total_catch_qt25'])                                           # add a column with the difference between the median and the 25th quantile
+qt_agent_time['total_catch_err_plus'] = \
+    abs(qt_agent_time['total_catch_med'] - qt_agent_time['total_catch_qt75'])                                           # add a column with the difference between teh median and the 75th quantile
+
 
 
 # TODO: TODO create files with raw data:catch per agent per time step (1 iteration)
@@ -237,22 +242,36 @@ graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id',
 # graph_constructor.plot_line_pandas(qt_alternative_time, x_values='time_step_id', img_name = 'qt_alt_time')            # make line graph of the choice option time series average data
 
 # ----------------------------------------------------------------------------------------------------------------------
-# produce graphical outputs - median and quantile values
+# produce data and graphical outputs - median, min and max values for memory evolution
 # ----------------------------------------------------------------------------------------------------------------------
+
 single_memory_data = data_transformer.get_single_simulation_memory_evolution(agent_set_output, duration)                # get data on the amount of options with an entry in the agents heatmap in the last simulation for every agent en time step specific
-single_memory_data_summary = pd.DataFrame()
-single_memory_data_summary['time_step_id'] = single_memory_data['time_step_id']
-single_memory_data_summary['min_knowledge'] = single_memory_data.min(axis=1)
-single_memory_data_summary['med_knowledge'] = single_memory_data.median(axis=1)
-single_memory_data_summary['max_knowledge'] = single_memory_data.max(axis=1)
+
+single_memory_data_summary = pd.DataFrame()                                                                             # make summary data for the memory evolution
+single_memory_data_summary['time_step_id'] = single_memory_data['time_step_id']                                         # enter column with time
+single_memory_data_summary['min_knowledge'] = single_memory_data.min(axis=1)                                            # enter column with the least knowledgeable agent value
+single_memory_data_summary['med_knowledge'] = single_memory_data.median(axis=1)                                         # enter column with the median knowledgeable agent value
+single_memory_data_summary['max_knowledge'] = single_memory_data.max(axis=1)                                            # enter column with the most knowledgeable agent value
 
 graph_constructor.plot_line_pandas(single_memory_data, x_values='time_step_id',
                                    img_name='knowledge_evolution_last_simulation',
-                                   y_label=' # of entries in heatmap', legend_title='Agents')
+                                   y_label=' # of entries in heatmap', legend_title='Agents')                           # plot memory evolution over time fro all agents
 
 graph_constructor.plot_line_pandas(single_memory_data_summary, x_values='time_step_id',
                                    img_name='summary_knowledge_evolution_last_simulation',
-                                   y_label=' # of entries in heatmap', legend_title='Agents')
+                                   y_label=' # of entries in heatmap', legend_title='Agents')                           # plot summary values for memory evolution over time (min-median-max
+
+# ----------------------------------------------------------------------------------------------------------------------
+# produce data and graphical outputs - intricate measure for the mean number of competitors (over all options) per agent
+# ----------------------------------------------------------------------------------------------------------------------
+competitor_df = pd.DataFrame(agent_set_output.average_expected_competitor_tracker).transpose()                          # make a pd.Dataframe from the data
+competitor_df['time_step_id'] = competitor_df.index                                                                     # repair small error in tracker->pd.dataframe conversion --> get time_step column from index
+graph_constructor.plot_line_pandas(competitor_df,
+                                   x_values='time_step_id', y_values=None,
+                                   img_name='test_average_competitors_SA{}_SP{}'.format(shared_alternatives,            # format the img name with the number of memory entries (SA) shared with a number of people (SP) by every agent in every time step
+                                                                                        share_partners),
+                                   y_label='average expected number of competitors'
+                                   , legend_title='Agents')                                                             # make plot from data containgin data of agents average competitors per cell over time
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce database outputs (e.g. .csv or .json)
@@ -282,7 +301,7 @@ data_writer.write_json(agent_set_time_series, "agent_set_time_series.json")     
 data_writer.write_csv(single_memory_data, 'last_simulation_memory_evolution.csv')                                       # write knowledge evolution data
 
 
-# jaccard_agent_knowledge = data_transformer.get_single_simulation_jaccard_matrices(agent_set_output)                     # get jaccard indices similarity matrices for last simulation - not working properly
+# jaccard_agent_knowledge = data_transformer.get_single_simulation_jaccard_matrices(agent_set_output)                     # get jaccard indices similarity matrices for last simulation
 # data_writer.write_csv(jaccard_agent_knowledge, 'last_simulation_jaccard_agents.csv')
 # data_writer.write_json(jaccard_agent_knowledge, 'last_simulation_jaccard_agents.json')
 # graph_constructor.plot_jaccard(jaccard_agent_knowledge.drop('iteration_id', axis=1),
@@ -292,13 +311,6 @@ data_writer.write_csv(single_memory_data, 'last_simulation_memory_evolution.csv'
 #                                y_label='Jaccard Index Value',
 #                                legend_title='agent_j')
 
-competitor_df = pd.DataFrame(agent_set_output.average_expected_competitor_tracker).transpose()
-competitor_df['time_step_id'] = competitor_df.index
-graph_constructor.plot_line_pandas(competitor_df,
-                                   x_values='time_step_id', y_values=None,
-                                   img_name='test_average_competitors_SA{}_SP{}'.format(shared_alternatives, share_partners),
-                                   y_label='average expected number of competitors'
-                                   , legend_title='Agents')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Runtime tracking

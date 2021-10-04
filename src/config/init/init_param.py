@@ -27,7 +27,7 @@ Module Usage:
 -   all defined variables are input for module ARTEMIS.py
 
 Last Updated:
-    08-09-2021
+    01-10-2021
 
 Version Number:
     0.1
@@ -49,27 +49,27 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 
 
 # model characteristics
-duration = 50                       # number of time steps in the model
-choice_set_size = 20                # number of discrete alternatives in the choice set
-number_of_agents = 50               # number of foragers in the model
-number_of_iterations = 1           # number of iterations/simulations the model runs for
+duration = 100                          # number of time steps in the model
+choice_set_size = 20                    # number of discrete alternatives in the choice set
+number_of_agents = 100                  # number of foragers in the model
+number_of_iterations = 1                # number of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-growth_type = 'static'              # indicates stock dynamics -- placeholder, currently not implemented
-stock_reset_scenario = 'random-repeat' # indicates if and how the stock in a DiscreteAlternative objects resets
-chance_reset_stock = 0.9       # chance the stock is repeated at the end of a time_step
+growth_type = 'static'                  # indicates stock dynamics -- placeholder, currently not implemented
+stock_reset_scenario = 'random-repeat'  # indicates if and how the stock in a DiscreteAlternative objects resets
+chance_reset_stock = 0.9                # chance the stock is repeated at the end of a time_step
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- INFORMATION SHARING PARAMETERS -------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 information_sharing_scenario = 'Random Sharing'
-# considered functionality: ['No Sharing', Coalition Sharing', 'Random Sharing']
+# considered functionality: ['No Sharing', Coalition Sharing' (not implemented yet), 'Random Sharing']
 
-# Indicators 'No Sharing'
-shared_alternatives = 5                 # number of known alternatives shared at any given time
-share_partners = 50                      # the number of agents an agent informs about a (part of) the personal heatmap
+# Indicators 'Random Sharing'
+shared_alternatives = 1                 # number of known alternatives shared at any given time
+share_partners = 1                      # the number of agents an agent informs about a (part of) the personal heatmap
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ share_partners = 50                      # the number of agents an agent informs
 # ----------------------------------------------------------------------------------------------------------------------
 
 competition_scenario = 'interference-simple'  # indicate the way competition is modelled in the model
-interference_factor = 0.8                     # factor for interference-simple scenario only
+interference_factor = 0.8                     # factor for interference-simple scenario only, indicates a factor for catch reduction for every competitor present
 # room for future functionality in competition
 
 # ----------------------------------------------------------------------------------------------------------------------

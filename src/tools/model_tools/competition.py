@@ -32,7 +32,7 @@ Module Usage:
 -   the module will be used in run_model.py to introduce competition in simulations
 
 Last Updated:
-    07-09-2021
+    01-10-2021
 
 Version Number:
     0.1
@@ -65,7 +65,7 @@ class CompetitionHandler:
                     "correct": self.__correct_absent,
 
                 },
-            'interference-simple':                                                                                      # competition through interference in accounted for by correcting the catch for the amount agents that have chosen that choice option
+            'interference-simple':                                                                                      # competition through interference accounted for by correcting the effort for the number of agents that have chosen that choice option
                 {
                     "init": self.__init_interference,
                     "load": self.__load_interference,
@@ -85,7 +85,7 @@ class CompetitionHandler:
                 },
             'fixed-catch':
                 {
-                    # relic code= obsolete
+                    # relic code = obsolete
                     "init": self.__init_fixed_catch,
                     "load": self.__load_fixed_catch,
                     "correct": self.__correct_fixed_catch
@@ -99,7 +99,8 @@ class CompetitionHandler:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __init_relevant(self):
-        """method to initialise the relevant attributes needed for competition corrections"""
+        """method to initialise the relevant attributes (e.g. competition specific trackers),
+        needed when accounting for competition"""
         if isinstance(self.competition_method, str):                                                                    # if only a single competition type is specified
             relevant = self.__init_relevant_single()
         elif isinstance(self.competition_method, tuple):                                                                # if multiple competition types are specified - currently not supported
@@ -110,19 +111,21 @@ class CompetitionHandler:
         return relevant
 
     def __init_relevant_single(self):
-        """method to initialise the relevant attributes needed for competition corrections (when only 1 scenario)"""
+        """method to initialise the relevant attributes (e.g. competition specific trackers)
+         needed when accounting for competition"""
         relevant = self.competition_instruction[self.competition_method]['init']()
         return relevant
 
     def __init_relevant_multiple(self):
-        """method to initialise the relevant attributes needed for competition corrections (when multiple scenarios)"""
+        """method to initialise the relevant attributes (e.g. competition specific trackers)
+         needed when accounting for competition"""
         # TODO -- FUTURE -- allow functionality for multiple scenarios simultaneously - METHOD UNFINISHED
         relevant = {}
         # Include loop here to ensure relevant data for all considered competition are added
         return relevant
 
     def __init_absent(self):
-        """method to define relevant data, as an absent competition does not need any data,
+        """method to define relevant data, as an absence of competition does not need any data,
          only present to fix bugging"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(int)                                                              # dictionary that creates and returns an integer 0 if a key is called that is not already in
@@ -159,7 +162,7 @@ class CompetitionHandler:
         return relevant_data
 
 # ----------------------------------------------------------------------------------------------------------------------
-# ---------------------------- Methods to load relevant agent choices functionality ------------------------------------
+# ---------------------------- Methods to load relevant agent choice functionality -------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
     def load_competition_data(self, chosen_alternative_id, agent_id, interference_factor=0):
         """loads data on the agent and chosen choice option"""
@@ -188,12 +191,13 @@ class CompetitionHandler:
         """loads data on the agent and chosen choice option"""
         self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id
+
 # ----------------------------------------------------------------------------------------------------------------------
-# ---------------------- Methods to return any corrections needed to account for competition ---------------------------
+# ---------------------- Methods to return any adjustments needed to account for competition ---------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def competition_correction(self, choice_set, agent_set, agent_id, time_id):
-        """returns the real catch a ForagerAgent gains, when corrected for competition"""
+        """returns the real catch a ForagerAgent gains, when adjusted for competition"""
 
         choice_id = self.relevant_data['agent_choices'][agent_id]
 
@@ -207,7 +211,7 @@ class CompetitionHandler:
             "{} is foraging in {} and is hindered by interference with {}".format(agent_id, choice_id, correction_tag)  # report on interference to user
             )
 
-        agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents
+        agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents itself
         # agent_set.update_memory
         choice_set.catch_map[choice_id] += corrected_catch                                                              # update tracker of the choice set for total catch in a choice option
         choice_set.effort_map[choice_id] += 1                                                                           # update tracker of the choice set for effort in a choice option

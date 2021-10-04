@@ -35,7 +35,7 @@ Module Usage:
 -   choice_making.py loads parts of the ForagerAgent object as input for the ChoiceMaker object
 
 Last Updated:
-    07-09-2021
+    01-10-2021
 
 Version Number:
     0.2
@@ -89,7 +89,7 @@ class AgentSet:                                         # to be implemented, not
 
     def update_average_expected_competitor_tracker(self, time_id):
         """Method that updates a tracker containing data on the average number of competitors expected
-        in a given time step for every agent -- TODO: NOT IMPLEMENTED YET"""
+        in a given time step for every agent"""
 
         temp_probability_dictionary = {}                                                                                # temporary dictionary to store agent specific probability maps fro choosing a option (e.g. grid cell) to forage in/from
         number_of_options = len(self.agents[next(iter(self.agents))].heatmap)                                           # get total number of options(e.g. the amount of grid cells an agent can choose from) as the number of entries in the first agents heatmap
