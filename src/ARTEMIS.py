@@ -121,15 +121,15 @@ while iteration_counter < number_of_iterations:
                                                iteration_id=iteration_counter)
 
     # TODO: --MINOR-- possible duplicate functionality in two different time series dataframes, might be merged
-    alternative_specific_data = alternative_specific_data.append(temp_alternative_specific_data).reset_index(drop=True) # attach iteration specific choice option data to the full dataset and reset indices to prevent index errors
-    choice_set_time_series = choice_set_time_series.append(temp_choice_set_time_series).reset_index(drop=True)          # attach iteration specific  choice option time series data to the full dataset and reset indices to prevent index errors
-    agent_specific_data = agent_specific_data.append(temp_agent_specific_data).reset_index(drop=True)                   # attach iteration specific  agent data to the full dataset and reset indices to prevent index errors
-    agent_set_time_series = agent_set_time_series.append(temp_agent_set_time_series).reset_index(drop=True)             # attach iteration specific  agent time series data to the full dataset and reset indices to prevent index errors
+    alternative_specific_data = alternative_specific_data.append(temp_alternative_specific_data).reset_index(drop=True) # attach iteration specific choice option data to the full dataset and reset indices to prevent index errors -- Currently extracts final stock after a run and the cumulative number of catch events in each choice option
+    choice_set_time_series = choice_set_time_series.append(temp_choice_set_time_series).reset_index(drop=True)          # attach iteration specific choice option time series data to the full dataset and reset indices to prevent index errors -- Currently no data series extracted, for future use
+    agent_specific_data = agent_specific_data.append(temp_agent_specific_data).reset_index(drop=True)                   # attach iteration specific agent data to the full dataset and reset indices to prevent index errors -- Currently extracts the cumulative catch of an agent over a full simulation
+    agent_set_time_series = agent_set_time_series.append(temp_agent_set_time_series).reset_index(drop=True)             # attach iteration specific agent time series data to the full dataset and reset indices to prevent index errors -- Currently extracts the total catch of all agents for every time step specifically
 
     iteration_counter += 1                                                                                              # progress to the next iteration
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Exit iteration loop and extract mean and sd) from raw data outputs
+# ----------------------------------------------------------------------------------------------------------------------# Exit iteration loop and
+# extract mean and sd from raw data outputs
 # ----------------------------------------------------------------------------------------------------------------------
 avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
     data_transformer.get_average_dataframes(alternative_specific_data,                                                  # extract averages from raw dataset with data from all iterations using methods from export_data.py functionality
@@ -217,7 +217,7 @@ graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternati
                                   img_name='raw_alt_spec')                                                              # test to see distributions in the specific alternatives
 
 # ----------------------------------------------------------------------------------------------------------------------
-# produce graphical outputs - median and quantile values
+# produce graphical outputs - median and quantile values - ALL ERRORs currently needs to be fixed
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ERROR Code, needs to be fixed, quick and dirty fixes below
@@ -233,11 +233,11 @@ graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternati
 #                                  yerr_min=[col for col in qt_alternative_spec.columns if 'qt25' in col],
 #                                  img_name='qt_agent_spec')                                                             # make bar graph of the agent specific average data
 
-graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id',
-                                   y_values='total_catch_med',
-                                   yerr_plus='total_catch_err_plus',
-                                   yerr_min='total_catch_err_min',
-                                   img_name='qt_agent_time')                                                            # make line graph of the agent time series average data
+# graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id',
+#                                   y_values='total_catch_med',
+#                                   yerr_plus='total_catch_err_plus',
+#                                   yerr_min='total_catch_err_min',
+#                                   img_name='qt_agent_time')                                                            # make line graph of the agent time series average data (plots the median cumulative catch an agent over time, with error bars to the 25th and 75th percentile
 
 # graph_constructor.plot_line_pandas(qt_alternative_time, x_values='time_step_id', img_name = 'qt_alt_time')            # make line graph of the choice option time series average data
 
