@@ -62,11 +62,70 @@ class DataTransformer:
         only for future functionality/flexibility,
         not implemented in current version"""
 
-        self.functionality = \
+        self.functionality_extraction = self.__init_functionality_extraction()                                          # functionality to extract data as tracke dby the model
+        self.functionality_derived_measures = self.__init_functionality_derived()                                       # functionality to calculate measures, indices etc. from data tracked by the model
+
+    def __init_functionality_extraction(self):  # PLACE HOLDER FOR future reworking of the structure
+        """intialises a dictionary containing all possible functionality
+        for extracting and formatting directly tracked data in the model"""
+        functionality = \
             {
-                'avg': self.get_average_dataframes,
-                'sd': self.get_sd_dataframes
+                'generic_measures':
+                    {
+                        'iteration_tag': 'PLACEHOLDER'
+                    },
+                'alternative_spec':
+                    {
+                        'alternative_id': self.__extract_list_of_alternatives,
+                        'alternative_cumulative_effort': self.__transform_alternative_effort_data,
+                        'alternative_final_stock': self.__transform_final_stock_data
+                        # INSERT FURTHER FUNCTIONALITY HERE
+                    },
+                'choice_set_time':
+                    {
+                        'time_series_id': self.__extract_list_of_time_steps
+                        # INSERT FURTHER FUNCTIONALITY HERE
+                    },
+                'agent_spec':
+                    {
+                        'agent_id': self.__extract_list_of_agents,
+                        'agent_cumulative_catch': self.__transform_agent_catch_data
+                        # INSERT FURTHER FUNCTIONALITY HERE
+                    },
+                'agent_set_time':
+                    {
+                        'time_series_id': self.__extract_list_of_time_steps,
+                        'yearly_catch': self.__transform_agent_set_total_catch_data
+                        # INSERT FURTHER FUNCTIONALITY HERE
+                    },
+                'agent_spec_x_time':
+                    {
+                        'average_expected_competition': self.extract_average_expected_competition
+                        # INSERT FURTHER FUNCTIONALITY HERE
+                    }
+                # INSERT POTENTIAL OTHER DATA TYPES HERE
             }
+        return functionality
+
+    def __init_functionality_derived(self):  # PLACEHOLDER for future reworking of the structure
+        """intialises a dictionary containing all possible functionality
+        for deriving measures (e.g. averages) from tracked data,
+        often extracted in extraction functionality"""
+
+        functionality = \
+            {
+                'average': self.get_average_dataframes,
+                'standard deviation': self.get_sd_dataframes,
+                'standard error of the mean': 'PLACEHOLDER',
+                'median': 'PLACEHOLDER',
+                'quantile': 'PLACEHOLDER',
+                'min': 'PLACEHOLDER',
+                'max': 'PLACEHOLDER'
+            }
+        return functionality
+# ----------------------------------------------------------------------------------------------------------------------
+# ---------------------------- Main function to extract raw data series from model outputs -----------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def transform_output_data(self, choice_set, agent_set, duration, iteration_id=1):
         """main functionality method, extracts data (currently hardcoded) from agents and choice options,
@@ -97,7 +156,7 @@ class DataTransformer:
 
         # add iteration_id to dataframe
         iteration_id = ['iteration_' + str(iteration_id)] * len(temp_dictionary['alternative_id'])                      # add a tag for the iteration an a data point originates from to each data point
-        alternative_data.insert(0, 'iteration_id', iteration_id)                                                        # insert itertaion ID as first column in the new data format
+        alternative_data.insert(0, 'iteration_id', iteration_id)                                                        # insert iteration ID as first column in the new data format
 
         return alternative_data
 
@@ -429,7 +488,7 @@ class DataTransformer:
 
     def get_single_simulation_memory_evolution(self, agent_set, duration):
         """extracts for the last simulation how the agents heatmaps fill up with data,
-        this is merely Boolean information (0/1) and therefore only indicats if an agent has any knowledge on options,
+        this is merely Boolean information (0/1) and therefore only indicates if an agent has any knowledge on options,
         not the quality of these options"""
         temp_data = pd.DataFrame()                                                                                      # set up output data
         time_tracker = 0                                                                                                # set up time counter for loop functionality
@@ -473,5 +532,13 @@ class DataTransformer:
                 temp_data = temp_data.append(temp_dict, ignore_index=True)                                              # load data from dictionary in pandas dataframe
         return temp_data                                                                                                # return pandas dataframe
 
-    def get_average_competitor_data(self): #PLACEHOLDER
-        pass
+# ----------------------------------------------------------------------------------------------------------------------
+# --------------------------- Methods to Extract data from Competition Related Trackers---------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+    def extract_average_expected_competition(self, agent_set):
+        data_output = pd.DataFrame(agent_set.average_expected_competitor_tracker).transpose()                           # make a pd.Dataframe from the data on the average amount of competitors in a given choice option
+        data_output.insert(loc=0, column='time_step_id', value=data_output.index)                                       # repair small error in tracker->pd.dataframe conversion --> get time_step column from index
+        data_output.reset_index(inplace=True)                                                                           # reset index values to default indices
+        data_output.drop(columns='index', inplace=True)                                                                 # remove newly created redundant column 'index'
+        return data_output

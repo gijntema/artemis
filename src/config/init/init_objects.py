@@ -69,11 +69,11 @@ class ObjectInitializer:
     def initialize_forager_agents(self, nb_agents, choice_set,
                                   catchability_coefficient, nb_alternatives_known,
                                   explore_probability, duration_model,
-                                  coalition_forming=False, coalition_cheaters=False,
-                                  choice_method='random'):
+                                  choice_method="random"):
         """Method to set up the agents in the model"""
 
         # initialize all agents and time independent tracker variables
+        print(choice_method)
         agent_set = AgentSet()                                                                                          # create an instance of the object agent set to contain trackers and agents in
         agent_tracker = 0                                                                                               # make counter for following while loop functioning
 

@@ -129,21 +129,21 @@ class CompetitionHandler:
          only present to fix bugging"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(int)                                                              # dictionary that creates and returns an integer 0 if a key is called that is not already in
-        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
+        relevant_data['agent_choices'] = dict()
         return relevant_data
 
     def __init_interference(self):
         """method to initialise a tracker for effort, as effort is used a basis to correct catch for interference"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(int)                                                              # dictionary that creates and returns an integer 0 if a key is called that is not already in
-        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
+        relevant_data['agent_choices'] = dict()
         return relevant_data
 
     def __init_uptake(self):
         """method to initialise an ordered tracker for catch, as catch is used to reduce the resource stock"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
-        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
+        relevant_data['agent_choices'] = dict()
         return relevant_data
 
     def __init_price(self):
@@ -152,13 +152,13 @@ class CompetitionHandler:
         to human forager agents"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
-        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
+        relevant_data['agent_choices'] = dict()
         return relevant_data
 
     def __init_fixed_catch(self):
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
-        relevant_data['agent_choices'] = OrderedDict()                                                                  # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
+        relevant_data['agent_choices'] = dict()                                                                 # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
         return relevant_data
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -207,9 +207,9 @@ class CompetitionHandler:
         corrected_catch, correction_tag = \
             self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the competition methods specified
 
-        print(
-            "{} is foraging in {} and is hindered by interference with {}".format(agent_id, choice_id, correction_tag)  # report on interference to user
-            )
+        #print(
+        #    "{} is foraging in {} and is hindered by interference with {}".format(agent_id, choice_id, correction_tag)  # report on interference to user
+        #    )
 
         agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents itself
         # agent_set.update_memory

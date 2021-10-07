@@ -58,7 +58,6 @@ class AgentSet:                                         # to be implemented, not
         self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
 #        self.time_step_catch_distribution = {}         # tracker to save distribution of catch over the agents for every time_step - Currently not used
         self.average_expected_competitor_tracker = defaultdict(dict)   # tracker to contain the average expected amount of competitors expected when picking any cell
-        # TODO: implement tracker on line above
 
     def update_agent_trackers(self, agent_id, catch, alternative_index, time_tracker):
         """" updates the data contained in a single ForagerAgent
@@ -206,7 +205,7 @@ class ForagerAgent:
         """Uses the ChoiceMaker object from choice_making.py to choose a forage choice option
         and gets the actual catch from the choice options"""
         choice_alternative = self.choice_maker.make_choice()                                                            # prompt the ChoiceMaker to choose a choice option and retrun the ID of the chosen choice options
-
+        self.__update_list_of_knowns()
         return choice_alternative                                                                                       # return the chosen choice option
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -250,7 +249,7 @@ class ForagerAgent:
                     self.list_of_known_alternatives.append(alternative)
 
     def update_memory_trackers(self, time_id):
-        """currently ERRORS""" #TODo CURRENTLY does not work properly (all knowns for agent x are always an age of x)
+        """currently ERRORS""" #TODO CURRENTLY does not work properly (all knowns for agent x are always an age of x)
         for known in self.list_of_known_alternatives:
 
             try:
@@ -271,6 +270,7 @@ class ForagerAgent:
     def share_heatmap_knowledge(self, number_of_alternatives=1):
         """method that returns a given number of alternatives the ForagerAgent has knowledge on
         to be shared with other ForagerAgents"""
+        print("<{}> is now starting to share data".format(self.id))
         self.__update_list_of_knowns()                                                                                  # make sure the list of known alternatives is up to date
         shared_alternatives_indices = []                                                                                # empty list for later attchment of choice option indices to be shared
         shared_alternatives_data = []                                                                                   # empty list for later attchment of choice option contens to be shared
@@ -290,7 +290,9 @@ class ForagerAgent:
                     shared_alternatives_indices.append(shared_alternative)                                              # attach the choice option index from the randomly chosen entry
                     shared_alternatives_data.append(self.heatmap[shared_alternative])                                   # attach the choice option contents from the randmloy chosen entry
                 alternative_counter += 1
+                print("continue with share while loop {}".format(alternative_counter))
 
+        print('exiting share alternatives loop')
         return tuple((shared_alternatives_indices, shared_alternatives_data))                                           # return a tuple with choice option indices to be shared and the corresponding contents of those choice options
 
     def receive_heatmap_knowledge(self, shared_data, time_id=-99):
@@ -310,12 +312,14 @@ class ForagerAgent:
             elif isinstance(self.heatmap[received_index], float):                                                       # check if the receiving agent already has an entry for that choice: YES
                 self.heatmap[received_index] = (received_data + self.heatmap[received_index])/2                         # take average of newly shared data and the information already known from other data
 
-            try:
-                self.knowledge_evolution_tracker[time_id][received_index]['time_of_origin'] = int(time_id)
+            # TODO: duplicate functionality with self.update_memory_trackers()
+            # attempted functionality for knowledge degredation and knowledge age trackers (how long ago did an agent obtain a heatmap entry)
+#            try:
+#                self.knowledge_evolution_tracker[time_id][received_index]['time_of_origin'] = int(time_id)              # test if a time_of_origin us already present, and if so replace with the current time
 
-            except KeyError:
-                self.knowledge_evolution_tracker[time_id][received_index] = dict()
-                self.knowledge_evolution_tracker[time_id][received_index]['time_of_origin'] = int(time_id)
+#            except KeyError:
+#                self.knowledge_evolution_tracker[time_id][received_index] = dict()                                      # if time_o
+#                self.knowledge_evolution_tracker[time_id][received_index]['time_of_origin'] = int(time_id)
 
             received_counter += 1                                                                                       # proceed to next shared choice option
 

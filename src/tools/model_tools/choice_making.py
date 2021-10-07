@@ -40,7 +40,7 @@ from random import choice, random, choices
 
 
 class ChoiceMaker:
-    def __init__(self, choice_set, choice_method='random', agent='ForagerAgent Placeholder'):                           # initilisation statement
+    def __init__(self, choice_set, choice_method, agent='ForagerAgent Placeholder'):                           # initilisation statement
         self.choice_indices = list(choice_set.discrete_alternatives.keys())                                             # initialise list of potential choice options the agent can choose from
         self.choice_instruction = self.__init_instructions()                                                            # initialise dictionary with all references to all potential functionality of a ChoiceMaker object
         self.choice_method = choice_method                                                                              # indication of the functionality this specific instance of ChoiceMaker should have
@@ -109,6 +109,7 @@ class ChoiceMaker:
         """" initialises the data needed for the 'explore_heatmap' choice method: a reference to:
         - the agent heatmap and
         - the agent explore probability"""
+
         relevant_data = dict()                                                                                          # initialise data dictionary
         relevant_data['explore_probability'] = agent.explore_probability                                                # load explore probability
         relevant_data['heatmap'] = agent.heatmap                                                                        # load agent heatmap
@@ -137,6 +138,7 @@ class ChoiceMaker:
 
     def __make_choice_random(self):
         """method to choose a random choice option to forage in"""
+        # print("<agent> is now using random to choose")
         chosen = choice(self.choice_indices)
         return chosen
 
@@ -161,7 +163,7 @@ class ChoiceMaker:
     def __make_choice_explore_heatmap(self):
         """method to choose an option based on either the full_heatmap or random methods,
         according to a fixed probability"""
-        if random < self.relevant_agent_data['explore_probability']:                                                    # if a random number between 0 and 1 is smaller than the explore probability, the ForagerAgent will explore a random cell
+        if random() < self.relevant_agent_data['explore_probability']:                                                  # if a random number between 0 and 1 is smaller than the explore probability, the ForagerAgent will explore a random cell
             chosen = self.__make_choice_random()
         else:                                                                                                           # if a random number between 0 and 1 is larger than the explore probability, the ForagerAgent will choose based on the heatmap
             chosen = self.__make_choice_full_heatmap()
@@ -171,7 +173,7 @@ class ChoiceMaker:
     def __make_choice_explore_weighted_heatmap(self):
         """method to choose an option based on either the full_heatmap or random methods,
         according to a fixed probability"""
-        if random < self.relevant_agent_data['explore_probability']:                                                    # if a random number between 0 and 1 is smaller than the explore probability, the ForagerAgent will explore a random cell
+        if random() < self.relevant_agent_data['explore_probability']:                                                  # if a random number between 0 and 1 is smaller than the explore probability, the ForagerAgent will explore a random cell
             chosen = self.__make_choice_random()
         else:                                                                                                           # if a random number between 0 and 1 is larger than the explore probability, the ForagerAgent will choose based on the heatmap
             chosen = self.__make_choice_full_weighted_heatmap()

@@ -15,7 +15,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# TODO: Remember to check for bugging using Dictionary over OrderedDict (and consider collections.DefaultDict objects)
 """
 This Module is used as the main execution of the model, it is divided into six core aspects:
 - Initialize Parameters                         (import init_param.py)
@@ -64,7 +63,6 @@ from src.tools.output_tools.outcome_visualization import GraphConstructor       
 from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
 
 
-# TODO: -- MINOR -- Fix time_step naming as plotly organises by first digit rather than full number
 iteration_counter = 0                                                                                                   # initliazation of counter for iteration loops
 alternative_specific_data = pd.DataFrame()                                                                              # intialize object to contain data on the choice options in the model
 choice_set_time_series = pd.DataFrame()                                                                                 # intialize object to contain time series data on the choice options in the model
@@ -87,11 +85,15 @@ while iteration_counter < number_of_iterations:
 # ----------------------------------------------------------------------------------------------------------------------
 # initialize choice set and forager agents
 # ----------------------------------------------------------------------------------------------------------------------
+    print(choice_method)
     choice_set = object_initializer.initialize_choice_set(choice_set_size, init_stock, sd_init_stock, growth_factor)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
-    agent_set = object_initializer.initialize_forager_agents(number_of_agents, choice_set,                              # initialize the forager agents in the model (e.g. fishermen)
-                                                             catchability_coefficient,
-                                                             init_number_of_alternatives_known,
-                                                             explore_probability, duration, choice_method
+    agent_set = object_initializer.initialize_forager_agents(nb_agents=number_of_agents,
+                                                             choice_set=choice_set,                                     # initialize the forager agents in the model (e.g. fishermen)
+                                                             catchability_coefficient=catchability_coefficient,
+                                                             nb_alternatives_known=init_number_of_alternatives_known,
+                                                             explore_probability=explore_probability,
+                                                             duration_model=duration,
+                                                             choice_method=choice_method
                                                              )
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -190,10 +192,10 @@ qt_agent_spec = qt25_agent_spec \
 qt_agent_time = qt25_agent_time \
     .join(qt50_agent_time.drop('time_step_id', axis='columns'), lsuffix='_qt25', rsuffix='_med') \
     .join(qt75_agent_time.drop('time_step_id', axis='columns').add_suffix('_qt75'))                                     # merge 25th,50th and 75th into one dataframe for data contained in the AgentSet objects (AKA the more general descriptors of fleets, flocks, packs or whatever group the agents represent)
-qt_agent_time['total_catch_err_min'] = \
-    abs(qt_agent_time['total_catch_med'] - qt_agent_time['total_catch_qt25'])                                           # add a column with the difference between the median and the 25th quantile
-qt_agent_time['total_catch_err_plus'] = \
-    abs(qt_agent_time['total_catch_med'] - qt_agent_time['total_catch_qt75'])                                           # add a column with the difference between teh median and the 75th quantile
+# qt_agent_time['total_catch_err_min'] = \
+#    abs(qt_agent_time['total_catch_med'] - qt_agent_time['total_catch_qt25'])                                          # add a column with the difference between the median and the 25th quantile
+# qt_agent_time['total_catch_err_plus'] = \
+#    abs(qt_agent_time['total_catch_med'] - qt_agent_time['total_catch_qt75'])                                          # add a column with the difference between teh median and the 75th quantile
 
 
 
@@ -239,7 +241,7 @@ graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternati
 #                                   yerr_min='total_catch_err_min',
 #                                   img_name='qt_agent_time')                                                            # make line graph of the agent time series average data (plots the median cumulative catch an agent over time, with error bars to the 25th and 75th percentile
 
-# graph_constructor.plot_line_pandas(qt_alternative_time, x_values='time_step_id', img_name = 'qt_alt_time')            # make line graph of the choice option time series average data
+graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id', img_name= 'qt_agent_time')                   # make line graph of the choice option time series average data
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce data and graphical outputs - median, min and max values for memory evolution
@@ -264,12 +266,18 @@ graph_constructor.plot_line_pandas(single_memory_data_summary, x_values='time_st
 # ----------------------------------------------------------------------------------------------------------------------
 # produce data and graphical outputs - intricate measure for the mean number of competitors (over all options) per agent
 # ----------------------------------------------------------------------------------------------------------------------
-competitor_df = pd.DataFrame(agent_set_output.average_expected_competitor_tracker).transpose()                          # make a pd.Dataframe from the data
-competitor_df['time_step_id'] = competitor_df.index                                                                     # repair small error in tracker->pd.dataframe conversion --> get time_step column from index
+competitor_df = data_transformer.extract_average_expected_competition(agent_set_output)                                 # make a pd.Dataframe from the data on the average amount of competitors in a given choice option
 graph_constructor.plot_line_pandas(competitor_df,
                                    x_values='time_step_id', y_values=None,
-                                   img_name='test_average_competitors_SA{}_SP{}'.format(shared_alternatives,            # format the img name with the number of memory entries (SA) shared with a number of people (SP) by every agent in every time step
-                                                                                        share_partners),
+                                   img_name='test_average_competitors_SA{}_SP{}_Pe%{}_J{}'.format(
+                                                                                            shared_alternatives,      # format the img name with the number of memory entries (SA) shared with a number of people (SP) by every agent in every time step
+                                                                                            share_partners,
+                                                                                            int(
+                                                                                                explore_probability
+                                                                                                 * 100
+                                                                                                ),
+                                                                                            number_of_agents
+                                                                                              ),
                                    y_label='average expected number of competitors'
                                    , legend_title='Agents')                                                             # make plot from data containgin data of agents average competitors per cell over time
 

@@ -98,5 +98,5 @@ class GraphConstructor:
         fig.update_layout(yaxis_title=y_label,
                           legend_title=legend_title)
 
-        fig.show()                                                                                                      # line to immediatly show graphs, turned off for now
+        # fig.show()                                                                                                      # line to immediatly show graphs, turned off for now
         fig.write_image("{}.png".format(img_name))
