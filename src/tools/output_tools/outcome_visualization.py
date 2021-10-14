@@ -32,7 +32,6 @@ Version Number:
     0.1
 """
 
-
 class GraphConstructor:
 
     # TODO: --STRUCTURAL-- expand dictionary library and migrate functionality of below methods
@@ -86,6 +85,11 @@ class GraphConstructor:
 
         # fig.show()                                                                                                    # line to immediatly show graphs, turned off for now
         fig.write_image("{}.png".format(img_name))
+
+    def plot_scatter_pandas(self, pd_dataframe, x_values, y_values, img_name='unnamed'):
+        fig = pd_dataframe.plot.scatter(x=x_values, y=y_values)
+        fig.write_image("{}.png".format(img_name))
+
 
     def plot_jaccard(self, pd_dataframe, x_values, y_values=None, group_by=None,
                      img_name='unnamed', y_label='value', legend_title='values'):

@@ -58,24 +58,29 @@ from src.config.init.init_param import *                                        
 from src.config.init.init_objects import ObjectInitializer                                                              # module to initialize the objects in the module (agents and choices)
 from src.run_model import ModelRunner                                                                                   # module to run the model using initialized agents and choices
 from src.tools.model_tools.competition import CompetitionHandler                                                        # module that handles model feedbacks as a result of competition between agents
+from src.tools.output_tools.printing import PrintBlocker
 from src.tools.output_tools.data_extraction import DataTransformer                                                      # module to generate output data from the objects in the model
 from src.tools.output_tools.outcome_visualization import GraphConstructor                                               # module to make graphs from the output data
 from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
 
+print_blocker = PrintBlocker()
+if reporting is not True:                                                                                               # block printing if desired
+    print_blocker.block_print()
 
 iteration_counter = 0                                                                                                   # initliazation of counter for iteration loops
 alternative_specific_data = pd.DataFrame()                                                                              # intialize object to contain data on the choice options in the model
 choice_set_time_series = pd.DataFrame()                                                                                 # intialize object to contain time series data on the choice options in the model
 agent_specific_data = pd.DataFrame()                                                                                    # intialize object to contain data on the agents in the model
 agent_set_time_series = pd.DataFrame()                                                                                  # intialize object to contain time series data on the agents in the model
+other_x_catch_data = pd.DataFrame()                                                                                     # intialize object to contain a data series for catch and any desired otehr variable to correlate with catch
 
 # initialize class objects that are part of operational structure
 object_initializer = ObjectInitializer()                                                                                # initialize the object with the functionality to initialize agents and choice options
 model_runner = ModelRunner()                                                                                            # initialize the object with the functionality to run a simulation with the initialized agents and choice options
+competition_handler = CompetitionHandler(competition_method=competition_scenario)                                       # object that will ensure competition feedbacks are executed for in the model
 data_transformer = DataTransformer()                                                                                    # initialize the object with the functionality to extract output data from model objects
 graph_constructor = GraphConstructor()                                                                                  # initialize the object with the functionality to make graphs from output data
 data_writer = DataWriter()                                                                                              # initialize the object with the functionality to export data files from output data
-competition_handler = CompetitionHandler(competition_method=competition_scenario)                                       # object that will ensure competition feedbacks are executed for in the model
 
 while iteration_counter < number_of_iterations:
     print('-----------------------------------------------------------------------------------------------------------',# print statement for user to idnetify the progression of th emodel
@@ -85,7 +90,7 @@ while iteration_counter < number_of_iterations:
 # ----------------------------------------------------------------------------------------------------------------------
 # initialize choice set and forager agents
 # ----------------------------------------------------------------------------------------------------------------------
-    print(choice_method)
+
     choice_set = object_initializer.initialize_choice_set(choice_set_size, init_stock, sd_init_stock, growth_factor)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
     agent_set = object_initializer.initialize_forager_agents(nb_agents=number_of_agents,
                                                              choice_set=choice_set,                                     # initialize the forager agents in the model (e.g. fishermen)
@@ -126,9 +131,20 @@ while iteration_counter < number_of_iterations:
     alternative_specific_data = alternative_specific_data.append(temp_alternative_specific_data).reset_index(drop=True) # attach iteration specific choice option data to the full dataset and reset indices to prevent index errors -- Currently extracts final stock after a run and the cumulative number of catch events in each choice option
     choice_set_time_series = choice_set_time_series.append(temp_choice_set_time_series).reset_index(drop=True)          # attach iteration specific choice option time series data to the full dataset and reset indices to prevent index errors -- Currently no data series extracted, for future use
     agent_specific_data = agent_specific_data.append(temp_agent_specific_data).reset_index(drop=True)                   # attach iteration specific agent data to the full dataset and reset indices to prevent index errors -- Currently extracts the cumulative catch of an agent over a full simulation
-    agent_set_time_series = agent_set_time_series.append(temp_agent_set_time_series).reset_index(drop=True)             # attach iteration specific agent time series data to the full dataset and reset indices to prevent index errors -- Currently extracts the total catch of all agents for every time step specifically
+    agent_set_time_series = agent_set_time_series.append(temp_agent_set_time_series).reset_index(drop=True)             # attach iteration specific agent time series data to the full dataset and reset indices to prevent index errors -- Currently extracts the total catch of all agents for every time st:>?
+
+    other_x_catch_data = other_x_catch_data.append(data_transformer.get_other_x_catch(agent_set, iteration_counter)).reset_index(drop=True)  # Get desired explanatory variables x Catch dataframe
 
     iteration_counter += 1                                                                                              # progress to the next iteration
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Get last simulation Explanatory Variables x Catch dataframe
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+graph_constructor.plot_scatter_pandas(other_x_catch_data,
+                                      x_values='average_expected_competitors', y_values="catch",
+                                      img_name='competition_x_catch')
 
 # ----------------------------------------------------------------------------------------------------------------------# Exit iteration loop and
 # extract mean and sd from raw data outputs
@@ -323,13 +339,16 @@ data_writer.write_csv(single_memory_data, 'last_simulation_memory_evolution.csv'
 # ----------------------------------------------------------------------------------------------------------------------
 # Runtime tracking
 # ----------------------------------------------------------------------------------------------------------------------
+# check to see the knowledge an agent has at the end of the final simulation
+for agent in agent_set_output.agents:                                                                                   # print the fill of each agents heatmap of the final simualtion
+    print(agent, " knowns", "\t:\t", len(agent_set.agents[agent].list_of_known_alternatives))
+
+print_blocker.enable_print()                                                                                            # enable printing to report on runtime and other prints that are always wanted
+
 stop = timeit.default_timer()                                                                                           # stop model run timer
 execution_time = stop - start                                                                                           # calculate occured runtime
 
 print("Model Runtime: \t{} seconds".format(str(execution_time)))                                                        # report runtime in second
 print('Average Yearly Catch of Final Simulation = {}'.format(str(agent_set_output.total_catch/duration)))
-print('Average Yearly Catch = {}'.format(str(avg_agent_time['total_catch'].mean())))
+print('Average Yearly Catch over all Simulations = {}'.format(str(avg_agent_time['total_catch'].mean())))
 
-# check to see the knowledge an agent has at the end of the final simulation
-for agent in agent_set_output.agents:
-    print(agent, " knowns", "\t:\t", len(agent_set.agents[agent].list_of_known_alternatives))

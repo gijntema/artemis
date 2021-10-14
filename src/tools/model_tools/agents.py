@@ -218,7 +218,7 @@ class ForagerAgent:
         self.__update_forage_effort_tracker(alternative_index)                                                          # update the agents memory of what choice options were visitied during a simulation
         self.__update_forage_catch_tracker(alternative_index, catch)                                                    # update the agents memory of all catch ever extracted from a choice option
         self.__update_catch(catch)                                                                                      # update the total catch of an agent
-        self.__update_time_step_catch(time_step_counter, catch)                                                         # update the catch per time step
+        self.__update_time_step_catch(time_step_counter, catch, alternative_index)                                                         # update the catch per time step
 
     def __update_heatmap(self, alternative_index, catch):
         """overwrites a heatmap choice option entry using the last catch event of the agent"""
@@ -236,8 +236,14 @@ class ForagerAgent:
         """update agents total catch with last catch event"""
         self.total_catch += catch
 
-    def __update_time_step_catch(self, time_step_counter, catch):
+    def __update_time_step_catch(self, time_step_counter, catch, alternative_id):
         """update agents time_step specific catch with last catch event"""
+        if catch is float(0):
+            exit('Corrected Catch yields 0 for <{}>, with catchability <{}> in choice option <{}>time <{}>'
+                 .format(self.id,
+                         self.catchability_coefficient,
+                         alternative_id,
+                         time_step_counter))
         self.time_step_catch[time_step_counter] += catch
 
     def __update_list_of_knowns(self):  # Quick and dirty way of finding all knowns instead of only adding new ones
@@ -290,9 +296,7 @@ class ForagerAgent:
                     shared_alternatives_indices.append(shared_alternative)                                              # attach the choice option index from the randomly chosen entry
                     shared_alternatives_data.append(self.heatmap[shared_alternative])                                   # attach the choice option contents from the randmloy chosen entry
                 alternative_counter += 1
-                print("continue with share while loop {}".format(alternative_counter))
 
-        print('exiting share alternatives loop')
         return tuple((shared_alternatives_indices, shared_alternatives_data))                                           # return a tuple with choice option indices to be shared and the corresponding contents of those choice options
 
     def receive_heatmap_knowledge(self, shared_data, time_id=-99):

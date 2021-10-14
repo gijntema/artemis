@@ -39,8 +39,7 @@ Version Number:
 """
 
 from collections import defaultdict, OrderedDict
-from math import exp
-
+from sys import exit
 
 class CompetitionHandler:
     """class to implement competition mechanisms / feedbacks in the model"""
@@ -204,8 +203,25 @@ class CompetitionHandler:
         uncorrected_catch = choice_set.discrete_alternatives[choice_id].resource_stock \
                             * agent_set.agents[agent_id].catchability_coefficient                                       # extract hypothetical catch if competition was absent
 
+        if uncorrected_catch is float(0):
+            exit('Uncorrected Catch yields 0 for <{}>, with catchability <{}> in <{}>, '
+                 'with stock <{}> in time <{}>'.format(agent_id,
+                                                       agent_set.agents[agent_id].catchability_coefficient,
+                                                       choice_id,
+                                                       choice_set.discrete_alternatives[choice_id].resource_stock,
+                                                       time_id))
+
         corrected_catch, correction_tag = \
             self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the competition methods specified
+
+        if corrected_catch is float(0):
+            exit('Corrected Catch yields 0 for <{}>, with catchability <{}> in <{}>, '
+                 'with stock <{}> in time <{}>'.format(agent_id,
+                                                       agent_set.agents[agent_id].catchability_coefficient,
+                                                       choice_id,
+                                                       choice_set.discrete_alternatives[choice_id].resource_stock,
+                                                       time_id))
+
 
         #print(
         #    "{} is foraging in {} and is hindered by interference with {}".format(agent_id, choice_id, correction_tag)  # report on interference to user

@@ -37,7 +37,7 @@ Version Number:
 # TODO: eventually change this module to read the specified information form a configuration file (e.g. .json file)
 
 # Forager Characteristics
-explore_probability = -0.01                   # probability a forager does not choose a known cell, but picks a random cell
+explore_probability = 0.2                   # probability a forager does not choose a known cell, but picks a random cell
 catchability_coefficient = 0.2              # proportional uptake of the resource stock in one foraging event
 init_number_of_alternatives_known = 4       # number of choice options each agents has information on at initialisation
 choice_method = 'explore_weighted_heatmap'  # defines the way an agent chooses what forage option to forage from
@@ -49,10 +49,10 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 
 
 # model characteristics
-duration = 5                          # number of time steps in the model
+duration = 1000                          # number of time steps in the model
 choice_set_size = 20                    # number of discrete alternatives in the choice set
-number_of_agents = 100                  # number of foragers in the model
-number_of_iterations = 1                # number of iterations/simulations the model runs for
+number_of_agents = 100                 # number of foragers in the model
+number_of_iterations = 100                # number of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
@@ -65,11 +65,11 @@ chance_reset_stock = 0.9                # chance the stock is repeated at the en
 # ------------------------------------------- INFORMATION SHARING PARAMETERS -------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 information_sharing_scenario = 'Random Sharing'
-# considered functionality: ['No Sharing', Coalition Sharing' (not implemented yet), 'Random Sharing']
+# considered functionality: ['No Sharing', Group Sharing' (not implemented yet), 'Random Sharing']
 
 # Indicators 'Random Sharing'
-shared_alternatives = 3                 # number of known alternatives shared at any given time
-share_partners = 3                      # the number of agents an agent informs about a (part of) the personal heatmap
+shared_alternatives = 1                 # number of known alternatives shared at any given time
+share_partners = 1                      # the number of agents an agent informs about a (part of) the personal heatmap
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -81,17 +81,16 @@ interference_factor = 0.8                     # factor for interference-simple s
 # room for future functionality in competition
 
 # ----------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------- Reporting Settings -------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+reporting = True                            # flag to turn on of off printing as reporting the model progress during the run
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- UNIMPLEMENTED FUNCTIONALITY PLANNED FOR FUTURE --------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-# information Sharing Scenario Indicators
-# information_sharing_scenario = 'No Sharing'
-
-# information_sharing_method = 'Shared Heatmap'
-# considered functionality: ['Shared Heatmap, Information Diffusion']
-# TODO: Implement shared heatmap functionality
-
-# Indicators 'Coalition Forming'
+# Indicators 'group_sharing'
 coalition_cheaters = False              # indicates the existence of cheaters (agents that are part of multiple groups)
 coalition_size = number_of_agents/10    # indicates the size of the coalition (in number of agent members)
-# TODO: Implement Coalitions in Knowledge Sharing
+# TODO: Implement groups in Knowledge Sharing

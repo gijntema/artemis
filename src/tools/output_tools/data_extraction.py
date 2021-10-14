@@ -98,10 +98,16 @@ class DataTransformer:
                         'yearly_catch': self.__transform_agent_set_total_catch_data
                         # INSERT FURTHER FUNCTIONALITY HERE
                     },
-                'agent_spec_x_time':
+                'agent_spec_x_time_x_other':
                     {
-                        'average_expected_competition': self.extract_average_expected_competition
+                        'average_expected_competition': self.extract_average_expected_competition,
                         # INSERT FURTHER FUNCTIONALITY HERE
+                    },
+                'other_x_catch':
+                    {
+                        'catch_series': self.__extract_flat_agent_time_catch,
+                        'competition_series': self.__extract_flat_agent_time_competition
+                        # INSERT FURTHER FUNCTIONALITY
                     }
                 # INSERT POTENTIAL OTHER DATA TYPES HERE
             }
@@ -537,8 +543,52 @@ class DataTransformer:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def extract_average_expected_competition(self, agent_set):
+        """competition over time for every agent"""
         data_output = pd.DataFrame(agent_set.average_expected_competitor_tracker).transpose()                           # make a pd.Dataframe from the data on the average amount of competitors in a given choice option
         data_output.insert(loc=0, column='time_step_id', value=data_output.index)                                       # repair small error in tracker->pd.dataframe conversion --> get time_step column from index
         data_output.reset_index(inplace=True)                                                                           # reset index values to default indices
         data_output.drop(columns='index', inplace=True)                                                                 # remove newly created redundant column 'index'
         return data_output
+
+
+    def get_other_x_catch(self, agent_set, iteration_id):      # NOT FINISHED
+        """regression/correlation of competition to catch"""
+        data_output = pd.DataFrame()
+        for data_series_extractor in self.functionality_extraction['other_x_catch']:                                    # loop over all data series, as potential explanatory variables to catch, we have functionality on in the functionality dictionary (quick and dirty fix, could be adapted to choose specific functionality)
+            data_output = self.functionality_extraction['other_x_catch'][data_series_extractor](agent_set,
+                                                                                                data_output,
+                                                                                                iteration_id)
+        return data_output
+
+    def __extract_flat_agent_time_catch(self, agent_set, output_data, iteration_id):
+        """Extracts the important columns for the data frame such as ID columns and the response variable Catch"""
+        input_data = agent_set.agents
+        data_series_iteration = []
+        data_series_time = []
+        data_series_agent = []
+        data_series_catch = []
+
+        for time_id in tuple(input_data[next(iter(input_data))].time_step_catch.keys()):                                # loop over the items (time_steps) in an immutable list of time_steps as logged in the time_step_catch tracker of the first agent in the model
+            for agent in input_data:
+                data_series_iteration.append(iteration_id)
+                data_series_time.append(time_id)
+                data_series_agent.append(agent)
+                data_series_catch.append(input_data[agent].time_step_catch[time_id])
+
+        output_data['time_id'] = data_series_time
+        output_data['agent_id'] = data_series_agent
+        output_data['catch'] = data_series_catch
+
+        return output_data
+
+    def __extract_flat_agent_time_competition(self, agent_set, output_data, iteration_id):
+        """Extracts the average expected competition for every time and agent as explanatory variable"""
+        data_series_competition = []
+        input_data = agent_set.average_expected_competitor_tracker
+        for time_id in tuple(input_data.keys()):
+            for agent in input_data[time_id]:
+                data_series_competition.append(input_data[time_id][agent])
+
+        output_data['average_expected_competitors'] = data_series_competition
+
+        return output_data

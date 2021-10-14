@@ -93,9 +93,7 @@ class ModelRunner:
                                                                                         str(shared_heatmap_data[0]),
                                                                                         str(data_receiver_agent)))
 
-                        print('proceed to next share partner {}'.format(share_partner_counter))
-                        share_partner_counter += 1
-                                                 # proceed to share data with the next agent
+                        share_partner_counter += 1                                                                      # proceed to share data with the next agent
 
             # growth of the resource stock
             for alternative in choice_set.discrete_alternatives:                                                        # loop over all choice options to allow resource stock growth
