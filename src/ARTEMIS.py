@@ -115,7 +115,8 @@ while iteration_counter < number_of_iterations:
                                init_stock=init_stock,
                                sd_init_stock=sd_init_stock,
                                competition_handler=competition_handler,
-                               stock_reset_chance=chance_reset_stock)
+                               stock_reset_chance=chance_reset_stock,
+                               iteration_id=iteration_counter)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Transform the outcome objects of the model into usable data

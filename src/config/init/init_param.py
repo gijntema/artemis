@@ -44,15 +44,15 @@ choice_method = 'explore_weighted_heatmap'  # defines the way an agent chooses w
 
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present
-sd_init_stock = 5                  # standard deviation of initial stock present
+sd_init_stock = 25                  # standard deviation of initial stock present
 growth_factor = 1                   # per time step growth of stock (1 represents a static population in current Default settings)
 
 
 # model characteristics
-duration = 50                          # number of time steps in the model
+duration = 100                          # number of time steps in the model
 choice_set_size = 20                    # number of discrete alternatives in the choice set
 number_of_agents = 100                 # number of foragers in the model
-number_of_iterations = 5                # number of iterations/simulations the model runs for
+number_of_iterations = 100                # number of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------

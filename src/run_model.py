@@ -50,14 +50,15 @@ class ModelRunner:
                   init_stock=100,                                       # default if a non dynamic stock is 100 units
                   sd_init_stock=25,                                     # default sd if a non-dynamic stock is sd=25
                   competition_handler=None,                             # object that ensures the effects of competition are implemented
-                  stock_reset_chance=0.9):                              # change at the same stock being present next time step
+                  stock_reset_chance=0.9,                               # chance at the same stock being present next time step
+                  iteration_id=-99):                                    # for reporting on iterations
 
         agent_index_list = list(agent_set.agents.keys())                # identify the id of every agent in a list
         # loop for every time step
         time_tracker = 0                                                # set a counter for time loops
         while time_tracker < duration:                                  # begin time loop
             print('---------------------------------------------------------------------------------------------------',
-                  '\nStarting time step no.{} \n'.format(str(time_tracker)),
+                  '\nStarting time step no.{} in iteration no. {}\n'.format(str(time_tracker), iteration_id),
                   "---------------------------------------------------------------------------------------------------"
                   )
             time_id = str(time_tracker).zfill(len(str(duration)))
