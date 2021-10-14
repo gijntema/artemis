@@ -4,6 +4,8 @@ from src.tools.model_tools.choice_set import ChoiceSet, DiscreteAlternative
 from src.config.init.init_objects import ObjectInitializer
 from src.config.init.init_param import *
 
+import numpy as np
+import matplotlib.pyplot as plt
 
 competition_handler = CompetitionHandler('interference-simple')
 # competition_handler = CompetitionHandler('absent')
@@ -47,3 +49,13 @@ test_class = ObjectInitializer()
 test_key = str(type(test_class)).split("'")[1].split(".")[-1]
 
 print(test_key, " : ", test_dictionary[test_key])
+
+# testing random normal random numbe rgenerator
+
+mu, sigma = 100, 25
+dataset = np.random.normal(loc=100, scale=25, size=100000)
+count, bins, ignored = plt.hist(dataset, 30, density=True)
+plt.plot(bins, 1/(sigma * np.sqrt(2 * np.pi)) *
+         np.exp( - (bins - mu)**2 / (2 * sigma**2) ),
+         linewidth=2, color='r')
+plt.show()

@@ -89,9 +89,9 @@ class ModelRunner:
                             number_of_alternatives=shared_alternatives)
                         data_receiver_agent = random.choice(agent_index_list)                                           # pick random agent to share with
                         agent_set.agents[data_receiver_agent].receive_heatmap_knowledge(shared_heatmap_data, time_id)   # picked agent receives data
-                        print('{} is now sharing data on stock(s) in {} with {}'.format(str(agent),                     # report on data sharing
-                                                                                        str(shared_heatmap_data[0]),
-                                                                                        str(data_receiver_agent)))
+                        # print('{} is now sharing data on stock(s) in {} with {}'.format(str(agent),                     # report on data sharing
+                        #                                                                 str(shared_heatmap_data[0]),
+                        #                                                                 str(data_receiver_agent)))
 
                         share_partner_counter += 1                                                                      # proceed to share data with the next agent
 

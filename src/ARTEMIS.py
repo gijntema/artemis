@@ -231,7 +231,8 @@ graph_constructor.plot_line_pandas(avg_agent_time, x_values='time_step_id',
 
 # graph_constructor.plot_line_pandas(avg_alternative_time, x_values='time_step_id', img_name = 'avg_alt_time')          # make line graph of the choice option time series average data
 
-graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternative_id', y_values='alternative_effort',
+graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternative_id',
+                                  y_values='alternative_final_stock',
                                   img_name='raw_alt_spec')                                                              # test to see distributions in the specific alternatives
 
 # ----------------------------------------------------------------------------------------------------------------------

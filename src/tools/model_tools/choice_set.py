@@ -104,8 +104,14 @@ class DiscreteAlternative:
     def initialize_standard_stock(self, init_stock, sd_init_stock, growth_factor=1):
         """draws and sets an initial stock size in the choice option drawn from
         a normal distribution with a given  mean and sd"""
-        self.resource_stock = np.random.normal(loc=init_stock, scale=sd_init_stock)                                     # generate random stock with given mean and standard deviation from a normal distribution
+
+        self.resource_stock = self.__pos_normal(mean=init_stock, sd=sd_init_stock)                                 # generate random stock with given mean and standard deviation from a normal distribution
         self.growth_factor = growth_factor                                                                              # set growth factor (in dynamic stock scenarios)
+
+    def __pos_normal(self, mean, sd):
+        """returns values from a normal distribution, cut off at 0 """
+        x = np.random.normal(loc=mean, scale=sd)
+        return x if x > 0 else self.__pos_normal(mean, sd)
 
     def stock_growth(self):
         """Method placeholder for future implementation of dynamic stock, currently not great executed"""

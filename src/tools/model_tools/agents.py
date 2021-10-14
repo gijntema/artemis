@@ -276,12 +276,12 @@ class ForagerAgent:
     def share_heatmap_knowledge(self, number_of_alternatives=1):
         """method that returns a given number of alternatives the ForagerAgent has knowledge on
         to be shared with other ForagerAgents"""
-        print("<{}> is now starting to share data".format(self.id))
+        # print("<{}> is now starting to share data".format(self.id))
         self.__update_list_of_knowns()                                                                                  # make sure the list of known alternatives is up to date
         shared_alternatives_indices = []                                                                                # empty list for later attchment of choice option indices to be shared
         shared_alternatives_data = []                                                                                   # empty list for later attchment of choice option contens to be shared
         if not isinstance(number_of_alternatives, int) and number_of_alternatives != 'ALL':                             # check if number of choice options to be shared is an integer or all
-            raise TypeError("number can only be an integer or ALL")
+           raise TypeError("number can only be an integer or ALL")
 
         elif number_of_alternatives == 'ALL':                                                                           # share all data
             shared_alternatives_indices = self.list_of_known_alternatives                                               # to be shared indices are all indices memory has an entry on

@@ -48,10 +48,11 @@ class CompetitionHandler:
 # ------------------------------------ Dictionary dictating all functionality ------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, competition_method):
+    def __init__(self, competition_method, interference_factor=0.8):
         self.competition_instruction = self.__init_instructions()
         self.competition_method = competition_method
         self.relevant_data = self.__init_relevant()
+        self.relevant_data['interference_factor'] = interference_factor
 
     def __init_instructions(self):
         """define a dictionary with instruction on all possible functionality for including competition"""
@@ -163,7 +164,7 @@ class CompetitionHandler:
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------- Methods to load relevant agent choice functionality -------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-    def load_competition_data(self, chosen_alternative_id, agent_id, interference_factor=0):
+    def load_competition_data(self, chosen_alternative_id, agent_id, interference_factor=0.8):
         """loads data on the agent and chosen choice option"""
         self.competition_instruction[self.competition_method]['load'](chosen_alternative_id, agent_id, interference_factor)
 
@@ -203,29 +204,26 @@ class CompetitionHandler:
         uncorrected_catch = choice_set.discrete_alternatives[choice_id].resource_stock \
                             * agent_set.agents[agent_id].catchability_coefficient                                       # extract hypothetical catch if competition was absent
 
-        if uncorrected_catch is float(0):
-            exit('Uncorrected Catch yields 0 for <{}>, with catchability <{}> in <{}>, '
-                 'with stock <{}> in time <{}>'.format(agent_id,
-                                                       agent_set.agents[agent_id].catchability_coefficient,
-                                                       choice_id,
-                                                       choice_set.discrete_alternatives[choice_id].resource_stock,
-                                                       time_id))
+        print('Uncorrected Catch yields <{}> for <{}>, with catchability <{}> in <{}>,'
+              'with stock <{}> in time <{}>'.format(uncorrected_catch,
+                                                    agent_id,
+                                                    agent_set.agents[agent_id].catchability_coefficient,
+                                                    choice_id,
+                                                    choice_set.discrete_alternatives[choice_id].resource_stock,
+                                                    time_id))
 
         corrected_catch, correction_tag = \
             self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the competition methods specified
 
-        if corrected_catch is float(0):
-            exit('Corrected Catch yields 0 for <{}>, with catchability <{}> in <{}>, '
-                 'with stock <{}> in time <{}>'.format(agent_id,
-                                                       agent_set.agents[agent_id].catchability_coefficient,
-                                                       choice_id,
-                                                       choice_set.discrete_alternatives[choice_id].resource_stock,
-                                                       time_id))
+        print('Corrected Catch yields <{}> for <{}>, with catchability <{}> in <{}>,'
+              'with stock <{}> in time <{}>, corrected for <{}>'.format(corrected_catch,
+                                                    agent_id,
+                                                    agent_set.agents[agent_id].catchability_coefficient,
+                                                    choice_id,
+                                                    choice_set.discrete_alternatives[choice_id].resource_stock,
+                                                    time_id,
+                                                    correction_tag))
 
-
-        #print(
-        #    "{} is foraging in {} and is hindered by interference with {}".format(agent_id, choice_id, correction_tag)  # report on interference to user
-        #    )
 
         agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents itself
         # agent_set.update_memory
@@ -245,7 +243,14 @@ class CompetitionHandler:
         """method to correct catch using interference by using the interference factor
         as percentual decline of catch per competitor"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
-        corrected_catch = uncorrected_catch * (self.relevant_data['interference_factor']^(number_of_competitors-1))     # correct using interference fatctro^(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
+        corrected_catch = uncorrected_catch * (self.relevant_data['interference_factor']**(number_of_competitors-1))    # correct using interference fatctro^(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
+        print("Correction occurring as: Uncorrected Catch <{}> * (interference factor <{}> to the power "
+              "of number of competitors <{}> = Corrected catch <{}>".format(
+            uncorrected_catch,
+            self.relevant_data['interference_factor'],
+            number_of_competitors-1,
+            corrected_catch
+        ))
         correction_tag = str(number_of_competitors-1) + " other foragers"
         return corrected_catch, correction_tag
 

@@ -38,7 +38,7 @@ Version Number:
     0.1
 """
 
-
+# TODO: UNFINISHED, UNFUNCTIONAL CODE
 class HeatmapSharer:
 
     def __init__(self, agent, other_agent_indices=tuple(),
