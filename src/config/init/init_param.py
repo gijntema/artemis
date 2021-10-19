@@ -59,14 +59,14 @@ number_of_iterations = 1                # number of iterations/simulations the m
 # ----------------------------------------------------------------------------------------------------------------------
 growth_type = 'static'                  # indicates stock dynamics -- placeholder, currently not implemented
 stock_reset_scenario = 'random-repeat'  # indicates if and how the stock in a DiscreteAlternative objects resets
-chance_reset_stock = 0.1                # chance the stock is repeated at the end of a time_step
+chance_reset_stock = 0.9                # chance the stock is repeated at the end of a time_step
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- INFORMATION SHARING PARAMETERS -------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 sharing_strategy = 'random_sharing'                 # determines what an agent will share
-pick_receiver_strategy = 'random_choice'          # determines with whom an agent will share - UNIMPLEMENTED
-receiving_strategy = "combine_receiver"             # determines how a receiver agent will handle shared data - UNIMPLEMENTED
+pick_receiver_strategy = 'random_choice'            # determines with whom an agent will share
+receiving_strategy = "combine_receiver"             # determines how a receiver agent will handle shared data
 
 # Quantitative Parameters
 shared_alternatives = 10                 # number of known alternatives shared at any given time
