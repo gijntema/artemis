@@ -98,7 +98,10 @@ while iteration_counter < number_of_iterations:
                                                              nb_alternatives_known=init_number_of_alternatives_known,
                                                              explore_probability=explore_probability,
                                                              duration_model=duration,
-                                                             choice_method=choice_method
+                                                             choice_method=choice_method,
+                                                             sharing_strategy=sharing_strategy,
+                                                             receiver_choice_strategy=pick_receiver_strategy,
+                                                             receiving_strategy=receiving_strategy
                                                              )
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -108,14 +111,13 @@ while iteration_counter < number_of_iterations:
         model_runner.run_model(choice_set=choice_set,                                                                   # run the model and return final states of the agents and choice options in the model
                                agent_set=agent_set,
                                duration=duration,
-                               information_sharing_scenario=information_sharing_scenario,
                                share_partners=share_partners,
                                shared_alternatives=shared_alternatives,
                                stock_reset_scenario=stock_reset_scenario,
                                init_stock=init_stock,
                                sd_init_stock=sd_init_stock,
                                competition_handler=competition_handler,
-                               stock_reset_chance=chance_reset_stock,
+                               stock_reset_chance=chance_reset_stock,                                                   # TODO: Move as internal Attribite of DiscreteAlternative Objects, to allow for flexibility
                                iteration_id=iteration_counter)
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -139,15 +141,26 @@ while iteration_counter < number_of_iterations:
     iteration_counter += 1                                                                                              # progress to the next iteration
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Get last simulation Explanatory Variables x Catch dataframe
+# Get last simulation Explanatory Variables x Catch dataframe graphics
 # ----------------------------------------------------------------------------------------------------------------------
 
 
 graph_constructor.plot_scatter_pandas(other_x_catch_data,
                                       x_values='average_expected_competitors', y_values="catch",
                                       img_name='competition_x_catch')
+graph_constructor.plot_scatter_pandas(other_x_catch_data,
+                                      x_values='catch', y_values='average_expected_competitors',
+                                      img_name='catch_x_competition')
 
-# ----------------------------------------------------------------------------------------------------------------------# Exit iteration loop and
+# ----------------------------------------------------------------------------------------------------------------------
+# Get last simulation Explanatory Variables x Catch dataframe graphics
+# ----------------------------------------------------------------------------------------------------------------------
+agent_catch_time_df = data_transformer.extract_agent_time_catch(agent_set_output)
+graph_constructor.plot_line_pandas(pd_dataframe=agent_catch_time_df,
+                                   x_values='time_id', y_label='catch',
+                                   img_name='catch_agent_time_last_simulation')
+
+# ----------------------------------------------------------------------------------------------------------------------    # Exit iteration loop and
 # extract mean and sd from raw data outputs
 # ----------------------------------------------------------------------------------------------------------------------
 avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
@@ -259,7 +272,7 @@ graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternati
 #                                   yerr_min='total_catch_err_min',
 #                                   img_name='qt_agent_time')                                                            # make line graph of the agent time series average data (plots the median cumulative catch an agent over time, with error bars to the 25th and 75th percentile
 
-graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id', img_name= 'qt_agent_time')                   # make line graph of the choice option time series average data
+graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id', img_name='qt_agent_time', y_label='cumulative_catch')                   # make line graph of the choice option time series average data
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce data and graphical outputs - median, min and max values for memory evolution
@@ -287,14 +300,17 @@ graph_constructor.plot_line_pandas(single_memory_data_summary, x_values='time_st
 competitor_df = data_transformer.extract_average_expected_competition(agent_set_output)                                 # make a pd.Dataframe from the data on the average amount of competitors in a given choice option
 graph_constructor.plot_line_pandas(competitor_df,
                                    x_values='time_step_id', y_values=None,
-                                   img_name='test_average_competitors_SA{}_SP{}_Pe%{}_J{}'.format(
+                                   img_name='test_average_competitors_SA{}_SP{}_Pe%{}_J{}_Pr%{}'.format(
                                                                                             shared_alternatives,      # format the img name with the number of memory entries (SA) shared with a number of people (SP) by every agent in every time step
                                                                                             share_partners,
                                                                                             int(
                                                                                                 explore_probability
-                                                                                                 * 100
+                                                                                                * 100
                                                                                                 ),
-                                                                                            number_of_agents
+                                                                                            number_of_agents,
+                                                                                            int(
+                                                                                                chance_reset_stock
+                                                                                                * 100)
                                                                                               ),
                                    y_label='average expected number of competitors'
                                    , legend_title='Agents')                                                             # make plot from data containgin data of agents average competitors per cell over time
@@ -341,9 +357,6 @@ data_writer.write_csv(single_memory_data, 'last_simulation_memory_evolution.csv'
 # ----------------------------------------------------------------------------------------------------------------------
 # Runtime tracking
 # ----------------------------------------------------------------------------------------------------------------------
-# check to see the knowledge an agent has at the end of the final simulation
-for agent in agent_set_output.agents:                                                                                   # print the fill of each agents heatmap of the final simualtion
-    print(agent, " knowns", "\t:\t", len(agent_set.agents[agent].list_of_known_alternatives))
 
 print_blocker.enable_print()                                                                                            # enable printing to report on runtime and other prints that are always wanted
 

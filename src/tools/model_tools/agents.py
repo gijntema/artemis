@@ -47,6 +47,7 @@ import random
 import copy
 from collections import defaultdict  # TODO: --STRUCTURAL-- Replace difficult initialisation
 from src.tools.model_tools.choice_making import ChoiceMaker
+from src.tools.model_tools.sharing import HeatmapExchanger
 
 
 class AgentSet:                                         # to be implemented, not yet included in the other scripts
@@ -128,7 +129,10 @@ class AgentSet:                                         # to be implemented, not
 class ForagerAgent:
     """general class to define objects as agents that may forage from a resource and their attributes"""
     def __init__(self, choice_set, choice_method, agent_id=None,
-                 catchability_coefficient=0, nb_of_alternatives_known=1, explore_probability=0):
+                 catchability_coefficient=0, nb_of_alternatives_known=1, explore_probability=0,
+                 other_agent_indices=tuple(),
+                 sharing_strategy='random_sharing', pick_receiver_strategy='random_pick',
+                 receiving_strategy='combine_receiver'):
 
         # Tracker variables
         self.total_catch = 0                                                                                            # tracker variable to track total catch for this agent
@@ -147,13 +151,21 @@ class ForagerAgent:
         self.list_of_known_alternatives = \
             self.__initialize_list_of_knowns(choice_set=choice_set,
                                             nb_of_alternatives_known=nb_of_alternatives_known)                          # list of alternatives that an agent has information on
+
         self.__initialize_fill_heatmap(choice_set=choice_set)                                                           # initialise the heatmap
 
-        # Decision Making attribute
+        # Decision Making attribute (separate object)
         self.choice_maker = ChoiceMaker(choice_set=choice_set,                                                          # object that identifies/loads the relevant data from ForagerAgents and can make foraging decisions for ForagerAgents based on that data
                                         choice_method=choice_method,
                                         agent=self)
 
+        # Heatmap Data Exchanger Attribute (separate object)
+        # TODO: While all functionality has been programmed, it has not yet been implemented in run_model
+        self.heatmap_exchanger = HeatmapExchanger(agent=self,
+                                                  sharing_strategy=sharing_strategy,
+                                                  pick_receiver_strategy=pick_receiver_strategy,
+                                                  receiving_strategy=receiving_strategy
+                                                  )
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------- Method to initialize agents before running the main model --------------------------------
@@ -306,9 +318,9 @@ class ForagerAgent:
 
         received_counter = 0
         while received_counter < len(received_alternative_indices):
-            # add knowledge if the alternative is unknown
             received_index = received_alternative_indices[received_counter]                                             # get index of a single shared choice option
             received_data = received_alternative_data[received_counter]                                                 # get contents of a single shared choice option
+            # add knowledge if the alternative is unknown
             if isinstance(self.heatmap[received_index], int):                                                           # check if the receiving agent already has an entry for that choice: NO
                 self.heatmap[received_index] = received_data                                                            # fill the empty choice option entry with the received data
 

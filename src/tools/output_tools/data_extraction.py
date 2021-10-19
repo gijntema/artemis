@@ -592,3 +592,25 @@ class DataTransformer:
         output_data['average_expected_competitors'] = data_series_competition
 
         return output_data
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ---------------------- Methods to Extract Catch data for agent specific temporal patterns-----------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    # TODO: QUICK AND DIRTY WAY OF doing this
+    def extract_agent_time_catch(self, agent_set):
+        input_data = agent_set.agents
+        output_data = {}
+
+        time_data = []
+        for time_id in tuple(input_data[next(iter(input_data))].time_step_catch.keys()):                                # loop over the items (time_steps) in an immutable list of time_steps as logged in the time_step_catch tracker of the first agent in the model
+            time_data.append(time_id)
+        output_data['time_id'] = time_data
+
+        for agent in input_data:
+            agent_catch_data = []
+            for time_id in tuple(input_data[next(iter(input_data))].time_step_catch.keys()):                            # loop over the items (time_steps) in an immutable list of time_steps as logged in the time_step_catch tracker of the first agent in the model
+                agent_catch_data.append(input_data[agent].time_step_catch[time_id])                                     # load time specific catch
+            output_data[agent] = agent_catch_data
+
+        output_data = pd.DataFrame(output_data)
+        return output_data

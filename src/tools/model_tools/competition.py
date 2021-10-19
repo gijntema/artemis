@@ -204,26 +204,8 @@ class CompetitionHandler:
         uncorrected_catch = choice_set.discrete_alternatives[choice_id].resource_stock \
                             * agent_set.agents[agent_id].catchability_coefficient                                       # extract hypothetical catch if competition was absent
 
-        print('Uncorrected Catch yields <{}> for <{}>, with catchability <{}> in <{}>,'
-              'with stock <{}> in time <{}>'.format(uncorrected_catch,
-                                                    agent_id,
-                                                    agent_set.agents[agent_id].catchability_coefficient,
-                                                    choice_id,
-                                                    choice_set.discrete_alternatives[choice_id].resource_stock,
-                                                    time_id))
-
         corrected_catch, correction_tag = \
             self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the competition methods specified
-
-        print('Corrected Catch yields <{}> for <{}>, with catchability <{}> in <{}>,'
-              'with stock <{}> in time <{}>, corrected for <{}>'.format(corrected_catch,
-                                                    agent_id,
-                                                    agent_set.agents[agent_id].catchability_coefficient,
-                                                    choice_id,
-                                                    choice_set.discrete_alternatives[choice_id].resource_stock,
-                                                    time_id,
-                                                    correction_tag))
-
 
         agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents itself
         # agent_set.update_memory
@@ -244,13 +226,7 @@ class CompetitionHandler:
         as percentual decline of catch per competitor"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
         corrected_catch = uncorrected_catch * (self.relevant_data['interference_factor']**(number_of_competitors-1))    # correct using interference fatctro^(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
-        print("Correction occurring as: Uncorrected Catch <{}> * (interference factor <{}> to the power "
-              "of number of competitors <{}> = Corrected catch <{}>".format(
-            uncorrected_catch,
-            self.relevant_data['interference_factor'],
-            number_of_competitors-1,
-            corrected_catch
-        ))
+
         correction_tag = str(number_of_competitors-1) + " other foragers"
         return corrected_catch, correction_tag
 

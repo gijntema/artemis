@@ -69,11 +69,14 @@ class ObjectInitializer:
     def initialize_forager_agents(self, nb_agents, choice_set,
                                   catchability_coefficient, nb_alternatives_known,
                                   explore_probability, duration_model,
-                                  choice_method="random"):
+                                  choice_method="random",
+                                  sharing_strategy='random_sharing',
+                                  receiver_choice_strategy='random_choice',
+                                  receiving_strategy='combine_receiver'):
+
         """Method to set up the agents in the model"""
 
         # initialize all agents and time independent tracker variables
-        print(choice_method)
         agent_set = AgentSet()                                                                                          # create an instance of the object agent set to contain trackers and agents in
         agent_tracker = 0                                                                                               # make counter for following while loop functioning
 
@@ -84,7 +87,10 @@ class ObjectInitializer:
                                                       agent_id=agent_id,
                                                       catchability_coefficient=catchability_coefficient,
                                                       nb_of_alternatives_known=nb_alternatives_known,
-                                                      explore_probability=explore_probability)                          # initialise a ForagerAgent and set up the necessary functioning of attribute ChoiceMaker
+                                                      explore_probability=explore_probability,
+                                                      sharing_strategy=sharing_strategy,
+                                                      pick_receiver_strategy=receiver_choice_strategy,
+                                                      receiving_strategy=receiving_strategy)                            # initialise a ForagerAgent and set up the necessary functioning of attribute ChoiceMaker
 
             agent_tracker += 1                                                                                          # proceed to next agent
 
@@ -95,12 +101,17 @@ class ObjectInitializer:
             time_id = str(duration_counter).zfill(len(str(duration_model)))
             agent_set.total_time_step_catch_tracker[time_id] = 0                                                        # make entry in time_step specific catch tracker for the specified time step
 
-            agent_tracker = 0                                                                                           # make counter for all time_steps in the model for While loop functioning
-            while agent_tracker < nb_agents:                                                                            # loop over all agents
-                agent_id = 'agent_' + str(agent_tracker).zfill(len(str(nb_agents)))                                     # set ID of the agent to be modified
-                agent_set.agents[agent_id].time_step_catch[time_id] = 0                                                 # for the considered agent, initialise the catch in the given time_step as 0
-                agent_tracker += 1                                                                                      # proceed to next agent
-
+                                                                                                                        # make counter for all time_steps in the model for While loop functioning
+            for agent in agent_set.agents:                                                                              # loop over all agents
+                agent_set.agents[agent].time_step_catch[time_id] = 0                                                    # for the considered agent, initialise the catch in the given time_step as 0
+                                                                                                                        # proceed to next agent
             duration_counter += 1                                                                                       # proceed to next time_step
+
+        # LOAD list of agent ids as potential receivers for any data sharing
+        for agent in agent_set.agents:                                                                                  # loop over agents
+            agent_set.agents[agent].heatmap_exchanger.functionality['pick_receiver'][receiver_choice_strategy]['init']\
+                    (
+                        list_of_agents=list(agent_set.agents.keys())
+                    )
 
         return agent_set

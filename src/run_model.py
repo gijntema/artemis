@@ -42,7 +42,6 @@ class ModelRunner:
     def run_model(self,
                   choice_set,                                           # the choice options in the model
                   agent_set,                                            # the agents in the model
-                  information_sharing_scenario,                         # the scenario for what and how an agent shares data
                   shared_alternatives,                                  # amount of choice options datapoints an agent shares with anothe agent in a given time step
                   share_partners,                                       # amount of partners an agent shares dat with in a given time step
                   duration=10,                                          # duration of the model (no. time steps)
@@ -54,6 +53,9 @@ class ModelRunner:
                   iteration_id=-99):                                    # for reporting on iterations
 
         agent_index_list = list(agent_set.agents.keys())                # identify the id of every agent in a list
+
+        # TODO: LOAD AGENT INDEX LIST AS LIST OF COMPETITORS HERE
+
         # loop for every time step
         time_tracker = 0                                                # set a counter for time loops
         while time_tracker < duration:                                  # begin time loop
@@ -83,18 +85,21 @@ class ModelRunner:
                 # operations specific to a sharing scenario
                 # TODO: probably possible to migrate into a library dictionary to avoid endless if and elif statements
                 #  and make this more flexible for heterogeneity in sharing data (e.g. Asymmetric data exchange)
-                if information_sharing_scenario == 'Random Sharing':                                                    # identify sharing scenarios
-                    share_partner_counter = 0                                                                           # initialise counter to loop over the agents data will be shared to
-                    while share_partner_counter < share_partners:                                                       # loop over all agents that are picked to receive data
-                        shared_heatmap_data = agent_set.agents[agent].share_heatmap_knowledge(                          # identify what data will be shared with another agent
-                            number_of_alternatives=shared_alternatives)
-                        data_receiver_agent = random.choice(agent_index_list)                                           # pick random agent to share with
-                        agent_set.agents[data_receiver_agent].receive_heatmap_knowledge(shared_heatmap_data, time_id)   # picked agent receives data
+                #if information_sharing_scenario == 'Random Sharing':                                                    # identify sharing scenarios
+                #    share_partner_counter = 0                                                                           # initialise counter to loop over the agents data will be shared to
+                #    while share_partner_counter < share_partners:                                                       # loop over all agents that are picked to receive data
+                #        shared_heatmap_data = agent_set.agents[agent].share_heatmap_knowledge(                          # identify what data will be shared with another agent
+                #            number_of_alternatives=shared_alternatives)
+                #        data_receiver_agent = random.choice(agent_index_list)                                           # pick random agent to share with
+                #        agent_set.agents[data_receiver_agent].receive_heatmap_knowledge(shared_heatmap_data, time_id)   # picked agent receives data
                         # print('{} is now sharing data on stock(s) in {} with {}'.format(str(agent),                     # report on data sharing
                         #                                                                 str(shared_heatmap_data[0]),
                         #                                                                 str(data_receiver_agent)))
 
-                        share_partner_counter += 1                                                                      # proceed to share data with the next agent
+                #        share_partner_counter += 1                                                                      # proceed to share data with the next agent
+
+                agent_set.agents[agent].heatmap_exchanger.provide_data(agent_set)
+
 
             # growth of the resource stock
             for alternative in choice_set.discrete_alternatives:                                                        # loop over all choice options to allow resource stock growth

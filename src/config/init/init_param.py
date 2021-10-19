@@ -51,25 +51,26 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 # model characteristics
 duration = 100                          # number of time steps in the model
 choice_set_size = 20                    # number of discrete alternatives in the choice set
-number_of_agents = 100                 # number of foragers in the model
-number_of_iterations = 100                # number of iterations/simulations the model runs for
+number_of_agents = 100                  # number of foragers in the model
+number_of_iterations = 1                # number of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 growth_type = 'static'                  # indicates stock dynamics -- placeholder, currently not implemented
 stock_reset_scenario = 'random-repeat'  # indicates if and how the stock in a DiscreteAlternative objects resets
-chance_reset_stock = 0.9                # chance the stock is repeated at the end of a time_step
+chance_reset_stock = 0.1                # chance the stock is repeated at the end of a time_step
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- INFORMATION SHARING PARAMETERS -------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-information_sharing_scenario = 'Random Sharing'
-# considered functionality: ['No Sharing', Group Sharing' (not implemented yet), 'Random Sharing']
+sharing_strategy = 'random_sharing'                 # determines what an agent will share
+pick_receiver_strategy = 'random_choice'          # determines with whom an agent will share - UNIMPLEMENTED
+receiving_strategy = "combine_receiver"             # determines how a receiver agent will handle shared data - UNIMPLEMENTED
 
-# Indicators 'Random Sharing'
-shared_alternatives = 1                 # number of known alternatives shared at any given time
-share_partners = 1                      # the number of agents an agent informs about a (part of) the personal heatmap
+# Quantitative Parameters
+shared_alternatives = 10                 # number of known alternatives shared at any given time
+share_partners = 10                      # the number of agents an agent informs about a (part of) the personal heatmap
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -77,20 +78,10 @@ share_partners = 1                      # the number of agents an agent informs 
 # ----------------------------------------------------------------------------------------------------------------------
 
 competition_scenario = 'interference-simple'  # indicate the way competition is modelled in the model
-interference_factor = 0.8                     # factor for interference-simple scenario only, indicates a factor for catch reduction for every competitor present
-# room for future functionality in competition
+interference_factor = 0.8                     # indicates the reduction in catch for every competitor present
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------- Reporting Settings -------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-reporting = True                            # flag to turn on of off printing as reporting the model progress during the run
+reporting = True                            # flag to turn on or off print reporting during the model runs
 
-
-# ----------------------------------------------------------------------------------------------------------------------
-# ------------------------------------------- UNIMPLEMENTED FUNCTIONALITY PLANNED FOR FUTURE --------------------------
-# ----------------------------------------------------------------------------------------------------------------------
-
-# Indicators 'group_sharing'
-coalition_cheaters = False              # indicates the existence of cheaters (agents that are part of multiple groups)
-coalition_size = number_of_agents/10    # indicates the size of the coalition (in number of agent members)
-# TODO: Implement groups in Knowledge Sharing
