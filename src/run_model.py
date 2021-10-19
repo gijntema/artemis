@@ -80,24 +80,8 @@ class ModelRunner:
                 # if harvest removal is on, the stock is also reduced
                 competition_handler.competition_correction(choice_set, agent_set, agent, time_id=time_id)
 
-                # operations specific to a sharing scenario
-                # TODO: probably possible to migrate into a library dictionary to avoid endless if and elif statements
-                #  and make this more flexible for heterogeneity in sharing data (e.g. Asymmetric data exchange)
-                #if information_sharing_scenario == 'Random Sharing':                                                    # identify sharing scenarios
-                #    share_partner_counter = 0                                                                           # initialise counter to loop over the agents data will be shared to
-                #    while share_partner_counter < share_partners:                                                       # loop over all agents that are picked to receive data
-                #        shared_heatmap_data = agent_set.agents[agent].share_heatmap_knowledge(                          # identify what data will be shared with another agent
-                #            number_of_alternatives=shared_alternatives)
-                #        data_receiver_agent = random.choice(agent_index_list)                                           # pick random agent to share with
-                #        agent_set.agents[data_receiver_agent].receive_heatmap_knowledge(shared_heatmap_data, time_id)   # picked agent receives data
-                        # print('{} is now sharing data on stock(s) in {} with {}'.format(str(agent),                     # report on data sharing
-                        #                                                                 str(shared_heatmap_data[0]),
-                        #                                                                 str(data_receiver_agent)))
-
-                #        share_partner_counter += 1                                                                      # proceed to share data with the next agent
-
+                # share data with other agent(s)
                 agent_set.agents[agent].heatmap_exchanger.provide_data(agent_set)
-
 
             # growth of the resource stock
             for alternative in choice_set.discrete_alternatives:                                                        # loop over all choice options to allow resource stock growth
