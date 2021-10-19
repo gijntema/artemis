@@ -42,8 +42,6 @@ class ModelRunner:
     def run_model(self,
                   choice_set,                                           # the choice options in the model
                   agent_set,                                            # the agents in the model
-                  shared_alternatives,                                  # amount of choice options datapoints an agent shares with anothe agent in a given time step
-                  share_partners,                                       # amount of partners an agent shares dat with in a given time step
                   duration=10,                                          # duration of the model (no. time steps)
                   stock_reset_scenario='no-reset',                      # default is a dynamics stock
                   init_stock=100,                                       # default if a non dynamic stock is 100 units

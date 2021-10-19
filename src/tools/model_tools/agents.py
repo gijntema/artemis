@@ -132,7 +132,8 @@ class ForagerAgent:
                  catchability_coefficient=0, nb_of_alternatives_known=1, explore_probability=0,
                  other_agent_indices=tuple(),
                  sharing_strategy='random_sharing', pick_receiver_strategy='random_pick',
-                 receiving_strategy='combine_receiver'):
+                 receiving_strategy='combine_receiver',
+                 number_of_shared_alternatives=1, number_of_agents_shared_with=1):
 
         # Tracker variables
         self.total_catch = 0                                                                                            # tracker variable to track total catch for this agent
@@ -164,7 +165,9 @@ class ForagerAgent:
         self.heatmap_exchanger = HeatmapExchanger(agent=self,
                                                   sharing_strategy=sharing_strategy,
                                                   pick_receiver_strategy=pick_receiver_strategy,
-                                                  receiving_strategy=receiving_strategy
+                                                  receiving_strategy=receiving_strategy,
+                                                  number_of_shared_alternatives=number_of_shared_alternatives,
+                                                  number_of_agents_shared_with=number_of_agents_shared_with
                                                   )
 
 # ----------------------------------------------------------------------------------------------------------------------

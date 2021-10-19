@@ -101,7 +101,9 @@ while iteration_counter < number_of_iterations:
                                                              choice_method=choice_method,
                                                              sharing_strategy=sharing_strategy,
                                                              receiver_choice_strategy=pick_receiver_strategy,
-                                                             receiving_strategy=receiving_strategy
+                                                             receiving_strategy=receiving_strategy,
+                                                             number_of_shared_alternatives=shared_alternatives,
+                                                             number_of_agents_shared_with=share_partners
                                                              )
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -111,8 +113,6 @@ while iteration_counter < number_of_iterations:
         model_runner.run_model(choice_set=choice_set,                                                                   # run the model and return final states of the agents and choice options in the model
                                agent_set=agent_set,
                                duration=duration,
-                               share_partners=share_partners,
-                               shared_alternatives=shared_alternatives,
                                stock_reset_scenario=stock_reset_scenario,
                                init_stock=init_stock,
                                sd_init_stock=sd_init_stock,

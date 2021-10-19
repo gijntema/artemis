@@ -72,7 +72,8 @@ class ObjectInitializer:
                                   choice_method="random",
                                   sharing_strategy='random_sharing',
                                   receiver_choice_strategy='random_choice',
-                                  receiving_strategy='combine_receiver'):
+                                  receiving_strategy='combine_receiver',
+                                  number_of_shared_alternatives=1, number_of_agents_shared_with=1):
 
         """Method to set up the agents in the model"""
 
@@ -90,7 +91,9 @@ class ObjectInitializer:
                                                       explore_probability=explore_probability,
                                                       sharing_strategy=sharing_strategy,
                                                       pick_receiver_strategy=receiver_choice_strategy,
-                                                      receiving_strategy=receiving_strategy)                            # initialise a ForagerAgent and set up the necessary functioning of attribute ChoiceMaker
+                                                      receiving_strategy=receiving_strategy,
+                                                      number_of_shared_alternatives=number_of_shared_alternatives,
+                                                      number_of_agents_shared_with=number_of_agents_shared_with)        # initialise a ForagerAgent and set up the necessary functioning of attribute ChoiceMaker
 
             agent_tracker += 1                                                                                          # proceed to next agent
 
