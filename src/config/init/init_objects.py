@@ -37,6 +37,7 @@ Version Number:
 
 from src.tools.model_tools.agents import AgentSet, ForagerAgent
 from src.tools.model_tools.choice_set import ChoiceSet, DiscreteAlternative
+from src.tools.model_tools.allegiances import GroupFormer
 
 
 class ObjectInitializer:
@@ -116,5 +117,8 @@ class ObjectInitializer:
                     (
                         list_of_agents=list(agent_set.agents.keys())
                     )
+#        agent_set.group_former = GroupFormer(agent_set, number_of_groups=10)                                            # set up for later use of group based sharing, not yet implemented properly
+#        for agent in agent_set.agents:
+#           agent_set.agents[agent].group_allegiance = agent_set.group_former.relevant_data['personal_allegiances'][agent]
 
         return agent_set

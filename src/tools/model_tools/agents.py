@@ -48,17 +48,19 @@ import copy
 from collections import defaultdict  # TODO: --STRUCTURAL-- Replace difficult initialisation
 from src.tools.model_tools.choice_making import ChoiceMaker
 from src.tools.model_tools.sharing import HeatmapExchanger
-
+from src.tools.model_tools.allegiances import GroupFormer
 
 class AgentSet:                                         # to be implemented, not yet included in the other scripts
     """Class to contain both the agents in ForagerAgent objects (or a more specified version of it)
     and global data on all agents in the model """
-    def __init__(self):
-        self.agents = {}                                # dictionary with all agents as ForagerAgent objects
+    def __init__(self, group_forming=False):
+        self.agents = {}                                # dictionary with all agents as ForagerAgent objects            # TODO: migrate initilisation of agents from Init_objects.py
         self.total_catch = 0                            # Tracker for total catch of all agents and time_steps combined
         self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
 #        self.time_step_catch_distribution = {}         # tracker to save distribution of catch over the agents for every time_step - Currently not used
         self.average_expected_competitor_tracker = defaultdict(dict)   # tracker to contain the average expected amount of competitors expected when picking any cell
+        self.group_former = None                        # to handle groups in future versions of the model, quick and dirty init
+        # self.group_former = GroupFormer()             # to handle groups in future versions of the model - better Init
 
     def update_agent_trackers(self, agent_id, catch, alternative_index, time_tracker):
         """" updates the data contained in a single ForagerAgent
@@ -141,6 +143,7 @@ class ForagerAgent:
         self.forage_effort_tracker = {}                                                                                 # tracker variable for total location visits on each alternative (visits per alternative, cumulative for all time_steps)
         self.time_step_catch = {}                                                                                       # tracker variable to check time_step fluctuations in catch
         self.knowledge_evolution_tracker = defaultdict(dict)                                                            # tracker to identify how the memory of an agent changes over time
+        self.group_allegiance = None                                                                                    # for later functionality in group sharing
 
         # basic attributes/parameters
         self.id = agent_id                                                                                              # id consistent with other indices used in the rest of the model
