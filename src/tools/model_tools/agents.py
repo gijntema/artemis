@@ -53,14 +53,100 @@ from src.tools.model_tools.allegiances import GroupFormer
 class AgentSet:                                         # to be implemented, not yet included in the other scripts
     """Class to contain both the agents in ForagerAgent objects (or a more specified version of it)
     and global data on all agents in the model """
-    def __init__(self, group_forming=False):
-        self.agents = {}                                # dictionary with all agents as ForagerAgent objects            # TODO: migrate initilisation of agents from Init_objects.py
+    def __init__(self,
+                 nb_agents=100,
+                 choice_set=20,
+                 catchability_coefficient=0.2,
+                 nb_alternatives_known=4,
+                 explore_probability=0.2,
+                 duration_model=100,
+                 choice_method="random",
+                 sharing_strategy='random_sharing',
+                 receiver_choice_strategy='random_choice',
+                 receiving_strategy='combine_receiver',
+                 number_of_shared_alternatives=1, number_of_agents_shared_with=1):
+
+        self.agents = {}                                # dictionary with all agents as ForagerAgent objects            # TODO: migrate initilisation of agents from Init_objects.py EDIT: WORKING ON IT - see line below and init methods below
+#        self.agents = self.__init_agents()             # almost ready to replace the line above and init_objects.py
         self.total_catch = 0                            # Tracker for total catch of all agents and time_steps combined
         self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
-#        self.time_step_catch_distribution = {}         # tracker to save distribution of catch over the agents for every time_step - Currently not used
         self.average_expected_competitor_tracker = defaultdict(dict)   # tracker to contain the average expected amount of competitors expected when picking any cell
         self.group_former = None                        # to handle groups in future versions of the model, quick and dirty init
         # self.group_former = GroupFormer()             # to handle groups in future versions of the model - better Init
+
+# ----------------------------------------------------------------------------------------------------------------------
+# --------------------------------------- Initialization Supporting Methods --------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+    # UNIMPLEMENTED
+    def __init_agents(self, nb_agents, choice_set,
+                      catchability_coefficient, nb_alternatives_known,
+                      explore_probability, duration_model,
+                      choice_method="random",
+                      sharing_strategy='random_sharing',
+                      receiver_choice_strategy='random_choice',
+                      receiving_strategy='combine_receiver',
+                      number_of_shared_alternatives=1, number_of_agents_shared_with=1):
+
+        """Method to set up the individual agents in the model"""
+        agent_dictionary = dict()
+        agent_tracker = 0                                                                                               # make counter for following while loop functioning
+        while agent_tracker < nb_agents:
+            agent_id = 'agent_' + str(agent_tracker).zfill(len(str(nb_agents)))                                         # construct agent ID
+            agent_dictionary[agent_id] = ForagerAgent(choice_set=choice_set,
+                                                      choice_method=choice_method,
+                                                      agent_id=agent_id,
+                                                      catchability_coefficient=catchability_coefficient,
+                                                      nb_of_alternatives_known=nb_alternatives_known,
+                                                      explore_probability=explore_probability,
+                                                      sharing_strategy=sharing_strategy,
+                                                      pick_receiver_strategy=receiver_choice_strategy,
+                                                      receiving_strategy=receiving_strategy,
+                                                      number_of_shared_alternatives=number_of_shared_alternatives,
+                                                      number_of_agents_shared_with=number_of_agents_shared_with)        # initialise a ForagerAgent and set up the necessary functioning of attribute ChoiceMaker
+
+            agent_tracker += 1                                                                                          # proceed to next agent
+
+        return agent_dictionary
+
+    # UNIMPLEMENTED
+    def __init_time_data_trackers(self, duration_model):
+        duration_counter = 0                                                                                            # make counter for all time_steps in the model for While loop functioning
+        while duration_counter < duration_model:                                                                        # loop over all time steps in the model
+            time_id = str(duration_counter).zfill(len(str(duration_model)))
+            self.total_time_step_catch_tracker[time_id] = 0                                                             # make entry in time_step specific catch tracker for the specified time step
+
+            # make counter for all time_steps in the model for While loop functioning                                   # TODO: Potentially migrate to ForagerAgent Initialisation
+            for agent in self.agents:                                                                                   # loop over all agents
+                self.agents[agent].time_step_catch[time_id] = 0                                                         # for the considered agent, initialise the catch in the given time_step as 0
+                # proceed to next agent
+            duration_counter += 1
+
+    # UNIMPLEMENTED
+    def __init_potential_receivers(self, receiver_choice_strategy):
+        for agent in self.agents:                                                                                       # loop over agents
+            self.agents[agent].heatmap_exchanger.functionality['pick_receiver'][receiver_choice_strategy]['init'] \
+            (
+                list_of_agents=list(self.agents.keys())
+            )
+
+    # UNIMPLEMENTED
+    def __init_group_allegiances(self, number_of_groups=10,
+                                 division_style='equal_mutually_exclusive_groups',
+                                 group_dynamics=False):
+
+        group_former = GroupFormer(self,
+                                   number_of_groups=number_of_groups,
+                                   division_style=division_style,
+                                   group_dynamics=group_dynamics)                                                       # set up for later use of group based sharing, not yet implemented properly
+
+        for agent in self.agents:
+            self.agents[agent].group_allegiance = group_former.relevant_data['personal_allegiances'][agent]
+        return group_former
+
+# ----------------------------------------------------------------------------------------------------------------------
+# --------------------------------- Methods to update agent(set) related trackers --------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
     def update_agent_trackers(self, agent_id, catch, alternative_index, time_tracker):
         """" updates the data contained in a single ForagerAgent
