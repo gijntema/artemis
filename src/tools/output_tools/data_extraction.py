@@ -105,8 +105,9 @@ class DataTransformer:
                     },
                 'other_x_catch':
                     {
-                        'catch_series': self.__extract_flat_agent_time_catch,
-                        'competition_series': self.__extract_flat_agent_time_competition
+                        'catch': self.__extract_flat_agent_time_catch,
+                        'competition': self.__extract_flat_agent_time_competition,
+                        'knowledge_in_heatmap': self.__extract_flat_agent_time_knowledge
                         # INSERT FURTHER FUNCTIONALITY
                     }
                 # INSERT POTENTIAL OTHER DATA TYPES HERE
@@ -560,7 +561,7 @@ class DataTransformer:
                                                                                                 iteration_id)
         return data_output
 
-    def __extract_flat_agent_time_catch(self, agent_set, output_data, iteration_id):
+    def __extract_flat_agent_time_catch(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
         """Extracts the important columns for the data frame such as ID columns and the response variable Catch"""
         input_data = agent_set.agents
         data_series_iteration = []
@@ -575,13 +576,14 @@ class DataTransformer:
                 data_series_agent.append(agent)
                 data_series_catch.append(input_data[agent].time_step_catch[time_id])
 
+        output_data['iteration_id'] = data_series_iteration
         output_data['time_id'] = data_series_time
         output_data['agent_id'] = data_series_agent
         output_data['catch'] = data_series_catch
 
         return output_data
 
-    def __extract_flat_agent_time_competition(self, agent_set, output_data, iteration_id):
+    def __extract_flat_agent_time_competition(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
         """Extracts the average expected competition for every time and agent as explanatory variable"""
         data_series_competition = []
         input_data = agent_set.average_expected_competitor_tracker
@@ -591,6 +593,16 @@ class DataTransformer:
 
         output_data['average_expected_competitors'] = data_series_competition
 
+        return output_data
+
+    def __extract_flat_agent_time_knowledge(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
+        data_series_knowledge = []
+        input_data = agent_set.agents
+        for time_id in tuple(input_data[next(iter(input_data))].knowledge_evolution_tracker.keys()):
+            for agent in input_data:
+                data_series_knowledge.append(len(input_data[agent].knowledge_evolution_tracker[time_id]))
+
+        output_data['knowledge_in_heatmap'] = data_series_knowledge
         return output_data
 
 # ----------------------------------------------------------------------------------------------------------------------

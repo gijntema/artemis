@@ -52,7 +52,7 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 duration = 100                          # number of time steps in the model
 choice_set_size = 20                    # number of discrete alternatives in the choice set
 number_of_agents = 100                  # number of foragers in the model
-number_of_iterations = 1                # number of iterations/simulations the model runs for
+number_of_iterations = 10                # number of iterations/simulations the model runs for
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
@@ -69,8 +69,8 @@ pick_receiver_strategy = 'random_choice'            # determines with whom an ag
 receiving_strategy = "combine_receiver"             # determines how a receiver agent will handle shared data
 
 # Quantitative Parameters
-shared_alternatives = 10                 # number of known alternatives shared at any given time
-share_partners = 10                      # the number of agents an agent informs about a (part of) the personal heatmap
+shared_alternatives = 1                 # number of known alternatives shared at any given time
+share_partners = 1                     # the number of agents an agent informs about a (part of) the personal heatmap
 
 
 # ----------------------------------------------------------------------------------------------------------------------

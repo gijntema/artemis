@@ -342,6 +342,7 @@ data_writer.write_json(agent_set_time_series, "agent_set_time_series.json")     
 
 data_writer.write_csv(single_memory_data, 'last_simulation_memory_evolution.csv')                                       # write knowledge evolution data
 
+data_writer.write_csv(other_x_catch_data, 'flat_time_x_agent_results_SA{}_SP{}.csv'.format(shared_alternatives, share_partners))
 
 # jaccard_agent_knowledge = data_transformer.get_single_simulation_jaccard_matrices(agent_set_output)                     # get jaccard indices similarity matrices for last simulation
 # data_writer.write_csv(jaccard_agent_knowledge, 'last_simulation_jaccard_agents.csv')
