@@ -152,15 +152,21 @@ graph_constructor.plot_scatter_pandas(other_x_catch_data,
                                       x_values='catch', y_values='average_expected_competitors',
                                       img_name='catch_x_competition')
 
+graph_constructor.plot_scatter_pandas(other_x_catch_data,
+                                      x_values='knowledge_in_heatmap', y_values="catch",
+                                      img_name='knowledge_x_catch')
+
+
 # ----------------------------------------------------------------------------------------------------------------------
-# Get last simulation Explanatory Variables x Catch dataframe graphics
+# Get last simulation Catch dataframe graphics
 # ----------------------------------------------------------------------------------------------------------------------
 agent_catch_time_df = data_transformer.extract_agent_time_catch(agent_set_output)
 graph_constructor.plot_line_pandas(pd_dataframe=agent_catch_time_df,
                                    x_values='time_id', y_label='catch',
                                    img_name='catch_agent_time_last_simulation')
 
-# ----------------------------------------------------------------------------------------------------------------------    # Exit iteration loop and
+
+# ----------------------------------------------------------------------------------------------------------------------
 # extract mean and sd from raw data outputs
 # ----------------------------------------------------------------------------------------------------------------------
 avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
@@ -288,11 +294,11 @@ single_memory_data_summary['max_knowledge'] = single_memory_data.max(axis=1)    
 
 graph_constructor.plot_line_pandas(single_memory_data, x_values='time_step_id',
                                    img_name='knowledge_evolution_last_simulation',
-                                   y_label=' # of entries in heatmap', legend_title='Agents')                           # plot memory evolution over time fro all agents
+                                   y_label=' # of known cells', legend_title='Agents')                           # plot memory evolution over time fro all agents
 
 graph_constructor.plot_line_pandas(single_memory_data_summary, x_values='time_step_id',
                                    img_name='summary_knowledge_evolution_last_simulation',
-                                   y_label=' # of entries in heatmap', legend_title='Agents')                           # plot summary values for memory evolution over time (min-median-max
+                                   y_label=' # of known cells', legend_title='Agents')                           # plot summary values for memory evolution over time (min-median-max
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce data and graphical outputs - intricate measure for the mean number of competitors (over all options) per agent
@@ -313,7 +319,8 @@ graph_constructor.plot_line_pandas(competitor_df,
                                                                                                 * 100)
                                                                                               ),
                                    y_label='average expected number of competitors'
-                                   , legend_title='Agents')                                                             # make plot from data containgin data of agents average competitors per cell over time
+                                   , legend_title='Agents',
+                                   y_range=[0.2, 0.3])                                                             # make plot from data containgin data of agents average competitors per cell over time
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce database outputs (e.g. .csv or .json)

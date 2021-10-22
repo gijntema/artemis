@@ -65,7 +65,7 @@ class GraphConstructor:
         fig.write_image("{}.png".format(img_name))
 
     def plot_line_pandas(self, pd_dataframe, x_values, y_values=None, yerr_plus=None, yerr_min=None,
-                         img_name='unnamed', y_label='value', legend_title='values'):
+                         img_name='unnamed', y_label='value', legend_title='values', y_range=False, x_range=False):
         if y_values is None:
             y_values = list(pd_dataframe)                                                                               # if y values are not specified take all data series in the data
 
@@ -82,12 +82,21 @@ class GraphConstructor:
 
         fig.update_layout(yaxis_title=y_label,
                           legend_title=legend_title)
+        if y_range:
+            fig.update_yaxes(range=y_range)
+        if x_range:
+            fig.update_xaxes(range=x_range)
 
-        # fig.show()                                                                                                    # line to immediatly show graphs, turned off for now
         fig.write_image("{}.png".format(img_name))
 
-    def plot_scatter_pandas(self, pd_dataframe, x_values, y_values, img_name='unnamed'):
+    def plot_scatter_pandas(self, pd_dataframe, x_values, y_values, img_name='unnamed', y_range=False, x_range=False):
         fig = pd_dataframe.plot.scatter(x=x_values, y=y_values)
+
+        if y_range:
+            fig.update_yaxes(range=y_range)
+        if x_range:
+            fig.update_xaxes(range=x_range)
+
         fig.write_image("{}.png".format(img_name))
 
 
