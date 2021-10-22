@@ -64,15 +64,37 @@ class AgentSet:                                         # to be implemented, not
                  sharing_strategy='random_sharing',
                  receiver_choice_strategy='random_choice',
                  receiving_strategy='combine_receiver',
-                 number_of_shared_alternatives=1, number_of_agents_shared_with=1):
+                 number_of_shared_alternatives=1,
+                 number_of_agents_shared_with=1,
+                 number_of_sharing_groups=10,
+                 group_division_style='equal_mutually_exclusive_groups',
+                 group_dynamics=False):
 
-        self.agents = {}                                # dictionary with all agents as ForagerAgent objects            # TODO: migrate initilisation of agents from Init_objects.py EDIT: WORKING ON IT - see line below and init methods below
-#        self.agents = self.__init_agents()             # almost ready to replace the line above and init_objects.py
+        # self.agents = {}                                # dictionary with all agents as ForagerAgent objects            # TODO: migrate initilisation of agents from Init_objects.py EDIT: WORKING ON IT - see line below and init methods below
+        self.agents = self.__init_agents(
+                               nb_agents=nb_agents,
+                               choice_set=choice_set,
+                               catchability_coefficient=catchability_coefficient,
+                               nb_alternatives_known=nb_alternatives_known,
+                               explore_probability=explore_probability,
+                               duration_model=duration_model,
+                               choice_method=choice_method,
+                               sharing_strategy=sharing_strategy,
+                               receiver_choice_strategy=receiver_choice_strategy,
+                               receiving_strategy=receiving_strategy,
+                               number_of_shared_alternatives=number_of_shared_alternatives,
+                               number_of_agents_shared_with=number_of_agents_shared_with)                        # almost ready to replace the line above and init_objects.py
+
         self.total_catch = 0                            # Tracker for total catch of all agents and time_steps combined
         self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
         self.average_expected_competitor_tracker = defaultdict(dict)   # tracker to contain the average expected amount of competitors expected when picking any cell
         self.group_former = None                        # to handle groups in future versions of the model, quick and dirty init
-        # self.group_former = GroupFormer()             # to handle groups in future versions of the model - better Init
+
+        self.__init_time_data_trackers(duration_model=duration_model)
+        self.__init_potential_receivers(receiver_choice_strategy=receiver_choice_strategy)
+        self.group_former = self.__init_group_allegiances(number_of_groups=number_of_sharing_groups,                   # set up for better initialisation of group_former, reuiqres the best initiliasation of self.agents a few lines above
+                                                          group_division_style=group_division_style,
+                                                          group_dynamics=group_dynamics)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------------- Initialization Supporting Methods --------------------------------------------
@@ -132,16 +154,17 @@ class AgentSet:                                         # to be implemented, not
 
     # UNIMPLEMENTED
     def __init_group_allegiances(self, number_of_groups=10,
-                                 division_style='equal_mutually_exclusive_groups',
+                                 group_division_style='equal_mutually_exclusive_groups',
                                  group_dynamics=False):
 
         group_former = GroupFormer(self,
                                    number_of_groups=number_of_groups,
-                                   division_style=division_style,
+                                   division_style=group_division_style,
                                    group_dynamics=group_dynamics)                                                       # set up for later use of group based sharing, not yet implemented properly
 
         for agent in self.agents:
             self.agents[agent].group_allegiance = group_former.relevant_data['personal_allegiances'][agent]
+
         return group_former
 
 # ----------------------------------------------------------------------------------------------------------------------

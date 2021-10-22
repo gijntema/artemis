@@ -55,6 +55,7 @@ pd.options.plotting.backend = "plotly"                                          
 
 # Other Modules in the ARTEMIS model
 from src.config.init.init_param import *                                                                                # module containing parameter and scenario settings
+from src.tools.model_tools.agents import AgentSet,ForagerAgent
 from src.config.init.init_objects import ObjectInitializer                                                              # module to initialize the objects in the module (agents and choices)
 from src.run_model import ModelRunner                                                                                   # module to run the model using initialized agents and choices
 from src.tools.model_tools.competition import CompetitionHandler                                                        # module that handles model feedbacks as a result of competition between agents
@@ -92,19 +93,33 @@ while iteration_counter < number_of_iterations:
 # ----------------------------------------------------------------------------------------------------------------------
 
     choice_set = object_initializer.initialize_choice_set(choice_set_size, init_stock, sd_init_stock, growth_factor)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
-    agent_set = object_initializer.initialize_forager_agents(nb_agents=number_of_agents,
-                                                             choice_set=choice_set,                                     # initialize the forager agents in the model (e.g. fishermen)
-                                                             catchability_coefficient=catchability_coefficient,
-                                                             nb_alternatives_known=init_number_of_alternatives_known,
-                                                             explore_probability=explore_probability,
-                                                             duration_model=duration,
-                                                             choice_method=choice_method,
-                                                             sharing_strategy=sharing_strategy,
-                                                             receiver_choice_strategy=pick_receiver_strategy,
-                                                             receiving_strategy=receiving_strategy,
-                                                             number_of_shared_alternatives=shared_alternatives,
-                                                             number_of_agents_shared_with=share_partners
-                                                             )
+    #agent_set = object_initializer.initialize_forager_agents(nb_agents=number_of_agents,
+    #                                                         choice_set=choice_set,                                     # initialize the forager agents in the model (e.g. fishermen)
+    #                                                        catchability_coefficient=catchability_coefficient,
+    #                                                         nb_alternatives_known=init_number_of_alternatives_known,
+    #                                                         explore_probability=explore_probability,
+    #                                                         duration_model=duration,
+    #                                                         choice_method=choice_method,
+    #                                                         sharing_strategy=sharing_strategy,
+    #                                                         receiver_choice_strategy=pick_receiver_strategy,
+    #                                                         receiving_strategy=receiving_strategy,
+    #                                                         number_of_shared_alternatives=shared_alternatives,
+    #                                                         number_of_agents_shared_with=share_partners
+    #                                                         )
+
+    agent_set = AgentSet(nb_agents=number_of_agents,                                                                    # initialize the forager agents in the model (e.g. fishermen)
+                         choice_set=choice_set,
+                         catchability_coefficient=catchability_coefficient,
+                         nb_alternatives_known=init_number_of_alternatives_known,
+                         explore_probability=explore_probability,
+                         duration_model=duration,
+                         choice_method=choice_method,
+                         sharing_strategy=sharing_strategy,
+                         receiver_choice_strategy=pick_receiver_strategy,
+                         receiving_strategy=receiving_strategy,
+                         number_of_shared_alternatives=shared_alternatives,
+                         number_of_agents_shared_with=share_partners
+                         )
 
 # ----------------------------------------------------------------------------------------------------------------------
 # RUN SIMULATION
