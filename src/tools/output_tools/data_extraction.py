@@ -62,7 +62,7 @@ class DataTransformer:
         only for future functionality/flexibility,
         not implemented in current version"""
 
-        self.functionality_extraction = self.__init_functionality_extraction()                                          # functionality to extract data as tracke dby the model
+        self.functionality_extraction = self.__init_functionality_extraction()                                          # functionality to extract data as tracked by the model
         self.functionality_derived_measures = self.__init_functionality_derived()                                       # functionality to calculate measures, indices etc. from data tracked by the model
 
     def __init_functionality_extraction(self):  # PLACE HOLDER FOR future reworking of the structure
@@ -144,13 +144,16 @@ class DataTransformer:
 
         return alternative_specific_data, choice_set_time_series, agent_specific_data, agent_set_time_series
 
+# TODO KW: specific_data; what is specific data? you mean statistics over multpli iterations, such as averages etc? then that needs to be explained everywhere this is called
+# TODO KW: time_series implies the value of a variable at a given time. if cumulative information is provided then 'cum' or such indication needs to be in the name.
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------ Primary Subsections of the transform_output_data Method -------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __transform_alternative_data(self, choice_set, iteration_id=99):
-        """ Method to extract data related to specific choice options to a usable format"""
+        """ Method to extract data related to specific choice options to a usable format: effort and stock after fishing"""
         temp_dictionary = dict()
+        # create list with ID's of each alternative
         temp_dictionary['alternative_id'] = self.__extract_list_of_alternatives(choice_set)                             # attach choice option IDs as independent variables
 
         # currently implemented extractable data
@@ -186,12 +189,14 @@ class DataTransformer:
         return alternative_time_series_data
 
     def __transform_agent_data(self, agent_set, iteration_id=-99):
-        """"function to retrieve data per time step for each agent and transform to usable format"""
-        # extract list of time_steps
+        """"function to retrieve data per time step for each agent and transform to usable format""" #TODO KW: per time step? then why the function below called time_series_data?
+        # extract list of agent ID's
         temp_dictionary = dict()
         temp_dictionary['agent_id'] = self.__extract_list_of_agents(agent_set)
 
         # currently implemented extractable data
+        #TODO KW: if this is total catch then use TotalCatch in the name of the function!
+        #TODO KW: also specify if averaging over simulation occurred.
         temp_dictionary['agents_catch'] = self.__transform_agent_catch_data(agent_set)                                  # get agent specific total catch data (over all iteration time_steps) for each specific agent
         # add additional functionality HERE
 
@@ -206,6 +211,7 @@ class DataTransformer:
         return alternative_time_series_data
 
     def __transform_agent_time_series_data(self, agent_set, duration, iteration_id=99):
+        """"function to retrieve data per time step for each agent and transform to usable format: catch data per agent"""
         # TODO: --STRUCTURAL-- near-duplicate of method transform_alternative_time_series_data, could be merged?
         # extract list of time_steps
         temp_dictionary = dict()
@@ -230,6 +236,7 @@ class DataTransformer:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __extract_list_of_time_steps(self, duration_model):
+        #### Obtain the time step ID####
         time_steps = list()
         duration_counter = 0
         while duration_counter < duration_model:
@@ -240,6 +247,7 @@ class DataTransformer:
         return time_steps
 
     def __extract_list_of_alternatives(self, choice_set):
+        #### Obtain the list of alternative locations ID ####
         alternatives = list(choice_set.discrete_alternatives.keys())
         alternative_counter = 0
         while alternative_counter < len(alternatives):
@@ -249,6 +257,7 @@ class DataTransformer:
         return alternatives
 
     def __extract_list_of_agents(self, agent_set):
+        #### Obtain the agents ID's ####
         agents = list(agent_set.agents.keys())
         agent_counter = 0
         while agent_counter < len(agents):
@@ -259,14 +268,15 @@ class DataTransformer:
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------- Internal Methods to Extract Actual Data Series -------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-
+# TODO KW: actual data is extracted then call it extraction and not _transform_ happy to help fix this throughout the model, let me know!
     def __transform_alternative_effort_data(self, choice_set):
-
+        #### Obtain the realized effort TODO CHECK COMMENT ####
         effort_data = list(choice_set.effort_map.values())
 
         return effort_data
 
     def __transform_agent_catch_data(self, agent_set):
+        #### Obtain the TOTAL catch data ####
         catch_data = agent_set.agents
 
         # extract list of values for each agent
@@ -277,13 +287,14 @@ class DataTransformer:
         return catch
 
     def __transform_agent_set_total_catch_data(self, agent_set):
-
+        #### Obtain the TODO ????? ####
         # extract list of values for every time_step
         time_step_catch = list(agent_set.total_time_step_catch_tracker.values())
 
         return time_step_catch
 
     def __transform_final_stock_data(self, choice_set):
+        #### Obtain the resource after foraging TODO ????? ####
         final_stock_data = choice_set.discrete_alternatives
 
         final_stock = []
@@ -296,9 +307,10 @@ class DataTransformer:
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------- Methods to Extract Data Related to Distributional Effects --------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-
+#TODO KW: what is this? Related to Distributional Effects; tell your neighbour and use those words here....
 
     def __extract_time_step_catch_data(self, agent_set, time_step):
+        #### Obtain the TODO ???? ####
         catch_list = []
         data = agent_set.agents
         for agent in data:
@@ -308,12 +320,12 @@ class DataTransformer:
 
 # TODO: quick and dirty fix for some basic measures, needs better flexibility through functionality dictionary
 # ----------------------------------------------------------------------------------------------------------------------
-# --------------------------------- Methods to Extract Average Data Series ---------------------------------------------
+# --------------------------------- Methods to Create Average Data Series over Multiple Simulations---------------------
 # ----------------------------------------------------------------------------------------------------------------------
-
+# TODO waarom bij deze eerste geen def __get_average maar def get_average?
     def get_average_dataframes(self, alternative_specific_data, alternative_time_series_data,
                                agent_specific_data, agent_time_series_data):
-
+        #### Calculate the means over multiple simulations
         avg_alternative_specific = self.__get_average_alternative_specific(alternative_specific_data)
         avg_alternative_time = self.__get_average_alternative_time_series(alternative_time_series_data)
         avg_agent_specific = self.__get_average_agent_specific(agent_specific_data)
@@ -322,6 +334,7 @@ class DataTransformer:
         return avg_alternative_specific, avg_alternative_time, avg_agent_specific, avg_agent_time
 
     def __get_average_alternative_specific(self, alternative_specific_data):
+        #### TODO what happens here? ####
         temp_data = alternative_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('alternative_id').mean()
         temp_data['alternative_id'] = temp_data.index
@@ -329,6 +342,7 @@ class DataTransformer:
         return temp_data
 
     def __get_average_alternative_time_series(self, alternative_time_series_data):
+        #### TODO what happens here? ####
         temp_data = alternative_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').mean()
         temp_data['time_step_id'] = temp_data.index
@@ -336,6 +350,7 @@ class DataTransformer:
         return temp_data
 
     def __get_average_agent_specific(self, agent_specific_data):
+        #### TODO what happens here? ####
         temp_data = agent_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('agent_id').mean()
         temp_data['agent_id'] = temp_data.index
@@ -343,6 +358,7 @@ class DataTransformer:
         return temp_data
 
     def __get_average_agent_time_series(self, agent_time_series_data):
+        #### TODO what happens here? ####
         temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').mean()
         temp_data['time_step_id'] = temp_data.index
@@ -350,11 +366,11 @@ class DataTransformer:
         return temp_data
 
 # ----------------------------------------------------------------------------------------------------------------------
-# --------------------------- Methods to Extract standard deviation Data Series ----------------------------------------
+# --------------------------- Methods to Extract standard deviation Data Series TODO over multiple runs? per time step? explain----------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
     def get_sd_dataframes(self, alternative_specific_data, alternative_time_series_data,
                                agent_specific_data, agent_time_series_data):
-
+        #### TODO what happens here? ####
         sd_alternative_specific = self.__get_sd_alternative_specific(alternative_specific_data)
         sd_alternative_time = self.__get_sd_alternative_time_series(alternative_time_series_data)
         sd_agent_specific = self.__get_sd_agent_specific(agent_specific_data)
@@ -363,6 +379,7 @@ class DataTransformer:
         return sd_alternative_specific, sd_alternative_time, sd_agent_specific, sd_agent_time
 
     def __get_sd_alternative_specific(self, alternative_specific_data):
+        #### TODO what happens here? ####
         temp_data = alternative_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('alternative_id').std()
         temp_data['alternative_id'] = temp_data.index
@@ -370,6 +387,7 @@ class DataTransformer:
         return temp_data
 
     def __get_sd_alternative_time_series(self, alternative_time_series_data):
+        #### TODO what happens here? ####
         temp_data = alternative_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').std()
         temp_data['time_step_id'] = temp_data.index
@@ -377,6 +395,7 @@ class DataTransformer:
         return temp_data
 
     def __get_sd_agent_specific(self, agent_specific_data):
+        #### TODO what happens here? ####
         temp_data = agent_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('agent_id').std()
         temp_data['agent_id'] = temp_data.index
@@ -384,6 +403,7 @@ class DataTransformer:
         return temp_data
 
     def __get_sd_agent_time_series(self, agent_time_series_data):
+        #### TODO what happens here? ####
         temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').std()
         temp_data['time_step_id'] = temp_data.index
@@ -392,12 +412,12 @@ class DataTransformer:
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# ------------------------- Methods to Extract Quantile values for Data Series -----------------------------------------
+# ------------------------- Methods to Extract Quantile values for Data Series TODO OVER TIME STEPS, SIUMLATIONS, ETC?-----------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def get_qt_dataframes(self, alternative_specific_data, alternative_time_series_data,
                           agent_specific_data, agent_time_series_data, quantile=0.95):
-
+        #### TODO what happens here? ####
         qt_alternative_specific = self.__get_qt_alternative_specific(alternative_specific_data, quantile)
         qt_alternative_time = self.__get_qt_alternative_time_series(alternative_time_series_data, quantile)
         qt_agent_specific = self.__get_qt_agent_specific(agent_specific_data, quantile)
@@ -406,6 +426,7 @@ class DataTransformer:
         return qt_alternative_specific, qt_alternative_time, qt_agent_specific, qt_agent_time
 
     def __get_qt_alternative_specific(self, alternative_specific_data, quantile):
+        #### TODO what happens here? ####
         temp_data = alternative_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('alternative_id').quantile(q=quantile)
         temp_data['alternative_id'] = temp_data.index
@@ -413,6 +434,7 @@ class DataTransformer:
         return temp_data
 
     def __get_qt_alternative_time_series(self, alternative_time_series_data, quantile):
+        #### TODO what happens here? ####
         temp_data = alternative_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').quantile(q=quantile)
         temp_data['time_step_id'] = temp_data.index
@@ -420,6 +442,7 @@ class DataTransformer:
         return temp_data
 
     def __get_qt_agent_specific(self, agent_specific_data, quantile):
+        #### TODO what happens here? ####
         temp_data = agent_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('agent_id').quantile(q=quantile)
         temp_data['agent_id'] = temp_data.index
@@ -427,6 +450,7 @@ class DataTransformer:
         return temp_data
 
     def __get_qt_agent_time_series(self, agent_time_series_data, quantile):
+        #### TODO what happens here? ####
         temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').quantile(q=quantile)
         temp_data['time_step_id'] = temp_data.index
@@ -434,7 +458,7 @@ class DataTransformer:
         return temp_data
 
 # ----------------------------------------------------------------------------------------------------------------------
-# ------------------------- Methods to Extract SEM values for Data Series ----------------------------------------------
+# ------------------------- Methods to Extract SEM values for Data Series TODO OVER SIMULATIONS, TIME STEPS, ETC?----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def attach_sem_dataframes(self, alternative_specific_data, alternative_time_series_data,
@@ -450,6 +474,7 @@ class DataTransformer:
         return sem_alternative_specific, sem_alternative_time, sem_agent_specific, sem_agent_time
 
     def __attach_sem_alternative_specific(self, alternative_specific_data, target_dataframe):
+        #### TODO what happens here? ####
         temp_data = alternative_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('alternative_id').sem()
         temp_data['alternative_id'] = temp_data.index
@@ -460,6 +485,7 @@ class DataTransformer:
         return temp_data
 
     def __attach_sem_alternative_time_series(self, alternative_time_series_data, target_dataframe):
+        #### TODO what happens here? ####
         temp_data = alternative_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').sem()
         temp_data['time_step_id'] = temp_data.index
@@ -470,6 +496,7 @@ class DataTransformer:
         return temp_data
 
     def __attach_sem_agent_specific(self, agent_specific_data, target_dataframe):
+        #### TODO what happens here? ####
         temp_data = agent_specific_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('agent_id').sem()
         temp_data['agent_id'] = temp_data.index
@@ -480,6 +507,7 @@ class DataTransformer:
         return temp_data
 
     def __attach_sem_agent_time_series(self, agent_time_series_data, target_dataframe):
+        #### TODO what happens here? ####
         temp_data = agent_time_series_data.drop('iteration_id', axis=1, inplace=False)
         temp_data = temp_data.groupby('time_step_id').sem()
         temp_data['time_step_id'] = temp_data.index
@@ -490,7 +518,7 @@ class DataTransformer:
         return temp_data
 
 # ----------------------------------------------------------------------------------------------------------------------
-# ------------------- Methods to Extract values for memory/heatmap related reporter variables---------------------------
+# ------------------- Methods to Extract values for memory/heatmap related reporter variables for the last iteration TODO DEFINE REPORTER VARIABLES---------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def get_single_simulation_memory_evolution(self, agent_set, duration):
@@ -502,6 +530,7 @@ class DataTransformer:
         while time_tracker < duration:                                                                                  # loop over all time_steps
             time_data = {}
 
+            # loop over agents to obtain the number of known alternatives for each time step.
             for agent in agent_set.agents:
                 time_data['time_step_id'] = str(time_tracker).zfill(len(str(duration)))
                 time_data[agent] = len(agent_set.agents[agent].knowledge_evolution_tracker[time_data['time_step_id']])  # identify how many entries the heatmap has at a given time
@@ -544,8 +573,8 @@ class DataTransformer:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def extract_average_expected_competition(self, agent_set):
-        """competition over time for every agent"""
-        data_output = pd.DataFrame(agent_set.average_expected_competitor_tracker).transpose()                           # make a pd.Dataframe from the data on the average amount of competitors in a given choice option
+        """competition over time for every agent""" # TODO KW unclear with what the data_output is filled
+        data_output = pd.DataFrame(agent_set.average_expected_competitor_tracker).transpose()                           # make a pd.Dataframe from the data on the average number of competitors in a given choice option
         data_output.insert(loc=0, column='time_step_id', value=data_output.index)                                       # repair small error in tracker->pd.dataframe conversion --> get time_step column from index
         data_output.reset_index(inplace=True)                                                                           # reset index values to default indices
         data_output.drop(columns='index', inplace=True)                                                                 # remove newly created redundant column 'index'
@@ -553,16 +582,16 @@ class DataTransformer:
 
 
     def get_other_x_catch(self, agent_set, iteration_id):      # NOT FINISHED
-        """regression/correlation of competition to catch"""
+        """calculate the regression/correlation between competition and catch"""
         data_output = pd.DataFrame()
         for data_series_extractor in self.functionality_extraction['other_x_catch']:                                    # loop over all data series, as potential explanatory variables to catch, we have functionality on in the functionality dictionary (quick and dirty fix, could be adapted to choose specific functionality)
-            data_output = self.functionality_extraction['other_x_catch'][data_series_extractor](agent_set,
+            data_output = self.functionality_extraction['other_x_catch'][data_series_extractor](agent_set,              # TODO KW: all data series? competition aka number of competitiors is explicitly mentioned
                                                                                                 data_output,
                                                                                                 iteration_id)
         return data_output
 
     def __extract_flat_agent_time_catch(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
-        """Extracts the important columns for the data frame such as ID columns and the response variable Catch"""
+        """Extracts the important columns for the data frame: iterations, time step, agent ID  and catch"""
         input_data = agent_set.agents
         data_series_iteration = []
         data_series_time = []
@@ -570,11 +599,11 @@ class DataTransformer:
         data_series_catch = []
 
         for time_id in tuple(input_data[next(iter(input_data))].time_step_catch.keys()):                                # loop over the items (time_steps) in an immutable list of time_steps as logged in the time_step_catch tracker of the first agent in the model
-            for agent in input_data:
+            for agent in input_data:   # TODO KW: why in comment: first agent in the model? do you not loop over all agents?
                 data_series_iteration.append(iteration_id)
                 data_series_time.append(time_id)
                 data_series_agent.append(agent)
-                data_series_catch.append(input_data[agent].time_step_catch[time_id])
+                data_series_catch.append(input_data[agent].time_step_catch[time_id]) # TODO IF THIS IS TOTAL CATCH THEN CALL IT AS SUCH; otherwise this is interpreted as catch
 
         output_data['iteration_id'] = data_series_iteration
         output_data['time_id'] = data_series_time
@@ -584,7 +613,7 @@ class DataTransformer:
         return output_data
 
     def __extract_flat_agent_time_competition(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
-        """Extracts the average expected competition for every time and agent as explanatory variable"""
+        """Extracts the average expected competition for every time step and agent as explanatory variable"""
         data_series_competition = []
         input_data = agent_set.average_expected_competitor_tracker
         for time_id in tuple(input_data.keys()):
@@ -596,6 +625,7 @@ class DataTransformer:
         return output_data
 
     def __extract_flat_agent_time_knowledge(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
+        #### TODO what happens here?  ####
         data_series_knowledge = []
         input_data = agent_set.agents
         for time_id in tuple(input_data[next(iter(input_data))].knowledge_evolution_tracker.keys()):
@@ -610,6 +640,7 @@ class DataTransformer:
 # ----------------------------------------------------------------------------------------------------------------------
     # TODO: QUICK AND DIRTY WAY OF doing this
     def extract_agent_time_catch(self, agent_set):
+        #### TODO what happens here? is this catch or total catch?
         input_data = agent_set.agents
         output_data = {}
 
@@ -626,3 +657,5 @@ class DataTransformer:
 
         output_data = pd.DataFrame(output_data)
         return output_data
+
+# EOF
