@@ -17,7 +17,7 @@
 
 # TODO: Implement further functionality, only interference and absent competition supported now
 """
-This Module is aimed at handling and executing any corrections or effects of competition
+This Module is aimed at handling and executing any effects of competition on effort and catch
 using the CompetitionHandler object
 
 this module is read by run_model.py to be used to correct any profits or catches through competition
@@ -49,6 +49,7 @@ class CompetitionHandler:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, competition_method, interference_factor=0.8):
+        """"initialize competition """
         self.competition_instruction = self.__init_instructions()
         self.competition_method = competition_method
         self.relevant_data = self.__init_relevant()
@@ -112,20 +113,20 @@ class CompetitionHandler:
 
     def __init_relevant_single(self):
         """method to initialise the relevant attributes (e.g. competition specific trackers)
-         needed when accounting for competition"""
+         needed when accounting for a single competition type of competition"""
         relevant = self.competition_instruction[self.competition_method]['init']()
         return relevant
 
-    def __init_relevant_multiple(self):
+    def __init_relevant_multiple(self): # TODO KW: write down the difference between _single and _multiple
         """method to initialise the relevant attributes (e.g. competition specific trackers)
-         needed when accounting for competition"""
+         needed when accounting for multiple competition types"""
         # TODO -- FUTURE -- allow functionality for multiple scenarios simultaneously - METHOD UNFINISHED
         relevant = {}
         # Include loop here to ensure relevant data for all considered competition are added
         return relevant
 
-    def __init_absent(self):
-        """method to define relevant data, as an absence of competition does not need any data,
+    def __init_absent(self): # TODO: specify relevant data!
+        """method to define relevant data: effort and choice; when there is no competition,
          only present to fix bugging"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(int)                                                              # dictionary that creates and returns an integer 0 if a key is called that is not already in
@@ -133,20 +134,20 @@ class CompetitionHandler:
         return relevant_data
 
     def __init_interference(self):
-        """method to initialise a tracker for effort, as effort is used a basis to correct catch for interference"""
+        """method to initialise a tracker for effort and choice, because effort is used a basis to correct catch for interference"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(int)                                                              # dictionary that creates and returns an integer 0 if a key is called that is not already in
         relevant_data['agent_choices'] = dict()
         return relevant_data
 
-    def __init_uptake(self):
+    def __init_uptake(self): #TODO: you call it a tracker for catch but use the name effort?!
         """method to initialise an ordered tracker for catch, as catch is used to reduce the resource stock"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
         relevant_data['agent_choices'] = dict()
         return relevant_data
 
-    def __init_price(self):
+    def __init_price(self): #TODO: you call it a tracker for catch but use the name effort?!
         """method to initialise a tracker for catch of the current time_unit,
         as catch is used a basis to correct the price of foraged goods. making this competition method only applicable
         to human forager agents"""
@@ -155,7 +156,8 @@ class CompetitionHandler:
         relevant_data['agent_choices'] = dict()
         return relevant_data
 
-    def __init_fixed_catch(self):
+    def __init_fixed_catch(self):#TODO: you call it a tracker for catch but use the name effort?!
+        """method to initialize ...         """
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
         relevant_data['agent_choices'] = dict()                                                                 # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
@@ -165,7 +167,7 @@ class CompetitionHandler:
 # ---------------------------- Methods to load relevant agent choice functionality -------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
     def load_competition_data(self, chosen_alternative_id, agent_id, interference_factor=0.8):
-        """loads data on the agent and chosen choice option"""
+        """loads data on the agent and chosen choice option""" # TODO which data is loaded?
         self.competition_instruction[self.competition_method]['load'](chosen_alternative_id, agent_id, interference_factor)
 
     def __load_absent(self, chosen_alternative_id, agent_id, interference_factor=0):
@@ -188,7 +190,7 @@ class CompetitionHandler:
         pass
 
     def __load_fixed_catch(self, chosen_alternative_id, agent_id, interference_factor=0):
-        """loads data on the agent and chosen choice option"""
+        """loads data on the agent and chosen choice option""" #TODO KW: specify which data
         self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id
 
@@ -209,9 +211,9 @@ class CompetitionHandler:
 
         agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents itself
         # agent_set.update_memory
-        choice_set.catch_map[choice_id] += corrected_catch                                                              # update tracker of the choice set for total catch in a choice option
+        choice_set.catch_map[choice_id] += corrected_catch   # TODO make clear this is total catch                                                           # update tracker of the choice set for total catch in a choice option
         choice_set.effort_map[choice_id] += 1                                                                           # update tracker of the choice set for effort in a choice option
-
+ #TODO: why is catch at time t not updated here, only total catch?
         if 'uptake' in self.competition_method:
             choice_set.discrete_alternatives[choice_id].resource_stock_harvest(corrected_catch)                         # quick and dirty fix of blocking out the piece of code that reduces the resource stoc
 
@@ -232,6 +234,7 @@ class CompetitionHandler:
 
     def __correct_fixed_catch(self, choice_id, uncorrected_catch):
         """method to correct catch by dividing over the number of competitors, creates very strong competition"""
+        # TODO: deze snap ik niet, waarom zou je de vangst delen? waarom niet de aanwezige resource?
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
         corrected_catch = uncorrected_catch / number_of_competitors                                                     # prone to DividedByZeroError, but as this method should never be called if no foraging occurs in a choice option, this should be a nice test for functioning
         correction_tag = str(number_of_competitors - 1) + " other foragers"                                             # generate interference tag for later use in reporting
@@ -249,9 +252,10 @@ class CompetitionHandler:
 # --------------------- Methods to reset the saved content to start from default relevant data--------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-    def reset_relevant_data(self):
+    def reset_relevant_data(self): #TODO: add the relevant data explicitly
         """full reset of the relevant data trackers to ensure this will not interfere
         with competition handling in the next time_step"""
         self.relevant_data = self.__init_relevant()                                                                     # Reinitialise relevant data
 
 
+# EOF

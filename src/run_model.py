@@ -104,3 +104,4 @@ class ModelRunner:
 
         return choice_set, agent_set                                                                                    # return the final choice options and agents as simulation results
 
+# EOF

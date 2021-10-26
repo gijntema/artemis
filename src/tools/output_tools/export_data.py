@@ -52,3 +52,5 @@ class DataWriter:
             pd_dataframe.to_json(file_path)
         else:
             raise TypeError("Method only supports pandas.Dataframe objects as input and filename as strings")           # error handling: only pandas.Dataframes are accepted and only string filenames
+
+# EOF

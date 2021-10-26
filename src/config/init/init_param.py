@@ -85,3 +85,4 @@ interference_factor = 0.8                     # indicates the reduction in catch
 # ----------------------------------------------------------------------------------------------------------------------
 reporting = True                            # flag to turn on or off print reporting during the model runs
 
+# EOF

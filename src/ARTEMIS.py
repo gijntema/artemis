@@ -390,3 +390,4 @@ print("Model Runtime: \t{} seconds".format(str(execution_time)))                
 print('Average Yearly Catch of Final Simulation = {}'.format(str(agent_set_output.total_catch/duration)))
 print('Average Yearly Catch over all Simulations = {}'.format(str(avg_agent_time['total_catch'].mean())))
 
+# EOF

@@ -69,6 +69,7 @@ class AgentSet:                                         # to be implemented, not
                  number_of_sharing_groups=10,
                  group_division_style='equal_mutually_exclusive_groups',
                  group_dynamics=False):
+#TODO KW: ensure that the hard wired values above are not used in the first time step. these need to come from init_param from time=0 onwards
 
         # self.agents = {}                                # dictionary with all agents as ForagerAgent objects            # TODO: migrate initilisation of agents from Init_objects.py EDIT: WORKING ON IT - see line below and init methods below
         self.agents = self.__init_agents(
@@ -97,7 +98,7 @@ class AgentSet:                                         # to be implemented, not
                                                           group_dynamics=group_dynamics)
 
 # ----------------------------------------------------------------------------------------------------------------------
-# --------------------------------------- Initialization Supporting Methods --------------------------------------------
+# --------------------------------------- Initialization Supporting Methods TODO KW supporting what?--------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     # UNIMPLEMENTED
@@ -133,6 +134,7 @@ class AgentSet:                                         # to be implemented, not
 
     # UNIMPLEMENTED
     def __init_time_data_trackers(self, duration_model):
+        # TODO ADD Comment line
         duration_counter = 0                                                                                            # make counter for all time_steps in the model for While loop functioning
         while duration_counter < duration_model:                                                                        # loop over all time steps in the model
             time_id = str(duration_counter).zfill(len(str(duration_model)))
@@ -146,6 +148,7 @@ class AgentSet:                                         # to be implemented, not
 
     # UNIMPLEMENTED
     def __init_potential_receivers(self, receiver_choice_strategy):
+        #TODO add comment line
         for agent in self.agents:                                                                                       # loop over agents
             self.agents[agent].heatmap_exchanger.functionality['pick_receiver'][receiver_choice_strategy]['init'] \
             (
@@ -156,7 +159,7 @@ class AgentSet:                                         # to be implemented, not
     def __init_group_allegiances(self, number_of_groups=10,
                                  group_division_style='equal_mutually_exclusive_groups',
                                  group_dynamics=False):
-
+        # TODO add comment line
         group_former = GroupFormer(self,
                                    number_of_groups=number_of_groups,
                                    division_style=group_division_style,
@@ -178,11 +181,11 @@ class AgentSet:                                         # to be implemented, not
         self.agents[agent_id].update_agent_trackers(alternative_index=alternative_index, catch=catch,                   # update single agent trackers
                                                    time_step_counter=time_tracker)
 
-        self.__update_total_catch(catch)                                                                                # update overall catch
+        self.__update_total_catch(catch)             # TODO KW: het verschil tussen total catch en total time_step catch is me niet duidelijk. is de eerste een som per simulatie?                                                                    # update overall catch
         self.__update_total_time_step_catch(catch, time_tracker)                                                        # updates the catch per time_step
 
     def __update_total_catch(self, catch):
-        """updates the total catch by the given amount from a single catch event"""
+        """updates the total catch each time step by the given amount from a single catch event"""
         self.total_catch += catch
 
     def __update_average_time_step_catch(self):
@@ -192,9 +195,11 @@ class AgentSet:                                         # to be implemented, not
 
     def __update_total_time_step_catch(self, catch, time_tracker):
         """updates the total catch in a given time step by the given amount from a single catch event"""
+        # TODO: deze comment is identiek aan die van update_total_catch(self, catch) maar er gebeurd wat anders. wat gebeurd waar?
         self.total_time_step_catch_tracker[str(time_tracker)] += catch
 
     def update_memory_trackers(self, time_id):
+        """ update the memory of each agent: TODO maar welke trackers zijn dat?  """
         for agent in self.agents:
             self.agents[agent].update_memory_trackers(time_id)
 
@@ -205,9 +210,9 @@ class AgentSet:                                         # to be implemented, not
         temp_probability_dictionary = {}                                                                                # temporary dictionary to store agent specific probability maps fro choosing a option (e.g. grid cell) to forage in/from
         number_of_options = len(self.agents[next(iter(self.agents))].heatmap)                                           # get total number of options(e.g. the amount of grid cells an agent can choose from) as the number of entries in the first agents heatmap
 
-        for agent in self.agents:                                                                                       # Loop over Agents (1) to transform an agent heatmap into a prbability map --> what is the chance an agent will i each option
+        for agent in self.agents:                                                                                       # Loop over Agents (1) to transform an agent heatmap into a probability map --> what is the chance an agent will i each option
             agent_data = self.agents[agent]                                                                             # define agent data to keep the script visually pleasing
-            sum_heatmap_entries = sum(agent_data.heatmap.values())                                                      # calculate sum of heatmap entries fro later use
+            sum_heatmap_entries = sum(agent_data.heatmap.values())                                                      # calculate sum of heatmap entries for later use TODO KW entries? you mean the resource? or only the alternative ID?
             probability_of_exploration = agent_data.explore_probability                                                 # get probability of picking a random option for late ruse
 
             probability_map = copy.deepcopy(agent_data.heatmap)                                                         # create copy of heatmap to overwrite with new data (still contains the regular heatmap entries, but ensures same data structure)
@@ -245,7 +250,7 @@ class ForagerAgent:
                  sharing_strategy='random_sharing', pick_receiver_strategy='random_pick',
                  receiving_strategy='combine_receiver',
                  number_of_shared_alternatives=1, number_of_agents_shared_with=1):
-
+        """initialize agents """
         # Tracker variables
         self.total_catch = 0                                                                                            # tracker variable to track total catch for this agent
         self.forage_catch_tracker = {}                                                                                  # tracker variable for total catch gained from each alternative
@@ -479,3 +484,5 @@ class PredatorAgent(ForagerAgent):            # Not Implemented for now
 
     def __init__(self):
         ForagerAgent.__init__(self)
+
+# EOF
