@@ -77,7 +77,7 @@ agent_specific_data = pd.DataFrame()                                            
 agent_set_time_series = pd.DataFrame()                                                                                  # intialize object to contain time series data on the agents in the model
 other_x_catch_data = pd.DataFrame()                                                                                     # intialize object to contain a data series for catch and any desired otehr variable to correlate with catch
 
-output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}'.format(
+output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}_#Groups{}'.format(
     shared_alternatives,
     share_partners,
     int(explore_probability * 100),
@@ -86,7 +86,9 @@ output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}'.format(
     sharing_strategy,
     pick_receiver_strategy,
     receiving_strategy,
-    stock_reset_scenario)
+    stock_reset_scenario,
+    number_of_groups
+    )
 
 # initialize class objects that are part of operational structure
 # object_initializer = ObjectInitializer()                                                                              # initialize the object with the functionality to initialize agents and choice options
@@ -137,7 +139,10 @@ while iteration_counter < number_of_iterations:
                          receiver_choice_strategy=pick_receiver_strategy,
                          receiving_strategy=receiving_strategy,
                          number_of_shared_alternatives=shared_alternatives,
-                         number_of_agents_shared_with=share_partners
+                         number_of_agents_shared_with=share_partners,
+                         number_of_sharing_groups=number_of_groups,
+                         group_division_style=division_style,
+                         group_dynamics=group_dynamics
                          )
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -177,7 +182,9 @@ while iteration_counter < number_of_iterations:
 # ----------------------------------------------------------------------------------------------------------------------
 # Get last simulation Explanatory Variables x Catch dataframe graphics
 # ----------------------------------------------------------------------------------------------------------------------
-
+single_iteration_other_x_catch = other_x_catch_data[other_x_catch_data.iteration_id == 0]
+catch_group_aggregate_df = data_transformer.extract_time_x_group_catch(single_iteration_other_x_catch)
+graph_constructor.plot_line_pandas(catch_group_aggregate_df, x_values='time_id', img_name='group_catch_time')
 
 graph_constructor.plot_scatter_pandas(other_x_catch_data,
                                       x_values='average_expected_competitors', y_values="catch",

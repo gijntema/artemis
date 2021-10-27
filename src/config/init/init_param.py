@@ -69,11 +69,11 @@ pick_receiver_strategy = 'static_group_choice'            # determines with whom
 receiving_strategy = "combine_receiver"             # determines how a receiver agent will handle shared data
 
 # Quantitative Parameters
-shared_alternatives = 10                 # number of known alternatives shared at any given time
+shared_alternatives = 1                 # number of known alternatives shared at any given time
 share_partners = 10                    # the number of agents an agent informs about a (part of) the personal heatmap
 
 # Parameters related to group sharing ('pick receiver strategy' includes groups) # UNIMPLEMENTED
-number_of_groups = 10
+number_of_groups = 1
 division_style = 'equal_mutually_exclusive_groups'
 group_dynamics = False
 

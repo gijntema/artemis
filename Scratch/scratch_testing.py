@@ -6,6 +6,7 @@ from src.config.init.init_param import *
 
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 competition_handler = CompetitionHandler('interference-simple')
 # competition_handler = CompetitionHandler('absent')
@@ -59,3 +60,20 @@ plt.plot(bins, 1/(sigma * np.sqrt(2 * np.pi)) *
          np.exp( - (bins - mu)**2 / (2 * sigma**2) ),
          linewidth=2, color='r')
 plt.show()
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+def extract_time_x_group_catch(dataframe):
+    data_dictionary = defaultdict(list)
+    unique_values_time = dataframe['time_id'].unique()
+    unique_values_group = dataframe['group_allegiance'].unique()
+    for time_id in unique_values_time:
+        time_temp_df = dataframe[dataframe.time_id == time_id]
+        data_dictionary[time_id].append(time_id)
+        for group in unique_values_group:
+            temp_group_df = time_temp_df[dataframe.group_allegiance == group]
+            data_dictionary[group].append(temp_group_df['catch'].sum())
+
+    output_dataframe = pd.Dataframe(data_dictionary)
+    return output_dataframe

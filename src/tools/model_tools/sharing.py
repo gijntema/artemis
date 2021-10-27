@@ -162,6 +162,7 @@ class HeatmapExchanger:
         return relevant_data
 
     def __init_relevant_group_sharing(self, agent):
+        ## TODO: OBSOLETE CODE, IMPLEMENTED IN PICK RECEIVER STRATEGIES BELOW
         relevant_data = dict()
         relevant_data['agent_id'] = agent.id
         relevant_data['heatmap'] = agent.heatmap

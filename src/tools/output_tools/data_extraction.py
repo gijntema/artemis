@@ -596,6 +596,7 @@ class DataTransformer:
         data_series_iteration = []
         data_series_time = []
         data_series_agent = []
+        data_series_group_allegiance = []
         data_series_catch = []
 
         for time_id in tuple(input_data[next(iter(input_data))].time_step_catch.keys()):                                # loop over the items (time_steps) in an immutable list of time_steps as logged in the time_step_catch tracker of the first agent in the model
@@ -603,11 +604,13 @@ class DataTransformer:
                 data_series_iteration.append(iteration_id)
                 data_series_time.append(time_id)
                 data_series_agent.append(agent)
+                data_series_group_allegiance.append(input_data[agent].heatmap_exchanger.relevant_data['group_allegiance'])
                 data_series_catch.append(input_data[agent].time_step_catch[time_id]) # TODO IF THIS IS TOTAL CATCH THEN CALL IT AS SUCH; otherwise this is interpreted as catch
 
         output_data['iteration_id'] = data_series_iteration
         output_data['time_id'] = data_series_time
         output_data['agent_id'] = data_series_agent
+        output_data['group_allegiance'] = data_series_group_allegiance
         output_data['catch'] = data_series_catch
 
         return output_data
@@ -634,6 +637,22 @@ class DataTransformer:
 
         output_data['knowledge_in_heatmap'] = data_series_knowledge
         return output_data
+
+
+    def extract_time_x_group_catch(self, dataframe):
+        """QUICK AND DIRTY WAY TO GET GROUP SPECIFIC CATCH OVER TIME FOR A SINGLE SIMULATION"""
+        data_dictionary = defaultdict(list)
+        unique_values_time = dataframe['time_id'].unique()
+        unique_values_group = dataframe['group_allegiance'].unique()
+        for time_id in unique_values_time:
+            time_temp_df = dataframe[dataframe.time_id == time_id]
+            data_dictionary['time_id'].append(time_id)
+            for group in unique_values_group:
+                temp_group_df = time_temp_df[dataframe.group_allegiance == group]
+                data_dictionary[group].append(temp_group_df['catch'].sum())
+
+        output_dataframe = pd.DataFrame(data_dictionary)
+        return output_dataframe
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------- Methods to Extract Catch data for agent specific temporal patterns-----------------------------
