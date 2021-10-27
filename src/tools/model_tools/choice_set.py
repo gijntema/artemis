@@ -59,13 +59,24 @@ class ChoiceSet:
     including the choice options in the choice set as DiscreteAlternative objects in a dictionary object"""
 
     # initialisation of the object defining the attributes of a choice set
-    def __init__(self):
+    def __init__(self, nb_alternatives, init_stock, sd_init_stock, growth_factor=1):
         self.discrete_alternatives = {}                                                                                 # dictionary with all choice options as DiscreteAlternative objects
         self.effort_map = {}                                                                                            # tracker variable for effort (effort = 1 -> a single forage event) exerted to each choice options
         self.catch_map = {}                                                                                             # tracker variable for total catch gained from each choice options
+        self.__init_attributes(nb_alternatives, init_stock, sd_init_stock, growth_factor)
 
+    def __init_attributes(self, nb_alternatives, init_stock, sd_init_stock, growth_factor):
+        alternative_tracker = 0
+        while alternative_tracker < nb_alternatives:                                                                    # loop the creation of a alternative for the full size of the considered set of choices possibel
+            alternative_id = "alternative_" + str(alternative_tracker).zfill(len(str(nb_alternatives)))                 # assign ID
+            self.discrete_alternatives[alternative_id] = DiscreteAlternative(alternative_id, init_stock,
+                                                                                   sd_init_stock, growth_factor)        # define a single choice option with an ID, initial stock (with an sd) and growth factor
+            self.effort_map[alternative_id] = 0                                                                         # define a tracker with 0 effort on each choice option
+            self.catch_map[alternative_id] = 0                                                                          # define a tracker with 0 catch on every effort
 
-    def load_observed_alternatives(self, dataset):      # placeholder for later use in loading real world data
+            alternative_tracker += 1                                                                                    # proceed to next choice_option
+
+    def load_observed_alternatives(self, dataset):                                                                      # placeholder for later use in loading real world data
         pass
 
 

@@ -55,11 +55,12 @@ pd.options.plotting.backend = "plotly"                                          
 
 # Other Modules in the ARTEMIS model
 from src.config.init.init_param import *                                                                                # module containing parameter and scenario settings
-from src.tools.model_tools.agents import AgentSet,ForagerAgent
-from src.config.init.init_objects import ObjectInitializer                                                              # module to initialize the objects in the module (agents and choices)
+from src.tools.model_tools.agents import AgentSet                                                                       # module with agents (and groups of agents) functionality
+from src.tools.model_tools.choice_set import ChoiceSet                                                                  # module with choice option (e.g. grid cells) functionality
+# from src.config.init.init_objects import ObjectInitializer                                                              # module to initialize the objects in the module (agents and choices) - OLD OBSOLETE MODULE, ALL FUNCTIONALITY MIGRATED TO OTHER MODULES (agents.py and choice_set.py)
 from src.run_model import ModelRunner                                                                                   # module to run the model using initialized agents and choices
 from src.tools.model_tools.competition import CompetitionHandler                                                        # module that handles model feedbacks as a result of competition between agents
-from src.tools.output_tools.printing import PrintBlocker
+from src.tools.output_tools.printing import PrintBlocker                                                                # module that allows for blocking of print statements in the scripts
 from src.tools.output_tools.data_extraction import DataTransformer                                                      # module to generate output data from the objects in the model
 from src.tools.output_tools.outcome_visualization import GraphConstructor                                               # module to make graphs from the output data
 from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
@@ -76,7 +77,7 @@ agent_set_time_series = pd.DataFrame()                                          
 other_x_catch_data = pd.DataFrame()                                                                                     # intialize object to contain a data series for catch and any desired otehr variable to correlate with catch
 
 # initialize class objects that are part of operational structure
-object_initializer = ObjectInitializer()                                                                                # initialize the object with the functionality to initialize agents and choice options
+# object_initializer = ObjectInitializer()                                                                                # initialize the object with the functionality to initialize agents and choice options
 model_runner = ModelRunner()                                                                                            # initialize the object with the functionality to run a simulation with the initialized agents and choice options
 competition_handler = CompetitionHandler(competition_method=competition_scenario)                                       # object that will ensure competition feedbacks are executed for in the model
 data_transformer = DataTransformer()                                                                                    # initialize the object with the functionality to extract output data from model objects
@@ -92,8 +93,12 @@ while iteration_counter < number_of_iterations:
 # initialize choice set and forager agents
 # ----------------------------------------------------------------------------------------------------------------------
 
-    choice_set = object_initializer.initialize_choice_set(choice_set_size, init_stock, sd_init_stock, growth_factor)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
-    #agent_set = object_initializer.initialize_forager_agents(nb_agents=number_of_agents,
+    #choice_set = object_initializer.initialize_choice_set(choice_set_size, init_stock, sd_init_stock, growth_factor)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
+    choice_set = ChoiceSet(choice_set_size, init_stock, sd_init_stock, growth_factor)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
+
+
+
+    #agent_set = object_initializer.initialize_forager_agents(nb_agents=number_of_agents,                               # OBSOLETE OLD CODE, LEFT IN JUST TO BE SURE, WILL BE REMOVED AS SOON AS PROPER TESTING OF REPLACEMeNT HAS BEEN COMPLETED
     #                                                         choice_set=choice_set,                                     # initialize the forager agents in the model (e.g. fishermen)
     #                                                        catchability_coefficient=catchability_coefficient,
     #                                                         nb_alternatives_known=init_number_of_alternatives_known,

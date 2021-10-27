@@ -72,6 +72,10 @@ receiving_strategy = "combine_receiver"             # determines how a receiver 
 shared_alternatives = 1                 # number of known alternatives shared at any given time
 share_partners = 1                    # the number of agents an agent informs about a (part of) the personal heatmap
 
+# Parameters related to group sharing ('pick receiver strategy' includes groups) # UNIMPLEMENTED
+number_of_groups = 10
+division_style = 'equal_mutually_exclusive_groups'
+group_dynamics = False
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------- COMPETITION PARAMETERS ------------------------------------------------
