@@ -287,7 +287,7 @@ graph_constructor.plot_bar_pandas(avg_alternative_spec, x_values='alternative_id
 graph_constructor.plot_bar_pandas(avg_agent_spec, x_values='agent_id', img_name='avg_agent_spec')                       # make bar graph of the agent specific average data
 
 graph_constructor.plot_line_pandas(avg_agent_time, x_values='time_step_id',
-                                   y_values='total_catch', yerr_plus='total_catch_sem',
+                                   y_values='total_catch',
                                    img_name='avg_agent_time')                                                           # make line graph of the agent time series average data
 
 # graph_constructor.plot_line_pandas(avg_alternative_time, x_values='time_step_id', img_name = 'avg_alt_time')          # make line graph of the choice option time series average data
