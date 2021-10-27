@@ -89,13 +89,14 @@ class AgentSet:                                         # to be implemented, not
         self.total_catch = 0                            # Tracker for total catch of all agents and time_steps combined
         self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
         self.average_expected_competitor_tracker = defaultdict(dict)   # tracker to contain the average expected amount of competitors expected when picking any cell
-        self.group_former = None                        # to handle groups in future versions of the model, quick and dirty init
 
         self.__init_time_data_trackers(duration_model=duration_model)
-        self.__init_potential_receivers(receiver_choice_strategy=receiver_choice_strategy)
+        # self.__init_potential_receivers(receiver_choice_strategy=receiver_choice_strategy)
         self.group_former = self.__init_group_allegiances(number_of_groups=number_of_sharing_groups,                   # set up for better initialisation of group_former, reuiqres the best initiliasation of self.agents a few lines above
                                                           group_division_style=group_division_style,
                                                           group_dynamics=group_dynamics)
+        self.__init_potential_receivers(receiver_choice_strategy=receiver_choice_strategy)
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------------- Initialization Supporting Methods TODO KW supporting what?--------------------------------------------
@@ -152,7 +153,7 @@ class AgentSet:                                         # to be implemented, not
         for agent in self.agents:                                                                                       # loop over agents
             self.agents[agent].heatmap_exchanger.functionality['pick_receiver'][receiver_choice_strategy]['init'] \
             (
-                list_of_agents=list(self.agents.keys())
+                agent_set=self
             )
 
     # UNIMPLEMENTED

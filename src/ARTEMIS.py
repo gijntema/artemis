@@ -60,6 +60,7 @@ from src.tools.model_tools.choice_set import ChoiceSet                          
 # from src.config.init.init_objects import ObjectInitializer                                                              # module to initialize the objects in the module (agents and choices) - OLD OBSOLETE MODULE, ALL FUNCTIONALITY MIGRATED TO OTHER MODULES (agents.py and choice_set.py)
 from src.run_model import ModelRunner                                                                                   # module to run the model using initialized agents and choices
 from src.tools.model_tools.competition import CompetitionHandler                                                        # module that handles model feedbacks as a result of competition between agents
+
 from src.tools.output_tools.printing import PrintBlocker                                                                # module that allows for blocking of print statements in the scripts
 from src.tools.output_tools.data_extraction import DataTransformer                                                      # module to generate output data from the objects in the model
 from src.tools.output_tools.outcome_visualization import GraphConstructor                                               # module to make graphs from the output data
@@ -76,13 +77,26 @@ agent_specific_data = pd.DataFrame()                                            
 agent_set_time_series = pd.DataFrame()                                                                                  # intialize object to contain time series data on the agents in the model
 other_x_catch_data = pd.DataFrame()                                                                                     # intialize object to contain a data series for catch and any desired otehr variable to correlate with catch
 
+output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}'.format(
+    shared_alternatives,
+    share_partners,
+    int(explore_probability * 100),
+    number_of_agents,
+    int(chance_reset_stock * 100),
+    sharing_strategy,
+    pick_receiver_strategy,
+    receiving_strategy,
+    stock_reset_scenario)
+
 # initialize class objects that are part of operational structure
-# object_initializer = ObjectInitializer()                                                                                # initialize the object with the functionality to initialize agents and choice options
+# object_initializer = ObjectInitializer()                                                                              # initialize the object with the functionality to initialize agents and choice options
 model_runner = ModelRunner()                                                                                            # initialize the object with the functionality to run a simulation with the initialized agents and choice options
 competition_handler = CompetitionHandler(competition_method=competition_scenario)                                       # object that will ensure competition feedbacks are executed for in the model
 data_transformer = DataTransformer()                                                                                    # initialize the object with the functionality to extract output data from model objects
-graph_constructor = GraphConstructor()                                                                                  # initialize the object with the functionality to make graphs from output data
-data_writer = DataWriter()                                                                                              # initialize the object with the functionality to export data files from output data
+graph_constructor = GraphConstructor(output_file_suffix)                                                                # initialize the object with the functionality to make graphs from output data
+data_writer = DataWriter(output_file_suffix)                                                                            # initialize the object with the functionality to export data files from output data
+
+
 
 while iteration_counter < number_of_iterations:
     print('-----------------------------------------------------------------------------------------------------------',# print statement for user to idnetify the progression of th emodel
@@ -298,7 +312,7 @@ graph_constructor.plot_bar_pandas(alternative_specific_data, x_values='alternati
 #                                   yerr_min='total_catch_err_min',
 #                                   img_name='qt_agent_time')                                                            # make line graph of the agent time series average data (plots the median cumulative catch an agent over time, with error bars to the 25th and 75th percentile
 
-graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id', img_name='qt_agent_time', y_label='cumulative_catch')                   # make line graph of the choice option time series average data
+graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id', img_name='qt_agent_time', y_label='total_yearly_catch')                   # make line graph of the choice option time series average data
 
 # ----------------------------------------------------------------------------------------------------------------------
 # produce data and graphical outputs - median, min and max values for memory evolution
@@ -326,18 +340,7 @@ graph_constructor.plot_line_pandas(single_memory_data_summary, x_values='time_st
 competitor_df = data_transformer.extract_average_expected_competition(agent_set_output)                                 # make a pd.Dataframe from the data on the average amount of competitors in a given choice option
 graph_constructor.plot_line_pandas(competitor_df,
                                    x_values='time_step_id', y_values=None,
-                                   img_name='test_average_competitors_SA{}_SP{}_Pe%{}_J{}_Pr%{}'.format(
-                                                                                            shared_alternatives,      # format the img name with the number of memory entries (SA) shared with a number of people (SP) by every agent in every time step
-                                                                                            share_partners,
-                                                                                            int(
-                                                                                                explore_probability
-                                                                                                * 100
-                                                                                                ),
-                                                                                            number_of_agents,
-                                                                                            int(
-                                                                                                chance_reset_stock
-                                                                                                * 100)
-                                                                                              ),
+                                   img_name='test_average_competitors',
                                    y_label='average expected number of competitors'
                                    , legend_title='Agents',
                                    y_range=[0.2, 0.3])                                                             # make plot from data containgin data of agents average competitors per cell over time
@@ -346,34 +349,34 @@ graph_constructor.plot_line_pandas(competitor_df,
 # produce database outputs (e.g. .csv or .json)
 # ----------------------------------------------------------------------------------------------------------------------
 
-data_writer.write_csv(alternative_specific_data, "alternative_data.csv")                                                # write raw, choice option data for each specific iteration to .csv file
-data_writer.write_csv(choice_set_time_series, "choice_set_time_series.csv")                                             # write raw, choice option data for each specific iteration to .csv file
-data_writer.write_csv(agent_specific_data, "agent_data.csv")                                                            # write raw, agent data for each specific iteration to .csv file
-data_writer.write_csv(agent_set_time_series, "agent_set_time_series.csv")                                               # write raw, agent data for each specific iteration to .csv file
+data_writer.write_csv(alternative_specific_data, "alternative_data")                                                # write raw, choice option data for each specific iteration to .csv file
+data_writer.write_csv(choice_set_time_series, "choice_set_time_series")                                             # write raw, choice option data for each specific iteration to .csv file
+data_writer.write_csv(agent_specific_data, "agent_data")                                                            # write raw, agent data for each specific iteration to .csv file
+data_writer.write_csv(agent_set_time_series, "agent_set_time_series")                                               # write raw, agent data for each specific iteration to .csv file
 
-data_writer.write_json(alternative_specific_data, "alternative_data.json")                                              # write raw, choice option data for each specific iteration to .json file
-data_writer.write_json(choice_set_time_series, "choice_set_time_series.json")                                           # write raw, choice option data for each specific iteration to .json file
-data_writer.write_json(agent_specific_data, "agent_data.json")                                                          # write raw, agent data for each specific iteration to .json file
-data_writer.write_json(agent_set_time_series, "agent_set_time_series.json")                                             # write raw, agent data for each specific iteration to .json file
+data_writer.write_json(alternative_specific_data, "alternative_data")                                              # write raw, choice option data for each specific iteration to .json file
+data_writer.write_json(choice_set_time_series, "choice_set_time_series")                                           # write raw, choice option data for each specific iteration to .json file
+data_writer.write_json(agent_specific_data, "agent_data")                                                          # write raw, agent data for each specific iteration to .json file
+data_writer.write_json(agent_set_time_series, "agent_set_time_series")                                             # write raw, agent data for each specific iteration to .json file
 
 # TODO: --FUNCTIONALITY-- Writing average data outcomes not supported yet (only templates given below)
-# data_writer.write_json(alternative_specific_data, "average_alternative_data.json")
-# data_writer.write_json(choice_set_time_series, "average_choice_set_time_series.json")
-# data_writer.write_json(agent_specific_data, "average_agent_data.json")
-# data_writer.write_json(agent_set_time_series, "average_choice_set_time_series.json")
+# data_writer.write_json(alternative_specific_data, "average_alternative_data")
+# data_writer.write_json(choice_set_time_series, "average_choice_set_time_series")
+# data_writer.write_json(agent_specific_data, "average_agent_data")
+# data_writer.write_json(agent_set_time_series, "average_choice_set_time_series")
 
-# data_writer.write_csv(alternative_specific_data, "average_alternative_data.csv")
-# data_writer.write_csv(choice_set_time_series, "average_choice_set_time_series.csv")
-# data_writer.write_csv(agent_specific_data, "average_agent_data.csv")
-# data_writer.write_csv(agent_set_time_series, "average_choice_set_time_series.csv")
+# data_writer.write_csv(alternative_specific_data, "average_alternative_data")
+# data_writer.write_csv(choice_set_time_series, "average_choice_set_time_series")
+# data_writer.write_csv(agent_specific_data, "average_agent_data")
+# data_writer.write_csv(agent_set_time_series, "average_choice_set_time_series")
 
-data_writer.write_csv(single_memory_data, 'last_simulation_memory_evolution.csv')                                       # write knowledge evolution data
+data_writer.write_csv(single_memory_data, 'last_simulation_memory_evolution')                                       # write knowledge evolution data
 
-data_writer.write_csv(other_x_catch_data, 'flat_time_x_agent_results_SA{}_SP{}.csv'.format(shared_alternatives, share_partners))
+data_writer.write_csv(other_x_catch_data, 'flat_time_x_agent_results')
 
 # jaccard_agent_knowledge = data_transformer.get_single_simulation_jaccard_matrices(agent_set_output)                     # get jaccard indices similarity matrices for last simulation
-# data_writer.write_csv(jaccard_agent_knowledge, 'last_simulation_jaccard_agents.csv')
-# data_writer.write_json(jaccard_agent_knowledge, 'last_simulation_jaccard_agents.json')
+# data_writer.write_csv(jaccard_agent_knowledge, 'last_simulation_jaccard_agents')
+# data_writer.write_json(jaccard_agent_knowledge, 'last_simulation_jaccard_agents')
 # graph_constructor.plot_jaccard(jaccard_agent_knowledge.drop('iteration_id', axis=1),
 #                                x_values='agent_i',
 #                                group_by='time_step_id',

@@ -43,11 +43,11 @@ class ModelRunner:
                   choice_set,                                           # the choice options in the model
                   agent_set,                                            # the agents in the model
                   duration=10,                                          # duration of the model (no. time steps)
-                  stock_reset_scenario='no-reset',                      # default is a dynamics stock
+                  stock_reset_scenario='no-reset',                      # default is a non dynamics stock
                   init_stock=100,                                       # default if a non dynamic stock is 100 units
                   sd_init_stock=25,                                     # default sd if a non-dynamic stock is sd=25
                   competition_handler=None,                             # object that ensures the effects of competition are implemented
-                  stock_reset_chance=0.9,                               # chance at the same stock being present next time step
+                  stock_reset_chance=0.9,                               # the chance at the stock being reset to default initialisation (mean +-sd)
                   iteration_id=-99):                                    # for reporting on iterations
 
         agent_index_list = list(agent_set.agents.keys())                # identify the id of every agent in a list
@@ -93,7 +93,7 @@ class ModelRunner:
                 alternative_tracker = 0                                                                                 # initialise counter for loop functionality
                 nb_alternatives = len(choice_set.discrete_alternatives)                                                 # extract a list of choice option IDs
                 while alternative_tracker < nb_alternatives:                                                            # Loop over all choice options
-                    if random.random() < stock_reset_chance:                                                            # if a random number betwen 0 and 1 is below the stock reset chance we reset the stock
+                    if random.random() < stock_reset_chance:                                                            # if a random number between 0 and 1 is below the stock reset chance, we reset the stock
                         alternative_id = "alternative_" + str(alternative_tracker).zfill(len(str(nb_alternatives)))     # transform counter variable into actual choice option ID.
                         choice_set.discrete_alternatives[alternative_id].\
                             initialize_standard_stock(init_stock=init_stock, sd_init_stock=sd_init_stock)               # reinitialise stock drawn from a normal distribution with goven mean and init stock

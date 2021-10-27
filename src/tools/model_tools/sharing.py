@@ -52,7 +52,8 @@ class HeatmapExchanger:
         self.pick_receiver_strategy = pick_receiver_strategy
         self.receiving_strategy = receiving_strategy
         self.functionality = self.__init_functionality()
-        self.relevant_data = self.__init_relevant_data(agent,
+        self.relevant_data = {}                                                                                         # initialise empty data for functionality
+        self.relevant_data = self.__init_relevant_data(agent,                                                           # fill relevant data with the data accessed from other objects
                                                        number_of_shared_alternatives,
                                                        number_of_agents_shared_with,
                                                        other_agent_indices=tuple())
@@ -88,6 +89,11 @@ class HeatmapExchanger:
                             {
                                 "init": self.__init_other_agents_random_pick,
                                 "execute": self.__pick_receiver_random
+                            },
+                        "static_group_choice":
+                            {
+                                'init': self.__init_other_agents_static_group_choice,
+                                'execute': self.__pick_receiver_random
                             }
                         # INSERT FURTHER RECEIVER PICKING FUNCTIONALITY HERE
                     },
@@ -131,6 +137,7 @@ class HeatmapExchanger:
 
     def __init_relevant_data(self, agent, number_of_shared_alternatives, number_of_agents_shared_with, other_agent_indices):
         """returns references to all data/attributes from other objects needed to share or receive data"""
+        self.relevant_data['agent_id'] = agent.id
         sharing_relevant = self.functionality['sharing'][self.sharing_strategy]['init'](agent)                          # generate references to the relevant data for the specified sharing strategy
         receiving_relevant = self.functionality['receiving'][self.receiving_strategy]['init'](agent)                    # generate references to the relevant data for the specified sharing strategy
 
@@ -168,13 +175,25 @@ class HeatmapExchanger:
         relevant_data['number_of_agents_shared_with'] = number_of_agents_shared_with                                    # load the number of agents the choice options are shared
         return relevant_data
 # ----------------------------------------------------------------------------------------------------------------------
-# --------------------------- Initialisation of Strategy Specific Sharing Functionality --------------------------------
+# ----------------------------- Initialisation of Strategy Pick Receiver Functionality ---------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-    def __init_other_agents_random_pick(self, list_of_agents):
+    def __init_other_agents_random_pick(self, agent_set):
         """Methods for initiliazing a list of agents to pick from"""
+        list_of_agents = list(agent_set.agents.keys())                                                                  # agents to pick as receiver include all agents
         self.relevant_data['other_agent_indices'] = \
-            [x for x in list_of_agents if x is not self.relevant_data['agent_id']]
+            [x for x in list_of_agents if x is not self.relevant_data['agent_id']]                                      # exclude agent itself as potential receiver and load result into relevant data
+
+    def __init_other_agents_static_group_choice(self, agent_set):
+        input_data = agent_set.group_former.relevant_data                                                               # access the data in contained in the GroupFormer object
+        personal_id = self.relevant_data['agent_id']                                                                    # access personal id
+        personal_allegiance = input_data['personal_allegiances'][personal_id]                                           # identify which group the agent belongs to
+        group_memberships = input_data['overview_allegiances']                                                          # access data with what agents belong to what groups
+        list_of_agents = group_memberships[personal_allegiance]                                                         # identify what agents belong to the group the agent belongs to
+
+        self.relevant_data['other_agent_indices'] = \
+            [x for x in list_of_agents if x is not self.relevant_data['agent_id']]                                      # exclude agent itself as potential receiver and load result into relevant data
+        self.relevant_data['group_allegiance'] = personal_allegiance
 
 # ----------------------------------------------------------------------------------------------------------------------
 # -------------------------- Initialisation of Strategy Specific Receiving Functionality -------------------------------
@@ -270,6 +289,13 @@ class HeatmapExchanger:
 
     def __pick_receiver_random(self):
         receiver_agent = random.choice(self.relevant_data['other_agent_indices'])
+
+        if 'group_allegiance' in self.relevant_data:                                                                    # simple check to find out if the agent is really only sharing within its own group
+            print('<{}> with allegiance <{}> has chosen <{}> as receiver of the heatmap sharing'\
+                  .format(self.relevant_data['agent_id'],
+                          self.relevant_data['group_allegiance'],
+                          receiver_agent))
+
         return receiver_agent
 
 # ----------------------------------------------------------------------------------------------------------------------

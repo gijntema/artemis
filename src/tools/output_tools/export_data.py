@@ -39,16 +39,19 @@ import pandas as pd
 class DataWriter:
     """contains a set of methods to transform a pandas Dataframe object into output files"""
 
+    def __init__(self, output_file_suffix=""):
+        self.output_file_suffix = output_file_suffix
+
     def write_csv(self, pd_dataframe, filename):
         if isinstance(pd_dataframe, pd.DataFrame) and isinstance(filename, str):
-            file_path = "output/data_output/" + filename                                                                # attach path to desired output folder
+            file_path = "output/data_output/{}{}.csv".format(filename, self.output_file_suffix)                         # attach path to desired output folder
             pd_dataframe.to_csv(file_path)
         else:
             raise TypeError("Method only supports pandas.Dataframe objects as input and filename as strings")           # error handling: only pandas.Dataframes are accepted and only string filenames
 
     def write_json(self, pd_dataframe, filename):
         if isinstance(pd_dataframe, pd.DataFrame) and isinstance(filename, str):
-            file_path = "output/data_output/" + filename                                                                # attach path to desired output folder
+            file_path = "output/data_output/{}{}.json".format(filename, self.output_file_suffix)                        # attach path to desired output folder
             pd_dataframe.to_json(file_path)
         else:
             raise TypeError("Method only supports pandas.Dataframe objects as input and filename as strings")           # error handling: only pandas.Dataframes are accepted and only string filenames

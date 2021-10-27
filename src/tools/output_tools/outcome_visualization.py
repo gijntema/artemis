@@ -35,7 +35,8 @@ Version Number:
 class GraphConstructor:
 
     # TODO: --STRUCTURAL-- expand dictionary library and migrate functionality of below methods
-    def __init__(self): # piece of code if we want to make the methods below more flexible
+    def __init__(self, output_file_suffix=""):  # piece of code if we want to make the methods below more flexible
+        self.output_file_suffix = output_file_suffix
         self.supported_dictionary_library = \
             {
                 'bar': self.plot_bar_pandas,
@@ -62,7 +63,7 @@ class GraphConstructor:
                           legend_title=legend_title)
 
         # fig.show()                                                                                                    # line to immediatly show graphs, turned off for now
-        fig.write_image("{}.png".format(img_name))
+        fig.write_image("{}{}.png".format(img_name, self.output_file_suffix))
 
     def plot_line_pandas(self, pd_dataframe, x_values, y_values=None, yerr_plus=None, yerr_min=None,
                          img_name='unnamed', y_label='value', legend_title='values', y_range=False, x_range=False):
@@ -87,7 +88,7 @@ class GraphConstructor:
         if x_range:
             fig.update_xaxes(range=x_range)
 
-        fig.write_image("{}.png".format(img_name))
+        fig.write_image("{}{}.png".format(img_name, self.output_file_suffix))
 
     def plot_scatter_pandas(self, pd_dataframe, x_values, y_values, img_name='unnamed', y_range=False, x_range=False):
         fig = pd_dataframe.plot.scatter(x=x_values, y=y_values)
@@ -97,7 +98,7 @@ class GraphConstructor:
         if x_range:
             fig.update_xaxes(range=x_range)
 
-        fig.write_image("{}.png".format(img_name))
+        fig.write_image("{}{}.png".format(img_name, self.output_file_suffix))
 
 
     def plot_jaccard(self, pd_dataframe, x_values, y_values=None, group_by=None,
@@ -112,4 +113,4 @@ class GraphConstructor:
                           legend_title=legend_title)
 
         # fig.show()                                                                                                      # line to immediatly show graphs, turned off for now
-        fig.write_image("{}.png".format(img_name))
+        fig.write_image("{}{}.png".format(img_name, self.output_file_suffix))
