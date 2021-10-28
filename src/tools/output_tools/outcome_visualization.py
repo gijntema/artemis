@@ -31,6 +31,8 @@ Last Updated:
 Version Number:
     0.1
 """
+import plotly.graph_objects as go
+
 
 class GraphConstructor:
 
@@ -113,4 +115,27 @@ class GraphConstructor:
                           legend_title=legend_title)
 
         # fig.show()                                                                                                      # line to immediatly show graphs, turned off for now
+        fig.write_image("{}{}.png".format(img_name, self.output_file_suffix))
+
+    def plot_violin_flat_pandas(self, pd_dataframe, group_by, y_values,
+                           img_name='unnamed_violin', y_label='value',
+                           y_range=False):
+
+        fig = go.Figure()
+        groups = pd_dataframe[group_by].unique()
+        for group in groups:
+            fig.add_trace(go.Violin(x=pd_dataframe[group_by][pd_dataframe[group_by] == group],
+                                    y=pd_dataframe[y_values][pd_dataframe[group_by] == group],
+                                    name=group,
+                                    box_visible=True,
+                                    meanline_visible=True,
+                                    line_color='black',
+                                    fillcolor='lightseagreen',
+                                    opacity=0.6))
+
+        if y_range:
+            fig.update_yaxes(range=y_range)
+
+        fig.update_layout(yaxis_title=y_label)
+
         fig.write_image("{}{}.png".format(img_name, self.output_file_suffix))

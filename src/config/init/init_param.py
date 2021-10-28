@@ -44,12 +44,12 @@ choice_method = 'explore_weighted_heatmap'  # defines the way an agent chooses w
 
 # Resource characteristics
 init_stock = 100                    # mean of initial stock present
-sd_init_stock = 25                  # standard deviation of initial stock present
+sd_init_stock = 50                  # standard deviation of initial stock present
 growth_factor = 1                   # per time step growth of stock (1 represents a static population in current Default settings)
 
 
 # model characteristics
-duration = 1000                          # number of time steps in the model
+duration = 100                          # number of time steps in the model
 choice_set_size = 20                    # number of discrete alternatives in the choice set
 number_of_agents = 100                  # number of foragers in the model
 number_of_iterations = 1                # number of iterations/simulations the model runs for
@@ -69,11 +69,11 @@ pick_receiver_strategy = 'static_group_choice'            # determines with whom
 receiving_strategy = "combine_receiver"             # determines how a receiver agent will handle shared data
 
 # Quantitative Parameters
-shared_alternatives = 1                 # number of known alternatives shared at any given time
-share_partners = 10                    # the number of agents an agent informs about a (part of) the personal heatmap
+shared_alternatives = 20                 # number of known alternatives shared at any given time
+share_partners = 1                    # the number of agents an agent informs about a (part of) the personal heatmap
 
 # Parameters related to group sharing ('pick receiver strategy' includes groups) # UNIMPLEMENTED
-number_of_groups = 1
+number_of_groups = 50
 division_style = 'equal_mutually_exclusive_groups'
 group_dynamics = False
 

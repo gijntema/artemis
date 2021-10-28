@@ -77,7 +77,7 @@ agent_specific_data = pd.DataFrame()                                            
 agent_set_time_series = pd.DataFrame()                                                                                  # intialize object to contain time series data on the agents in the model
 other_x_catch_data = pd.DataFrame()                                                                                     # intialize object to contain a data series for catch and any desired otehr variable to correlate with catch
 
-output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}_#Groups{}'.format(
+output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}_#Groups{}_duration{}_stocksd{}'.format(
     shared_alternatives,
     share_partners,
     int(explore_probability * 100),
@@ -87,7 +87,9 @@ output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}_#Groups{}
     pick_receiver_strategy,
     receiving_strategy,
     stock_reset_scenario,
-    number_of_groups
+    number_of_groups,
+    duration,
+    sd_init_stock
     )
 
 # initialize class objects that are part of operational structure
@@ -185,6 +187,9 @@ while iteration_counter < number_of_iterations:
 single_iteration_other_x_catch = other_x_catch_data[other_x_catch_data.iteration_id == 0]
 catch_group_aggregate_df = data_transformer.extract_time_x_group_catch(single_iteration_other_x_catch)
 graph_constructor.plot_line_pandas(catch_group_aggregate_df, x_values='time_id', img_name='group_catch_time')
+data_writer.write_csv(catch_group_aggregate_df, 'group_catch_time')
+graph_constructor.plot_violin_flat_pandas(pd_dataframe=single_iteration_other_x_catch, group_by='group_allegiance',
+                                          y_values='catch', img_name='violin_group_catch', y_label='Catch', y_range=[0, 35])
 
 graph_constructor.plot_scatter_pandas(other_x_catch_data,
                                       x_values='average_expected_competitors', y_values="catch",
