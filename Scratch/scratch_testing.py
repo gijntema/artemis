@@ -7,6 +7,7 @@ from src.config.init.init_param import *
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import plotly.graph_objects as go
 
 competition_handler = CompetitionHandler('interference-simple')
 # competition_handler = CompetitionHandler('absent')
@@ -77,3 +78,34 @@ def extract_time_x_group_catch(dataframe):
 
     output_dataframe = pd.Dataframe(data_dictionary)
     return output_dataframe
+
+# MAKE MAYTRIX PLOT FOR FORAGE VISITS PER ALTERNATIVE (Y) AND OVER TIME (X)
+def extract__visualize_frequency_space_x_time_visits(dataframe):
+    # Visualizing a heatmap plot for Space x Time forage visits
+    df = dataframe  # Replace with other_x_catch_data when running after a ARTEMIS.py run
+    output_df = pd.DataFrame()
+    time_data_series = np.sort(df['time_id'].unique())
+    output_df['time_id'] = time_data_series
+
+    option_series = np.sort(df['forage_visit'].unique())
+    for alternative in option_series:
+        alternative_data_series = []
+        for time in time_data_series:
+            alternative_data_series.append(
+                len(df.loc[(df['iteration_id'] == 0) & (df['time_id'] == time) & (df['forage_visit'] == alternative)]))
+        output_df[alternative] = alternative_data_series
+
+    df = output_df
+    heatmap_data = []
+    list_of_alternatives = list(df.columns)[1:]
+
+    for column in list_of_alternatives:
+        heatmap_data.append(df[column])
+
+    fig = go.Figure(data=go.Heatmap(z=heatmap_data,
+                                    y=list_of_alternatives,
+                                    x=df['time_id']))
+    #fig.update_layout(yaxis_title='forage_option',
+    #                  x_axis_title='time')
+    fig.show()
+    fig.write_image("{}{}.png".format('forage_visit_matrix', '_test'))
