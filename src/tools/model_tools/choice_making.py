@@ -157,7 +157,6 @@ class ChoiceMaker:
         total_expectation = sum(catch_weights)                                                                          # get total expectated catch (on the heatmap) as sum of all entries in the heatmap
         probability_weights = [x / total_expectation for x in catch_weights]                                            # use total expected catch to make proportional weights from the heatmap catch data
         chosen = choices(list(heatmap.keys()), weights=probability_weights, k=1)[0]                                     # returns key based on the probabilities weight given as the catch events in memory
-        # chosen = choices(list(heatmap.keys()), weights=heatmap.values(), k=1)[0]                                      # simpler version of the above that does not give erros, but has not been thoroughly tested for proper functioning - not sure if non-proportional weight work properly
         return chosen
 
     def __make_choice_explore_heatmap(self):

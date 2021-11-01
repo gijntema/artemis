@@ -112,7 +112,7 @@ while iteration_counter < number_of_iterations:
 # ----------------------------------------------------------------------------------------------------------------------
 
     #choice_set = object_initializer.initialize_choice_set(choice_set_size, init_stock, sd_init_stock, growth_factor)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
-    choice_set = ChoiceSet(choice_set_size, init_stock, sd_init_stock, growth_factor)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
+    choice_set = ChoiceSet(choice_set_size, init_stock, sd_init_stock, growth_factor, duration=duration)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
 
 
 

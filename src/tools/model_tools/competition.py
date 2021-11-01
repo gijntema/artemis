@@ -213,7 +213,9 @@ class CompetitionHandler:
         # agent_set.update_memory
         choice_set.catch_map[choice_id] += corrected_catch   # TODO make clear this is total catch                                                           # update tracker of the choice set for total catch in a choice option
         choice_set.effort_map[choice_id] += 1                                                                           # update tracker of the choice set for effort in a choice option
- #TODO: why is catch at time t not updated here, only total catch?
+        #TODO: why is catch at time t not updated here, only total catch?
+        choice_set.time_visit_map[choice_id][time_id] += 1
+
         if 'uptake' in self.competition_method:
             choice_set.discrete_alternatives[choice_id].resource_stock_harvest(corrected_catch)                         # quick and dirty fix of blocking out the piece of code that reduces the resource stoc
 

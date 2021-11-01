@@ -107,9 +107,11 @@ class DataTransformer:
                     {
                         'catch': self.__extract_flat_agent_time_catch,
                         'competition': self.__extract_flat_agent_time_competition,
-                        'knowledge_in_heatmap': self.__extract_flat_agent_time_knowledge
+                        'knowledge_in_heatmap': self.__extract_flat_agent_time_knowledge,
+                        'forage_option_visit': self.__extract_flat_agent_time_forage_option_visit
                         # INSERT FURTHER FUNCTIONALITY
                     }
+
                 # INSERT POTENTIAL OTHER DATA TYPES HERE
             }
         return functionality
@@ -569,7 +571,7 @@ class DataTransformer:
         return temp_data                                                                                                # return pandas dataframe
 
 # ----------------------------------------------------------------------------------------------------------------------
-# --------------------------- Methods to Extract data from Competition Related Trackers---------------------------------
+# ------------------------------------ Methods to Extract flat Time x Agent data ---------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def extract_average_expected_competition(self, agent_set):
@@ -638,6 +640,15 @@ class DataTransformer:
         output_data['knowledge_in_heatmap'] = data_series_knowledge
         return output_data
 
+    def __extract_flat_agent_time_forage_option_visit(self, agent_set, output_data=pd.DataFrame(), iteration=-99):
+        data_series_forage_visits = []
+        # TODO: IMPLEMENT Functionality
+        input_data = agent_set.forage_visit_tracker
+        for time_id in tuple(input_data.keys()):
+            for agent in input_data[time_id]:
+                data_series_forage_visits.append(input_data[time_id][agent])
+        output_data['forage_visit'] = data_series_forage_visits
+        return output_data
 
     def extract_time_x_group_catch(self, dataframe):
         """QUICK AND DIRTY WAY TO GET GROUP SPECIFIC CATCH OVER TIME FOR A SINGLE SIMULATION"""
@@ -653,6 +664,14 @@ class DataTransformer:
 
         output_dataframe = pd.DataFrame(data_dictionary)
         return output_dataframe
+
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# -------------------------------- Methods to Extract flat Time x Alternative Data series-------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+    def __extract_flat_alternative_time(self, choice_set):
+        pass
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------- Methods to Extract Catch data for agent specific temporal patterns-----------------------------

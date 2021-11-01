@@ -45,7 +45,7 @@ Version Number:
 
 import random
 import copy
-from collections import defaultdict  # TODO: --STRUCTURAL-- Replace difficult initialisation
+from collections import defaultdict
 from src.tools.model_tools.choice_making import ChoiceMaker
 from src.tools.model_tools.sharing import HeatmapExchanger
 from src.tools.model_tools.allegiances import GroupFormer
@@ -88,11 +88,11 @@ class AgentSet:                                         # to be implemented, not
 
         self.total_catch = 0                            # Tracker for total catch of all agents and time_steps combined
         self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
-        self.average_expected_competitor_tracker = defaultdict(dict)   # tracker to contain the average expected amount of competitors expected when picking any cell
+        self.average_expected_competitor_tracker = defaultdict(dict)                                                    # tracker to contain the average expected amount of competitors expected when picking any cell
+        self.forage_visit_tracker = defaultdict(dict)
 
         self.__init_time_data_trackers(duration_model=duration_model)
-        # self.__init_potential_receivers(receiver_choice_strategy=receiver_choice_strategy)
-        self.group_former = self.__init_group_allegiances(number_of_groups=number_of_sharing_groups,                   # set up for better initialisation of group_former, reuiqres the best initiliasation of self.agents a few lines above
+        self.group_former = self.__init_group_allegiances(number_of_groups=number_of_sharing_groups,                    # set up for better initialisation of group_former, reuiqres the best initiliasation of self.agents a few lines above
                                                           group_division_style=group_division_style,
                                                           group_dynamics=group_dynamics)
         self.__init_potential_receivers(receiver_choice_strategy=receiver_choice_strategy)
@@ -238,6 +238,8 @@ class AgentSet:                                         # to be implemented, not
 
             self.average_expected_competitor_tracker[time_id][agent_i] = average_encounters_expected                    # add the calculated measure to overall tracker in the agent_set as tracker[time=t][agent=i] = Cexp,i,t
 
+    def update_forage_visit_tracker(self, time_id, agent_id, chosen_alternative):
+        self.forage_visit_tracker[time_id][agent_id] = chosen_alternative
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------- the ForagerAgent object -----------------------------------------------

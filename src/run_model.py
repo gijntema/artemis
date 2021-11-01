@@ -71,6 +71,9 @@ class ModelRunner:
 
                 # forage event occurs and agents choose an optimal or random alternative
                 alternative_index = agent_set.agents[agent].make_choice(choice_set)
+                agent_set.update_forage_visit_tracker(time_id=time_id,
+                                                     agent_id=agent,
+                                                     chosen_alternative=alternative_index)                              # update the tracker that keeps track of where agents have gone to: TODO: QUICK and DIRTY implemented fo rnow
 
                 # load the chosen alternative
                 competition_handler.load_competition_data(alternative_index, agent)
