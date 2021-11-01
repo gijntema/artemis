@@ -7,7 +7,7 @@ from src.config.init.init_param import *
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import plotly.graph_objects as go
+#import plotly.graph_objects as go
 
 competition_handler = CompetitionHandler('interference-simple')
 # competition_handler = CompetitionHandler('absent')
@@ -82,6 +82,7 @@ def extract_time_x_group_catch(dataframe):
 # MAKE MAYTRIX PLOT FOR FORAGE VISITS PER ALTERNATIVE (Y) AND OVER TIME (X)
 def extract__visualize_frequency_space_x_time_visits(dataframe):
     # Visualizing a heatmap plot for Space x Time forage visits
+
     df = dataframe  # Replace with other_x_catch_data when running after a ARTEMIS.py run
     output_df = pd.DataFrame()
     time_data_series = np.sort(df['time_id'].unique())
@@ -95,6 +96,7 @@ def extract__visualize_frequency_space_x_time_visits(dataframe):
                 len(df.loc[(df['iteration_id'] == 0) & (df['time_id'] == time) & (df['forage_visit'] == alternative)]))
         output_df[alternative] = alternative_data_series
 
+    import plotly.graph_objects as go # FOR VISUALIZATION
     df = output_df
     heatmap_data = []
     list_of_alternatives = list(df.columns)[1:]
