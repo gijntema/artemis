@@ -41,7 +41,8 @@ Version Number:
     0.2
 """
 
-
+# TODO: Add prefix fleet or agent
+# TODO: Consider fleet.py & agents.py
 
 import random
 import copy
@@ -99,7 +100,7 @@ class AgentSet:                                         # to be implemented, not
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# --------------------------------------- Initialization Supporting Methods TODO KW supporting what?--------------------------------------------
+# ---------------------------------------- Methods Called by Initialization --------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     # UNIMPLEMENTED
@@ -133,9 +134,8 @@ class AgentSet:                                         # to be implemented, not
 
         return agent_dictionary
 
-    # UNIMPLEMENTED
     def __init_time_data_trackers(self, duration_model):
-        # TODO ADD Comment line
+        """Initialize containers for variables tracked over time"""
         duration_counter = 0                                                                                            # make counter for all time_steps in the model for While loop functioning
         while duration_counter < duration_model:                                                                        # loop over all time steps in the model
             time_id = str(duration_counter).zfill(len(str(duration_model)))
@@ -147,20 +147,10 @@ class AgentSet:                                         # to be implemented, not
                 # proceed to next agent
             duration_counter += 1
 
-    # UNIMPLEMENTED
-    def __init_potential_receivers(self, receiver_choice_strategy):
-        #TODO add comment line
-        for agent in self.agents:                                                                                       # loop over agents
-            self.agents[agent].heatmap_exchanger.functionality['pick_receiver'][receiver_choice_strategy]['init'] \
-            (
-                agent_set=self
-            )
-
-    # UNIMPLEMENTED
     def __init_group_allegiances(self, number_of_groups=10,
-                                 group_division_style='equal_mutually_exclusive_groups',
-                                 group_dynamics=False):
-        # TODO add comment line
+                                     group_division_style='equal_mutually_exclusive_groups',
+                                     group_dynamics=False):
+        """initialize groups of agents"""
         group_former = GroupFormer(self,
                                    number_of_groups=number_of_groups,
                                    division_style=group_division_style,
@@ -170,6 +160,14 @@ class AgentSet:                                         # to be implemented, not
             self.agents[agent].group_allegiance = group_former.relevant_data['personal_allegiances'][agent]
 
         return group_former
+
+    def __init_potential_receivers(self, receiver_choice_strategy):
+        """in agents, initialize with whom agents may share information based on their group allegiances"""
+        for agent in self.agents:                                                                                       # loop over agents
+            self.agents[agent].heatmap_exchanger.functionality['pick_receiver'][receiver_choice_strategy]['init'] \
+            (
+                agent_set=self
+            )
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------- Methods to update agent(set) related trackers --------------------------------------
@@ -182,11 +180,11 @@ class AgentSet:                                         # to be implemented, not
         self.agents[agent_id].update_agent_trackers(alternative_index=alternative_index, catch=catch,                   # update single agent trackers
                                                    time_step_counter=time_tracker)
 
-        self.__update_total_catch(catch)             # TODO KW: het verschil tussen total catch en total time_step catch is me niet duidelijk. is de eerste een som per simulatie?                                                                    # update overall catch
-        self.__update_total_time_step_catch(catch, time_tracker)                                                        # updates the catch per time_step
+        self.__update_total_catch(catch)             # Cumulative catch over all agents and time steps in the whole simulation
+        self.__update_total_time_step_catch(catch, time_tracker)                                                        # Cumulative catch over all agents per time step
 
     def __update_total_catch(self, catch):
-        """updates the total catch each time step by the given amount from a single catch event"""
+        """updates the total catch by the given amount from a single catch event for all agents"""
         self.total_catch += catch
 
     def __update_average_time_step_catch(self):
@@ -195,8 +193,7 @@ class AgentSet:                                         # to be implemented, not
         pass
 
     def __update_total_time_step_catch(self, catch, time_tracker):
-        """updates the total catch in a given time step by the given amount from a single catch event"""
-        # TODO: deze comment is identiek aan die van update_total_catch(self, catch) maar er gebeurd wat anders. wat gebeurd waar?
+        """updates the total catch for each time step by the given amount from a single catch event"""
         self.total_time_step_catch_tracker[str(time_tracker)] += catch
 
     def update_memory_trackers(self, time_id):
@@ -205,15 +202,14 @@ class AgentSet:                                         # to be implemented, not
             self.agents[agent].update_memory_trackers(time_id)
 
     def update_average_expected_competitor_tracker(self, time_id):
-        """Method that updates a tracker containing data on the average number of competitors expected
-        in a given time step for every agent"""
+        """calculating the average number of competitors expected in a given time step for every agent"""
 
         temp_probability_dictionary = {}                                                                                # temporary dictionary to store agent specific probability maps fro choosing a option (e.g. grid cell) to forage in/from
         number_of_options = len(self.agents[next(iter(self.agents))].heatmap)                                           # get total number of options(e.g. the amount of grid cells an agent can choose from) as the number of entries in the first agents heatmap
 
         for agent in self.agents:                                                                                       # Loop over Agents (1) to transform an agent heatmap into a probability map --> what is the chance an agent will i each option
             agent_data = self.agents[agent]                                                                             # define agent data to keep the script visually pleasing
-            sum_heatmap_entries = sum(agent_data.heatmap.values())                                                      # calculate sum of heatmap entries for later use TODO KW entries? you mean the resource? or only the alternative ID?
+            sum_heatmap_entries = sum(agent_data.heatmap.values())                                                      # calculate sum of heatmap entries (e.g. memories of grid cells) for later use
             probability_of_exploration = agent_data.explore_probability                                                 # get probability of picking a random option for late ruse
 
             probability_map = copy.deepcopy(agent_data.heatmap)                                                         # create copy of heatmap to overwrite with new data (still contains the regular heatmap entries, but ensures same data structure)
@@ -246,7 +242,7 @@ class AgentSet:                                         # to be implemented, not
 # ----------------------------------------------------------------------------------------------------------------------
 
 class ForagerAgent:
-    """general class to define objects as agents that may forage from a resource and their attributes"""
+    """general class to agents that may forage from a resource and their attributes"""
     def __init__(self, choice_set, choice_method, agent_id=None,
                  catchability_coefficient=0, nb_of_alternatives_known=1, explore_probability=0,
                  other_agent_indices=tuple(),
@@ -293,7 +289,6 @@ class ForagerAgent:
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------- Method to initialize agents before running the main model --------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-    # TODO Potential to make more efficient using collections.defaultdict()?
     def __initialize_choice_set_mirrors(self, choice_set_length):
         """build a list of choice option indices to serve as a basis
         to initialise the ForagerAgent memory and data trackers with"""
@@ -367,7 +362,7 @@ class ForagerAgent:
         """updates the effort tracker with the last chosen choice option"""
         self.forage_effort_tracker[alternative_index] += 1
 
-    def __update_catch(self, catch):
+    def __update_catch(self, catch):  # TODO: NAMING ISSUES - What Catch?
         """update agents total catch with last catch event"""
         self.total_catch += catch
 
@@ -450,15 +445,6 @@ class ForagerAgent:
             # When the receiving agent already has knowledge on the shared knowledge, take the average of both
             elif isinstance(self.heatmap[received_index], float):                                                       # check if the receiving agent already has an entry for that choice: YES
                 self.heatmap[received_index] = (received_data + self.heatmap[received_index])/2                         # take average of newly shared data and the information already known from other data
-
-            # TODO: duplicate functionality with self.update_memory_trackers()
-            # attempted functionality for knowledge degredation and knowledge age trackers (how long ago did an agent obtain a heatmap entry)
-#            try:
-#                self.knowledge_evolution_tracker[time_id][received_index]['time_of_origin'] = int(time_id)              # test if a time_of_origin us already present, and if so replace with the current time
-
-#            except KeyError:
-#                self.knowledge_evolution_tracker[time_id][received_index] = dict()                                      # if time_o
-#                self.knowledge_evolution_tracker[time_id][received_index]['time_of_origin'] = int(time_id)
 
             received_counter += 1                                                                                       # proceed to next shared choice option
 

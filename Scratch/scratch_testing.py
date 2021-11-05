@@ -80,10 +80,12 @@ def extract_time_x_group_catch(dataframe):
     return output_dataframe
 
 # MAKE MAYTRIX PLOT FOR FORAGE VISITS PER ALTERNATIVE (Y) AND OVER TIME (X)
-def extract__visualize_frequency_space_x_time_visits(dataframe):
+def extract__visualize_frequency_space_x_time_visits(dataframe, output_file_suffix):
     # Visualizing a heatmap plot for Space x Time forage visits
 
     df = dataframe  # Replace with other_x_catch_data when running after a ARTEMIS.py run
+    # df = other_x_catch_data
+    import numpy as np
     output_df = pd.DataFrame()
     time_data_series = np.sort(df['time_id'].unique())
     output_df['time_id'] = time_data_series
@@ -96,7 +98,7 @@ def extract__visualize_frequency_space_x_time_visits(dataframe):
                 len(df.loc[(df['iteration_id'] == 0) & (df['time_id'] == time) & (df['forage_visit'] == alternative)]))
         output_df[alternative] = alternative_data_series
 
-    import plotly.graph_objects as go # FOR VISUALIZATION
+    import plotly.graph_objects as go  # FOR VISUALIZATION
     df = output_df
     heatmap_data = []
     list_of_alternatives = list(df.columns)[1:]
@@ -110,4 +112,4 @@ def extract__visualize_frequency_space_x_time_visits(dataframe):
     #fig.update_layout(yaxis_title='forage_option',
     #                  x_axis_title='time')
     fig.show()
-    fig.write_image("{}{}.png".format('forage_visit_matrix', '_test'))
+    fig.write_image("{}{}.png".format('forage_visit_matrix', output_file_suffix))

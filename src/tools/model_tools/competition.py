@@ -117,6 +117,7 @@ class CompetitionHandler:
         relevant = self.competition_instruction[self.competition_method]['init']()
         return relevant
 
+    # UNIMPLEMENTED FOR FUTURE USE OF MULTIPLE COMPETITION EFFECTS SIMULTANEOUSLY
     def __init_relevant_multiple(self): # TODO KW: write down the difference between _single and _multiple
         """method to initialise the relevant attributes (e.g. competition specific trackers)
          needed when accounting for multiple competition types"""
@@ -140,38 +141,37 @@ class CompetitionHandler:
         relevant_data['agent_choices'] = dict()
         return relevant_data
 
-    def __init_uptake(self): #TODO: you call it a tracker for catch but use the name effort?!
-        """method to initialise an ordered tracker for catch, as catch is used to reduce the resource stock"""
+    def __init_uptake(self):
+        """method to initialise a function for harvest to remove stock present /fishing mortality in a grid cell
+        #TODO: Migrate to the other location --  future functionality"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
         relevant_data['agent_choices'] = dict()
         return relevant_data
 
-    def __init_price(self): #TODO: you call it a tracker for catch but use the name effort?!
-        """method to initialise a tracker for catch of the current time_unit,
-        as catch is used a basis to correct the price of foraged goods. making this competition method only applicable
-        to human forager agents"""
+    def __init_price(self):
+        """method to initialise a function for harvest to affect market price."""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
         relevant_data['agent_choices'] = dict()
         return relevant_data
 
-    def __init_fixed_catch(self):#TODO: you call it a tracker for catch but use the name effort?!
-        """method to initialize ...         """
+    def __init_fixed_catch(self):                                       # TODO: Rename to divided catch /split catch
+        """method to initialise a function for splitting the catch"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
         relevant_data['agent_choices'] = dict()                                                                 # OrderedDict as the order of the uptake matters (resources might be depleted by other before an agent arrives
         return relevant_data
 
 # ----------------------------------------------------------------------------------------------------------------------
-# ---------------------------- Methods to load relevant agent choice functionality -------------------------------------
+# ---------------------------- Methods to load agent choice functionality -------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-    def load_competition_data(self, chosen_alternative_id, agent_id, interference_factor=0.8):
-        """loads data on the agent and chosen choice option""" # TODO which data is loaded?
+    def load_competition_data(self, chosen_alternative_id, agent_id, interference_factor=0.8):                          # TODO: Migrate interference factor to relevant data and remove hardcoded data
+        """main functionality method for loading data on the agent and chosen choice option""" # TODO which data is loaded?
         self.competition_instruction[self.competition_method]['load'](chosen_alternative_id, agent_id, interference_factor)
 
     def __load_absent(self, chosen_alternative_id, agent_id, interference_factor=0):
-        """loads data on the agent and chosen choice option"""
+        """loads data on the agent and chosen choice option"""  # TODO check if all comments are unique
         self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id                                           # remember what agent choose which choice option
 
@@ -179,8 +179,8 @@ class CompetitionHandler:
         """loads data on the agent and chosen choice option"""
         self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id                                           # remember what agent choose which choice option
-        self.relevant_data['interference_factor'] = interference_factor
-
+        self.relevant_data['interference_factor'] = interference_factor                                                 # TODO: migrate interference factor to initialisation of relevant data
+                                                                                                                        # TODO DOUBLE CHECK FOR DUPLICATE FUNCTIONALITY
     def __load_uptake(self, chosen_alternative_id, agent_id, interference_factor=0):
         """Placeholder --> Functionality currently not supported"""
         pass
@@ -189,7 +189,7 @@ class CompetitionHandler:
         """Placeholder --> Functionality currently not supported"""
         pass
 
-    def __load_fixed_catch(self, chosen_alternative_id, agent_id, interference_factor=0):
+    def __load_fixed_catch(self, chosen_alternative_id, agent_id, interference_factor=0):                               # TODO: RENAME to deivided catch/split catch
         """loads data on the agent and chosen choice option""" #TODO KW: specify which data
         self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id
@@ -199,7 +199,7 @@ class CompetitionHandler:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def competition_correction(self, choice_set, agent_set, agent_id, time_id):
-        """returns the real catch a ForagerAgent gains, when adjusted for competition"""
+        """Main Functionality Method, returns the real catch a ForagerAgent gains, when adjusted for competition"""
 
         choice_id = self.relevant_data['agent_choices'][agent_id]
 
@@ -209,14 +209,15 @@ class CompetitionHandler:
         corrected_catch, correction_tag = \
             self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the competition methods specified
 
+        # update agent Trackers
         agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents itself
-        # agent_set.update_memory
-        choice_set.catch_map[choice_id] += corrected_catch   # TODO make clear this is total catch                                                           # update tracker of the choice set for total catch in a choice option
+        # agent_set.update_memory                                                                                       # TODO: Still necessary?
+        # Update grid cell trackers
+        choice_set.catch_map[choice_id] += corrected_catch                                                              # update tracker of the choice set for total catch in a choice option
         choice_set.effort_map[choice_id] += 1                                                                           # update tracker of the choice set for effort in a choice option
-        #TODO: why is catch at time t not updated here, only total catch?
         choice_set.time_visit_map[choice_id][time_id] += 1
 
-        if 'uptake' in self.competition_method:
+        if 'uptake' in self.competition_method:                                                                         # TODO migrat euptake to other location
             choice_set.discrete_alternatives[choice_id].resource_stock_harvest(corrected_catch)                         # quick and dirty fix of blocking out the piece of code that reduces the resource stoc
 
     def __correct_absent(self, choice_id, uncorrected_catch):
@@ -234,9 +235,8 @@ class CompetitionHandler:
         correction_tag = str(number_of_competitors-1) + " other foragers"
         return corrected_catch, correction_tag
 
-    def __correct_fixed_catch(self, choice_id, uncorrected_catch):
+    def __correct_fixed_catch(self, choice_id, uncorrected_catch):                                                      # TODO: Rename divided catch/split catch
         """method to correct catch by dividing over the number of competitors, creates very strong competition"""
-        # TODO: deze snap ik niet, waarom zou je de vangst delen? waarom niet de aanwezige resource?
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
         corrected_catch = uncorrected_catch / number_of_competitors                                                     # prone to DividedByZeroError, but as this method should never be called if no foraging occurs in a choice option, this should be a nice test for functioning
         correction_tag = str(number_of_competitors - 1) + " other foragers"                                             # generate interference tag for later use in reporting
@@ -251,7 +251,7 @@ class CompetitionHandler:
         pass
 
 # ----------------------------------------------------------------------------------------------------------------------
-# --------------------- Methods to reset the saved content to start from default relevant data--------------------------
+# --------------------- Methods to reset the saved content to start from empty relevant data--------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def reset_relevant_data(self): #TODO: add the relevant data explicitly

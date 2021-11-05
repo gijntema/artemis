@@ -35,6 +35,7 @@ Version Number:
 
 # Module usable to define the exogenous variables of any ARTEMIS run
 # TODO: eventually change this module to read the specified information form a configuration file (e.g. .json file)
+# TODO: Main functionality Method as keyword in description of methods
 
 # Forager Characteristics
 explore_probability = 0.2                   # probability a forager does not choose a known cell, but picks a random cell
@@ -49,7 +50,7 @@ growth_factor = 1                   # per time step growth of stock (1 represent
 
 
 # model characteristics
-duration = 100                          # number of time steps in the model
+duration = 50                          # number of time steps in the model
 choice_set_size = 20                    # number of discrete alternatives in the choice set
 number_of_agents = 100                  # number of foragers in the model
 number_of_iterations = 10                # number of iterations/simulations the model runs for
