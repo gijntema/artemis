@@ -49,6 +49,7 @@ Version Number:
 
 import numpy as np
 from collections import defaultdict
+from src.tools.model_tools.alternative_dynamics import DynamicsHandler
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------- Objects to contain the full choice set -----------------------------------------
@@ -59,19 +60,23 @@ class ChoiceSet:
     including the choice options in the choice set as DiscreteAlternative objects in a dictionary object"""
 
     # initialisation of the object defining the attributes of a choice set
-    def __init__(self, nb_alternatives, init_stock, sd_init_stock, growth_factor=1, duration=1):
+    def __init__(self, nb_alternatives, stock_distribution, init_stock, sd_init_stock, minimum_stock, maximum_stock, growth_factor=1, duration=1):
         self.discrete_alternatives = {}                                                                                 # dictionary with all choice options as DiscreteAlternative objects
         self.effort_map = {}                                                                                            # tracker variable for effort (effort = 1 -> a single forage event) exerted to each choice options
         self.catch_map = {}                                                                                             # tracker variable for total catch gained from each choice options
         self.time_visit_map = defaultdict(dict)
-        self.__init_attributes(nb_alternatives, init_stock, sd_init_stock, growth_factor, duration)
+        self.__init_attributes(nb_alternatives=nb_alternatives, stock_distribution=stock_distribution,
+                               init_stock=init_stock, sd_init_stock=sd_init_stock, growth_factor=growth_factor,
+                               duration=duration, maximum_stock=maximum_stock, minimum_stock=minimum_stock)
 
-    def __init_attributes(self, nb_alternatives, init_stock, sd_init_stock, growth_factor, duration):
+    def __init_attributes(self, nb_alternatives, stock_distribution, init_stock, sd_init_stock, minimum_stock, maximum_stock, growth_factor, duration):
         alternative_tracker = 0
         while alternative_tracker < nb_alternatives:                                                                    # loop the creation of a alternative for the full size of the considered set of choices possibel
             alternative_id = "alternative_" + str(alternative_tracker).zfill(len(str(nb_alternatives)))                 # assign ID
-            self.discrete_alternatives[alternative_id] = DiscreteAlternative(alternative_id, init_stock,
-                                                                                   sd_init_stock, growth_factor)        # define a single choice option with an ID, initial stock (with an sd) and growth factor
+            self.discrete_alternatives[alternative_id] = DiscreteAlternative(alternative_id, stock_distribution=stock_distribution,init_stock=init_stock,
+                                                                                   minimum_stock=minimum_stock,
+                                                                             maximum_stock=maximum_stock
+                                                                             , sd_init_stock=sd_init_stock, growth_factor=growth_factor)        # define a single choice option with an ID, initial stock (with an sd) and growth factor
             self.effort_map[alternative_id] = 0                                                                         # define a tracker with 0 effort on each choice option
             self.catch_map[alternative_id] = 0                                                                          # define a tracker with 0 catch on every effort
             self.time_visit_map[alternative_id] = dict()
@@ -109,27 +114,38 @@ class DiscreteAlternative:
     """Class to contain the choice option specific aspects and modifications,
     for now only resource stock is included"""
 
-    def __init__(self, alternative_id=None, init_stock=100, sd_init_stock=25, growth_factor=1):
+    def __init__(self, alternative_id=None, stock_distribution='uniform_random_repeat', init_stock=100, sd_init_stock=25, minimum_stock=0, maximum_stock=100, growth_factor=1):
         """"function defining the content of a choice options (e.g. a single grid cell in spatial considerations)"""
         self.alternative_id = alternative_id                                                                            # id consistent with other indices used in the rest of the model
         self.resource_stock = 0                                                                                         # contains the value(s) for the stock present
         self.growth_factor = 0                                                                                          # initialise value for growth factor
-        self.initialize_standard_stock(init_stock, sd_init_stock, growth_factor)                                        # loads proper initialization, overwriting the stock and growth factor with specified values
+        self.initialize_standard_stock(stock_distribution=stock_distribution, init_stock=init_stock, sd_init_stock=sd_init_stock, minimum_stock=minimum_stock, maximum_stock=maximum_stock, growth_factor=growth_factor)                                        # loads proper initialization, overwriting the stock and growth factor with specified values
         self.stock_type = 'singular'                                                                                    # indicates the structure of the stock (e.g. singular/age class)
         self.stock_growth_type = 'exponential'                                                                          # indicator for the way the stock grows
+        #self.dynamics_handler = DynamicsHandler(self, dynamics_scenario=stock_distribution)
 
     # TODO: Call below method to initialise over current roundabout way
-    def initialize_standard_stock(self, init_stock, sd_init_stock, growth_factor=1):
+    def initialize_standard_stock(self, stock_distribution, init_stock, sd_init_stock, minimum_stock, maximum_stock, growth_factor=1):
         """draws and sets an initial stock size in the choice option drawn from
         a normal distribution with a given  mean and sd"""
+        if stock_distribution == 'normal_random_repeat':
+            self.resource_stock = self.__pos_normal(mean=init_stock, sd=sd_init_stock)                                 # generate random stock with given mean and standard deviation from a normal distribution
+            self.growth_factor = growth_factor                                                                              # set growth factor (in dynamic stock scenarios)
 
-        self.resource_stock = self.__pos_normal(mean=init_stock, sd=sd_init_stock)                                 # generate random stock with given mean and standard deviation from a normal distribution
-        self.growth_factor = growth_factor                                                                              # set growth factor (in dynamic stock scenarios)
+        elif stock_distribution == 'uniform_random_repeat':
+            self.init_uniform_standard_stock(minimum_stock=minimum_stock, maximum_stock=maximum_stock)
 
     def __pos_normal(self, mean, sd):
         """returns values from a normal distribution, cut off at 0 """
         x = np.random.normal(loc=mean, scale=sd)
         return x if x > 0 else self.__pos_normal(mean, sd)
+
+    def init_uniform_standard_stock(self, minimum_stock, maximum_stock):
+        self.resource_stock = self.__pos_uniform(minimum_stock, maximum_stock)
+
+    def __pos_uniform(self, minimum, maximum):
+        x = np.random.uniform(low=minimum, high=maximum)
+        return x if x > 0 else self.__pos_uniform(minimum, maximum)
 
     def stock_growth(self):
         """Method placeholder for future implementation of dynamic stock, currently not great executed"""

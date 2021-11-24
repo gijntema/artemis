@@ -37,29 +37,30 @@ Version Number:
 # TODO: eventually change this module to read the specified information form a configuration file (e.g. .json file)
 # TODO: Main functionality Method as keyword in description of methods
 
+# model characteristics
+duration = 50                          # number of time steps in the model
+number_of_iterations = 1                # number of iterations/simulations the model runs for
+
 # Forager Characteristics
+number_of_agents = 100                      # number of foragers in the model
 explore_probability = 0.2                   # probability a forager does not choose a known cell, but picks a random cell
 catchability_coefficient = 0.2              # proportional uptake of the resource stock in one foraging event
 init_number_of_alternatives_known = 4       # number of choice options each agents has information on at initialisation
 choice_method = 'explore_weighted_heatmap'  # defines the way an agent chooses what forage option to forage from
 
 # Resource characteristics
+choice_set_size = 20                    # number of discrete alternatives in the choice set
 init_stock = 100                    # mean of initial stock present
 sd_init_stock = 25                  # standard deviation of initial stock present
 growth_factor = 1                   # per time step growth of stock (1 represents a static population in current Default settings)
-
-
-# model characteristics
-duration = 50                          # number of time steps in the model
-choice_set_size = 20                    # number of discrete alternatives in the choice set
-number_of_agents = 100                  # number of foragers in the model
-number_of_iterations = 10                # number of iterations/simulations the model runs for
+max_stock = 200                     # max for uniform distributions of the stock
+min_stock = 0                       # in for uniform_distributions of the stock
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 growth_type = 'static'                  # indicates stock dynamics -- placeholder, currently not implemented
-stock_reset_scenario = 'random-repeat'  # indicates if and how the stock in a DiscreteAlternative objects resets
+stock_reset_scenario = 'uniform_random_repeat'  # indicates if and how the stock in a DiscreteAlternative objects resets
 chance_reset_stock = 0.1                # chance the stock is reset at the end of a time_step
 
 # ----------------------------------------------------------------------------------------------------------------------

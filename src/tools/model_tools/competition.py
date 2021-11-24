@@ -84,12 +84,12 @@ class CompetitionHandler:
                     "load": self.__load_price,
                     "correct": self.__correct_price_simple
                 },
-            'fixed-catch':
+            'split-catch':
                 {
                     # relic code = obsolete
-                    "init": self.__init_fixed_catch,
-                    "load": self.__load_fixed_catch,
-                    "correct": self.__correct_fixed_catch
+                    "init": self.__init_split_catch,
+                    "load": self.__load_split_catch,
+                    "correct": self.__correct_split_catch
                 }
             # Enter future functionality HERE
         }
@@ -156,7 +156,7 @@ class CompetitionHandler:
         relevant_data['agent_choices'] = dict()
         return relevant_data
 
-    def __init_fixed_catch(self):                                       # TODO: Rename to divided catch /split catch
+    def __init_split_catch(self):
         """method to initialise a function for splitting the catch"""
         relevant_data = dict()
         relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
@@ -189,7 +189,7 @@ class CompetitionHandler:
         """Placeholder --> Functionality currently not supported"""
         pass
 
-    def __load_fixed_catch(self, chosen_alternative_id, agent_id, interference_factor=0):                               # TODO: RENAME to deivided catch/split catch
+    def __load_split_catch(self, chosen_alternative_id, agent_id, interference_factor=0):
         """loads data on the agent and chosen choice option""" #TODO KW: specify which data
         self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id
@@ -235,7 +235,7 @@ class CompetitionHandler:
         correction_tag = str(number_of_competitors-1) + " other foragers"
         return corrected_catch, correction_tag
 
-    def __correct_fixed_catch(self, choice_id, uncorrected_catch):                                                      # TODO: Rename divided catch/split catch
+    def __correct_split_catch(self, choice_id, uncorrected_catch):
         """method to correct catch by dividing over the number of competitors, creates very strong competition"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
         corrected_catch = uncorrected_catch / number_of_competitors                                                     # prone to DividedByZeroError, but as this method should never be called if no foraging occurs in a choice option, this should be a nice test for functioning

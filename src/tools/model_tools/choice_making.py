@@ -133,12 +133,19 @@ class ChoiceMaker:
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Main Functionality Method to make a choice for ForagerAgent objects
+# ----------------------------------------------------------------------------------------------------------------------
+    def make_choice(self):
+        """method that chooses the data based on the choice method provided
+        as key for the internal instructions dictionary"""
+        chosen = self.choice_instruction[self.choice_method]['choose']()
+        return chosen
+
+# ----------------------------------------------------------------------------------------------------------------------
 # Methods that make the actual choice for the ForagerAgent
 # ----------------------------------------------------------------------------------------------------------------------
-
     def __make_choice_random(self):
         """method to choose a random choice option to forage in"""
-        # print("<agent> is now using random to choose")
         chosen = choice(self.choice_indices)
         return chosen
 
@@ -179,10 +186,5 @@ class ChoiceMaker:
 
         return chosen
 
-    def make_choice(self):
-        """method that chooses the data based on the choice method provided
-        as key for the internal instructions dictionary"""
-        chosen = self.choice_instruction[self.choice_method]['choose']()
-        return chosen
 
 

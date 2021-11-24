@@ -79,7 +79,6 @@ def extract_time_x_group_catch(dataframe):
     output_dataframe = pd.Dataframe(data_dictionary)
     return output_dataframe
 
-# MAKE MAYTRIX PLOT FOR FORAGE VISITS PER ALTERNATIVE (Y) AND OVER TIME (X)
 def extract__visualize_frequency_space_x_time_visits(dataframe, output_file_suffix):
     # Visualizing a heatmap plot for Space x Time forage visits
 
@@ -113,3 +112,30 @@ def extract__visualize_frequency_space_x_time_visits(dataframe, output_file_suff
     #                  x_axis_title='time')
     fig.show()
     fig.write_image("{}{}.png".format('forage_visit_matrix', output_file_suffix))
+
+
+class ContainerTest:
+    def __init__(self, **kwargs_for_dynamics):
+        self.data = {'value': 'DEFAULT'}
+        self.double_packer = DoublePackageTest(self, **kwargs_for_dynamics)
+
+
+class DoublePackageTest:
+    def __init__(self, container_object, **kwargs):
+        self.relevant_data = dict()
+        self.data = container_object.data
+        for key, reference in kwargs.items():
+            self.relevant_data[key] = reference
+
+    def test_value_changer(self, new_data):
+        self.data['value'] = new_data
+
+
+init_stock = 100
+init_stock_sd = 25
+test_value = 'TESTVALUE'
+container = ContainerTest(init_stock=init_stock, init_stock_sd=init_stock_sd)
+container.double_packer.test_value_changer(test_value)
+print(container.data['value'])
+
+# EOF

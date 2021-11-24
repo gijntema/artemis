@@ -48,23 +48,32 @@ Version Number:
 import timeit                                                                                                           # import module to track runtime
 
 start = timeit.default_timer()                                                                                          # start timer for model run
-
 # import internal modules
 import pandas as pd                                                                                                     # pandas daytaframe as data structure tool
 pd.options.plotting.backend = "plotly"                                                                                  # set a different, preffered over default,  style of plotting
 
 # Other Modules in the ARTEMIS model
-from src.config.init.init_param import *                                                                                # module containing parameter and scenario settings
-from src.tools.model_tools.agents import AgentSet                                                                       # module with agents (and groups of agents) functionality
-from src.tools.model_tools.choice_set import ChoiceSet                                                                  # module with choice option (e.g. grid cells) functionality
-# from src.config.init.init_objects import ObjectInitializer                                                              # module to initialize the objects in the module (agents and choices) - OLD OBSOLETE MODULE, ALL FUNCTIONALITY MIGRATED TO OTHER MODULES (agents.py and choice_set.py)
+from src.config.init.init_param import *                                                                                # module containing parameter and scenario settings manually defined in a script
+# from src.config.init.init_read_param import ConfigReader                                                                # module to read parameters for the model from a config file -- CURRENTLY NOT IMPLEMENTED
+
+from src.config.init.make_config import ConfigHandler
 from src.run_model import ModelRunner                                                                                   # module to run the model using initialized agents and choices
+
+from src.tools.model_tools.agents import AgentFleet                                                                     # module with agents (and groups of agents) functionality
+from src.tools.model_tools.choice_set import ChoiceSet                                                                  # module with choice option (e.g. grid cells) functionality
 from src.tools.model_tools.competition import CompetitionHandler                                                        # module that handles model feedbacks as a result of competition between agents
 
 from src.tools.output_tools.printing import PrintBlocker                                                                # module that allows for blocking of print statements in the scripts
 from src.tools.output_tools.data_extraction import DataTransformer                                                      # module to generate output data from the objects in the model
 from src.tools.output_tools.outcome_visualization import GraphConstructor                                               # module to make graphs from the output data
 from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
+
+# make an object that contains all config data and return the appropriate parameters in different sections of the model
+# cfg_file = "PLACEHOLDER"
+# config_reader = ConfigReader(cfg_file=cfg_file)
+config_handler = ConfigHandler(scenario_file='base_config.csv')
+
+# TODO: READ CONFIG key 'Model' entries
 
 print_blocker = PrintBlocker()
 if reporting is not True:                                                                                               # block printing if desired
@@ -74,10 +83,10 @@ iteration_counter = 0                                                           
 alternative_specific_data = pd.DataFrame()                                                                              # intialize object to contain data on the choice options in the model
 choice_set_time_series = pd.DataFrame()                                                                                 # intialize object to contain time series data on the choice options in the model
 agent_specific_data = pd.DataFrame()                                                                                    # intialize object to contain data on the agents in the model
-agent_set_time_series = pd.DataFrame()                                                                                  # intialize object to contain time series data on the agents in the model
+fleet_time_series = pd.DataFrame()                                                                                      # intialize object to contain time series data on the agents in the model
 other_x_catch_data = pd.DataFrame()                                                                                     # intialize object to contain a data series for catch and any desired otehr variable to correlate with catch
 
-output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}_#Groups{}_duration{}_stocksd{}'.format(
+output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}_#Gr{}_T{}_Ssd{}'.format(
     shared_alternatives,
     share_partners,
     int(explore_probability * 100),
@@ -90,7 +99,7 @@ output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}_#Groups{}
     number_of_groups,
     duration,
     sd_init_stock
-    )
+)
 
 # initialize class objects that are part of operational structure
 # object_initializer = ObjectInitializer()                                                                              # initialize the object with the functionality to initialize agents and choice options
@@ -101,73 +110,63 @@ graph_constructor = GraphConstructor(output_file_suffix)                        
 data_writer = DataWriter(output_file_suffix)                                                                            # initialize the object with the functionality to export data files from output data
 
 
-
 while iteration_counter < number_of_iterations:
     print('-----------------------------------------------------------------------------------------------------------',# print statement for user to idnetify the progression of th emodel
           '\nStarting Iteration no.{} \n'.format(str(iteration_counter)),
           "-----------------------------------------------------------------------------------------------------------"
           )
 # ----------------------------------------------------------------------------------------------------------------------
-# initialize choice set and forager agents
+# initialize choice set and the flee, containing all agents
 # ----------------------------------------------------------------------------------------------------------------------
 
-    #choice_set = object_initializer.initialize_choice_set(choice_set_size, init_stock, sd_init_stock, growth_factor)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
-    choice_set = ChoiceSet(choice_set_size, init_stock, sd_init_stock, growth_factor, duration=duration)    # initialize the potential option in the model (e.g. the grid with cells to fish in)
+    choice_set = ChoiceSet(choice_set_size,
+                           stock_distribution=stock_reset_scenario,
+                           init_stock=init_stock,
+                           sd_init_stock=sd_init_stock,
+                           growth_factor=growth_factor,
+                           duration=duration, maximum_stock=max_stock, minimum_stock=min_stock)                # initialize the potential option in the model (e.g. the grid with cells to fish in)
 
-
-
-    #agent_set = object_initializer.initialize_forager_agents(nb_agents=number_of_agents,                               # OBSOLETE OLD CODE, LEFT IN JUST TO BE SURE, WILL BE REMOVED AS SOON AS PROPER TESTING OF REPLACEMeNT HAS BEEN COMPLETED
-    #                                                         choice_set=choice_set,                                     # initialize the forager agents in the model (e.g. fishermen)
-    #                                                        catchability_coefficient=catchability_coefficient,
-    #                                                         nb_alternatives_known=init_number_of_alternatives_known,
-    #                                                         explore_probability=explore_probability,
-    #                                                         duration_model=duration,
-    #                                                         choice_method=choice_method,
-    #                                                         sharing_strategy=sharing_strategy,
-    #                                                         receiver_choice_strategy=pick_receiver_strategy,
-    #                                                         receiving_strategy=receiving_strategy,
-    #                                                         number_of_shared_alternatives=shared_alternatives,
-    #                                                         number_of_agents_shared_with=share_partners
-    #                                                         )
-
-    agent_set = AgentSet(nb_agents=number_of_agents,                                                                    # initialize the forager agents in the model (e.g. fishermen)
-                         choice_set=choice_set,
-                         catchability_coefficient=catchability_coefficient,
-                         nb_alternatives_known=init_number_of_alternatives_known,
-                         explore_probability=explore_probability,
-                         duration_model=duration,
-                         choice_method=choice_method,
-                         sharing_strategy=sharing_strategy,
-                         receiver_choice_strategy=pick_receiver_strategy,
-                         receiving_strategy=receiving_strategy,
-                         number_of_shared_alternatives=shared_alternatives,
-                         number_of_agents_shared_with=share_partners,
-                         number_of_sharing_groups=number_of_groups,
-                         group_division_style=division_style,
-                         group_dynamics=group_dynamics
-                         )
+    fleet = AgentFleet(
+                            nb_agents=number_of_agents,                                                                 # initialize the forager agents in the model (e.g. fishermen)
+                            choice_set=choice_set,
+                            catchability_coefficient=catchability_coefficient,
+                            nb_alternatives_known=init_number_of_alternatives_known,
+                            explore_probability=explore_probability,
+                            duration_model=duration,
+                            choice_method=choice_method,
+                            sharing_strategy=sharing_strategy,
+                            receiver_choice_strategy=pick_receiver_strategy,
+                            receiving_strategy=receiving_strategy,
+                            number_of_shared_alternatives=shared_alternatives,
+                            number_of_agents_shared_with=share_partners,
+                            number_of_sharing_groups=number_of_groups,
+                            group_division_style=division_style,
+                            group_dynamics=group_dynamics
+                            )
 
 # ----------------------------------------------------------------------------------------------------------------------
 # RUN SIMULATION
 # ----------------------------------------------------------------------------------------------------------------------
-    choice_set_output, agent_set_output = \
+    choice_set_output, fleet_output = \
         model_runner.run_model(choice_set=choice_set,                                                                   # run the model and return final states of the agents and choice options in the model
-                               agent_set=agent_set,
+                               fleet=fleet,
                                duration=duration,
                                stock_reset_scenario=stock_reset_scenario,
                                init_stock=init_stock,
                                sd_init_stock=sd_init_stock,
                                competition_handler=competition_handler,
                                stock_reset_chance=chance_reset_stock,                                                   # TODO: Move as internal Attribite of DiscreteAlternative Objects, to allow for flexibility
-                               iteration_id=iteration_counter)
+                               iteration_id=iteration_counter,
+                               max_stock=max_stock,
+                               min_stock=min_stock)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Transform the outcome objects of the model into usable data
 # ----------------------------------------------------------------------------------------------------------------------
     # TODO -- FUNCTIONALITY -- identify functionality wanted in output data
-    temp_alternative_specific_data, temp_choice_set_time_series, temp_agent_specific_data, temp_agent_set_time_series = \
+    temp_alternative_specific_data, temp_choice_set_time_series, temp_agent_specific_data, temp_fleet_time_series = \
         data_transformer.transform_output_data(choice_set_output,                                                       # extract four types of data from the output agents and choice options
-                                               agent_set_output,
+                                               fleet_output,
                                                duration,
                                                iteration_id=iteration_counter)
 
@@ -175,9 +174,9 @@ while iteration_counter < number_of_iterations:
     alternative_specific_data = alternative_specific_data.append(temp_alternative_specific_data).reset_index(drop=True) # attach iteration specific choice option data to the full dataset and reset indices to prevent index errors -- Currently extracts final stock after a run and the cumulative number of catch events in each choice option
     choice_set_time_series = choice_set_time_series.append(temp_choice_set_time_series).reset_index(drop=True)          # attach iteration specific choice option time series data to the full dataset and reset indices to prevent index errors -- Currently no data series extracted, for future use
     agent_specific_data = agent_specific_data.append(temp_agent_specific_data).reset_index(drop=True)                   # attach iteration specific agent data to the full dataset and reset indices to prevent index errors -- Currently extracts the cumulative catch of an agent over a full simulation
-    agent_set_time_series = agent_set_time_series.append(temp_agent_set_time_series).reset_index(drop=True)             # attach iteration specific agent time series data to the full dataset and reset indices to prevent index errors -- Currently extracts the total catch of all agents for every time st:>?
+    fleet_time_series = fleet_time_series.append(temp_fleet_time_series).reset_index(drop=True)                         # attach iteration specific agent time series data to the full dataset and reset indices to prevent index errors -- Currently extracts the total catch of all agents for every time st:>?
 
-    other_x_catch_data = other_x_catch_data.append(data_transformer.get_other_x_catch(agent_set, iteration_counter)).reset_index(drop=True)  # Get desired explanatory variables x Catch dataframe
+    other_x_catch_data = other_x_catch_data.append(data_transformer.get_other_x_catch(fleet, iteration_counter)).reset_index(drop=True)  # Get desired explanatory variables x Catch dataframe
 
     iteration_counter += 1                                                                                              # progress to the next iteration
 
@@ -206,7 +205,7 @@ graph_constructor.plot_scatter_pandas(other_x_catch_data,
 # ----------------------------------------------------------------------------------------------------------------------
 # Get last simulation Catch dataframe graphics
 # ----------------------------------------------------------------------------------------------------------------------
-agent_catch_time_df = data_transformer.extract_agent_time_catch(agent_set_output)
+agent_catch_time_df = data_transformer.extract_agent_time_catch(fleet_output)
 graph_constructor.plot_line_pandas(pd_dataframe=agent_catch_time_df,
                                    x_values='time_id', y_label='catch',
                                    img_name='catch_agent_time_last_simulation')
@@ -219,7 +218,7 @@ avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
     data_transformer.get_average_dataframes(alternative_specific_data,                                                  # extract averages from raw dataset with data from all iterations using methods from export_data.py functionality
                                             choice_set_time_series,
                                             agent_specific_data,
-                                            agent_set_time_series)
+                                            fleet_time_series)
 
 
 # TODO: Make the underlying methods in DataTransformer more efficient, are all quick and dirty fixes now
@@ -227,12 +226,12 @@ sd_alternative_spec, sd_alternative_time, sd_agent_spec, sd_agent_time = \
     data_transformer.get_sd_dataframes(alternative_specific_data,                                                       # extract standard deviation from raw dataset with data from all iterations
                                         choice_set_time_series,
                                         agent_specific_data,
-                                        agent_set_time_series)
+                                        fleet_time_series)
 
 avg_alternative_spec, avg_alternative_time, avg_agent_spec, avg_agent_time = \
     data_transformer.attach_sem_dataframes(
         alternative_specific_data, choice_set_time_series,
-        agent_specific_data, agent_set_time_series,
+        agent_specific_data, fleet_time_series,
         target_alt_spec=avg_alternative_spec, target_alt_time=avg_alternative_time,
         target_agent_spec=avg_agent_spec, target_agent_time=avg_agent_time)                                             # add Standard error of the mean (SEM) to dataframes
 
@@ -244,19 +243,19 @@ qt75_alternative_spec, qt75_alternative_time, qt75_agent_spec, qt75_agent_time =
     data_transformer.get_qt_dataframes(alternative_specific_data,
                                        choice_set_time_series,
                                        agent_specific_data,
-                                       agent_set_time_series, quantile=0.75)                                            # 75th quantile for four data types
+                                       fleet_time_series, quantile=0.75)                                            # 75th quantile for four data types
 
 qt50_alternative_spec, qt50_alternative_time, qt50_agent_spec, qt50_agent_time = \
     data_transformer.get_qt_dataframes(alternative_specific_data,
                                        choice_set_time_series,
                                        agent_specific_data,
-                                       agent_set_time_series, quantile=0.50)                                            # 50th quantile AKA median
+                                       fleet_time_series, quantile=0.50)                                            # 50th quantile AKA median
 
 qt25_alternative_spec, qt25_alternative_time, qt25_agent_spec, qt25_agent_time = \
     data_transformer.get_qt_dataframes(alternative_specific_data,
                                        choice_set_time_series,
                                        agent_specific_data,
-                                       agent_set_time_series, quantile=0.25)                                            # 25th quantile
+                                       fleet_time_series, quantile=0.25)                                            # 25th quantile
 
 
 qt_alternative_spec = qt25_alternative_spec\
@@ -330,7 +329,7 @@ graph_constructor.plot_line_pandas(qt_agent_time, x_values='time_step_id', img_n
 # produce data and graphical outputs - median, min and max values for memory evolution
 # ----------------------------------------------------------------------------------------------------------------------
 
-single_memory_data = data_transformer.get_single_simulation_memory_evolution(agent_set_output, duration)                # get data on the amount of options with an entry in the agents heatmap in the last simulation for every agent en time step specific
+single_memory_data = data_transformer.get_single_simulation_memory_evolution(fleet_output, duration)                # get data on the amount of options with an entry in the agents heatmap in the last simulation for every agent en time step specific
 
 single_memory_data_summary = pd.DataFrame()                                                                             # make summary data for the memory evolution
 single_memory_data_summary['time_step_id'] = single_memory_data['time_step_id']                                         # enter column with time
@@ -349,7 +348,7 @@ graph_constructor.plot_line_pandas(single_memory_data_summary, x_values='time_st
 # ----------------------------------------------------------------------------------------------------------------------
 # produce data and graphical outputs - intricate measure for the mean number of competitors (over all options) per agent
 # ----------------------------------------------------------------------------------------------------------------------
-competitor_df = data_transformer.extract_average_expected_competition(agent_set_output)                                 # make a pd.Dataframe from the data on the average amount of competitors in a given choice option
+competitor_df = data_transformer.extract_average_expected_competition(fleet_output)                                 # make a pd.Dataframe from the data on the average amount of competitors in a given choice option
 graph_constructor.plot_line_pandas(competitor_df,
                                    x_values='time_step_id', y_values=None,
                                    img_name='test_average_competitors',
@@ -364,29 +363,29 @@ graph_constructor.plot_line_pandas(competitor_df,
 data_writer.write_csv(alternative_specific_data, "alternative_data")                                                # write raw, choice option data for each specific iteration to .csv file
 data_writer.write_csv(choice_set_time_series, "choice_set_time_series")                                             # write raw, choice option data for each specific iteration to .csv file
 data_writer.write_csv(agent_specific_data, "agent_data")                                                            # write raw, agent data for each specific iteration to .csv file
-data_writer.write_csv(agent_set_time_series, "agent_set_time_series")                                               # write raw, agent data for each specific iteration to .csv file
+data_writer.write_csv(fleet_time_series, "fleet_time_series")                                               # write raw, agent data for each specific iteration to .csv file
 
 data_writer.write_json(alternative_specific_data, "alternative_data")                                              # write raw, choice option data for each specific iteration to .json file
 data_writer.write_json(choice_set_time_series, "choice_set_time_series")                                           # write raw, choice option data for each specific iteration to .json file
 data_writer.write_json(agent_specific_data, "agent_data")                                                          # write raw, agent data for each specific iteration to .json file
-data_writer.write_json(agent_set_time_series, "agent_set_time_series")                                             # write raw, agent data for each specific iteration to .json file
+data_writer.write_json(fleet_time_series, "fleet_time_series")                                             # write raw, agent data for each specific iteration to .json file
 
 # TODO: --FUNCTIONALITY-- Writing average data outcomes not supported yet (only templates given below)
 # data_writer.write_json(alternative_specific_data, "average_alternative_data")
 # data_writer.write_json(choice_set_time_series, "average_choice_set_time_series")
 # data_writer.write_json(agent_specific_data, "average_agent_data")
-# data_writer.write_json(agent_set_time_series, "average_choice_set_time_series")
+# data_writer.write_json(fleet_time_series, "average_choice_set_time_series")
 
 # data_writer.write_csv(alternative_specific_data, "average_alternative_data")
 # data_writer.write_csv(choice_set_time_series, "average_choice_set_time_series")
 # data_writer.write_csv(agent_specific_data, "average_agent_data")
-# data_writer.write_csv(agent_set_time_series, "average_choice_set_time_series")
+# data_writer.write_csv(fleet_time_series, "average_choice_set_time_series")
 
 data_writer.write_csv(single_memory_data, 'last_simulation_memory_evolution')                                       # write knowledge evolution data
 
 data_writer.write_csv(other_x_catch_data, 'flat_time_x_agent_results')
 
-# jaccard_agent_knowledge = data_transformer.get_single_simulation_jaccard_matrices(agent_set_output)                     # get jaccard indices similarity matrices for last simulation
+# jaccard_agent_knowledge = data_transformer.get_single_simulation_jaccard_matrices(fleet_output)                     # get jaccard indices similarity matrices for last simulation
 # data_writer.write_csv(jaccard_agent_knowledge, 'last_simulation_jaccard_agents')
 # data_writer.write_json(jaccard_agent_knowledge, 'last_simulation_jaccard_agents')
 # graph_constructor.plot_jaccard(jaccard_agent_knowledge.drop('iteration_id', axis=1),
@@ -407,7 +406,7 @@ stop = timeit.default_timer()                                                   
 execution_time = stop - start                                                                                           # calculate occured runtime
 
 print("Model Runtime: \t{} seconds".format(str(execution_time)))                                                        # report runtime in second
-print('Average Yearly Catch of Final Simulation = {}'.format(str(agent_set_output.total_catch/duration)))
+print('Average Yearly Catch of Final Simulation = {}'.format(str(fleet_output.total_catch/duration)))
 print('Average Yearly Catch over all Simulations = {}'.format(str(avg_agent_time['total_catch'].mean())))
 
 # EOF

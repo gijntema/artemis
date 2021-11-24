@@ -51,7 +51,7 @@ from src.tools.model_tools.choice_making import ChoiceMaker
 from src.tools.model_tools.sharing import HeatmapExchanger
 from src.tools.model_tools.allegiances import GroupFormer
 
-class AgentSet:                                         # to be implemented, not yet included in the other scripts
+class AgentFleet:                                         # to be implemented, not yet included in the other scripts
     """Class to contain both the agents in ForagerAgent objects (or a more specified version of it)
     and global data on all agents in the model """
     def __init__(self,
@@ -348,7 +348,7 @@ class ForagerAgent:
         self.__update_forage_effort_tracker(alternative_index)                                                          # update the agents memory of what choice options were visitied during a simulation
         self.__update_forage_catch_tracker(alternative_index, catch)                                                    # update the agents memory of all catch ever extracted from a choice option
         self.__update_catch(catch)                                                                                      # update the total catch of an agent
-        self.__update_time_step_catch(time_step_counter, catch, alternative_index)                                                         # update the catch per time step
+        self.__update_time_step_catch(time_step_counter, catch, alternative_index)                                      # update the catch per time step
 
     def __update_heatmap(self, alternative_index, catch):
         """overwrites a heatmap choice option entry using the last catch event of the agent"""
