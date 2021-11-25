@@ -260,6 +260,7 @@ class HeatmapExchanger:
         shared_alternatives_indices = []
         shared_alternatives_data = []
         if not isinstance(self.relevant_data['number_of_shared_alternatives'], int) \
+                and not isinstance(self.relevant_data['number_of_shared_alternatives'], float)\
                 and self.relevant_data['number_of_shared_alternatives'] != 'ALL':
             raise TypeError("number can only be an integer or ALL")
 
@@ -270,8 +271,17 @@ class HeatmapExchanger:
 
         else:
             # TODO: FIX quick fix of number of shared alternatives > number of known alternatives
+            # floor division to split certainly shared and chance at sharing
+            certain_shares = self.relevant_data['number_of_shared_alternatives'] // 1                                   # get al wholes as the number of alternatives that will be shared with 100% certainty
+            probability_share_additional = self.relevant_data['number_of_shared_alternatives'] % 1                      # get the chance of sharing an additional value (e.g. if number of shared alternatives = 2.5, in 50% chance of the time an agent wil share 2 alternatives and in 50% of the time it will share 3 alternatives)
+
+            # set number of alternatives to be shared, including uncertainties in this number
+            number_of_shared_alternatives = certain_shares
+            if random.random() < probability_share_additional:                                                          # check if a ranomd number between 0 and 1 is larger than the probability of sharing an extra alternative
+                number_of_shared_alternatives += 1                                                                      # share another alternative
+
             alternative_counter = 0
-            while alternative_counter < self.relevant_data['number_of_shared_alternatives']:
+            while alternative_counter < number_of_shared_alternatives:
                 shared_alternative = random.choice(self.relevant_data['known_alternatives'])                            # pick a random choice option index the agents memory has an entry on
                 if shared_alternative not in shared_alternatives_indices:                                               # check if we are not already sharing this choice option
                     shared_alternatives_indices.append(shared_alternative)                                              # attach the choice option index from the randomly chosen entry

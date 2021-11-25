@@ -207,7 +207,7 @@ class ConfigHandler:
             self.__adjust_parameters(config_key=path.split('|'), new_value=value, scenario_id=scenario_id)              # adjust the parameters in the template
 
     def remake_scenario_file(self, output_file=None, separator=';'):  # PLACEHOLDER
-        """converts the internal data on scenarios"""
+        """converts the internal data on scenarios to csv scenario files that can be read in model runs"""
         # 1) define output file
         if not output_file:
             output_file = self.scenario_filename
@@ -215,12 +215,12 @@ class ConfigHandler:
         if output_file == 'base_config.csv':
             output_file = '{}.'.join(output_file.split(".")).format('_with_adjusted_scenarios')
 
-        # 2) convert internal file to pd.Dataframe
-        # 2.1 read file structure from old file
+        # 2) read file structure from old file
         file_structure = pd.read_csv('base_config.csv', sep=separator).columns                                          # TODO: Inflexible quick fix
         paths = [column for column in file_structure if column != 'scenario_id']
 
-        # 2.2 # load every scenario into a new row in intermediate dictionary
+        # 3) convert internal file to pd.Dataframe by reading every scenario and building an intermediate dictionary
+        # TODO: faulty assignment for path 'options|growth|growth_attributes|growth_factor'
         dictionary_for_df = defaultdict(list)
         for scenario in self.scenarios_config:
             dictionary_for_df['scenario_id'].append(scenario)
@@ -228,7 +228,7 @@ class ConfigHandler:
                 dictionary_for_df[path].append(self.__get_config_value(config_key=path,
                                                                        scenario_id=scenario))
 
-        # 3) export pd Dataframe to output csv
+        # 4) export pd Dataframe to output csv
         intermediate_config_df = pd.DataFrame(dictionary_for_df)
         intermediate_config_df.to_csv(output_file, sep=separator, index=False)
 
