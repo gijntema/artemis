@@ -107,9 +107,11 @@ class SpatialChoiceSet(ChoiceSet):                                              
     def load_alternatives(self):    # placeholders for later use with real world data
         pass
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------- Objects to contain a single choice options in a discrete choice set ----------------------------
 # ----------------------------------------------------------------------------------------------------------------------
+
 class DiscreteAlternative:
     """Class to contain the choice option specific aspects and modifications,
     for now only resource stock is included"""
@@ -118,22 +120,22 @@ class DiscreteAlternative:
         """"function defining the content of a choice options (e.g. a single grid cell in spatial considerations)"""
         self.alternative_id = alternative_id                                                                            # id consistent with other indices used in the rest of the model
         self.resource_stock = 0                                                                                         # contains the value(s) for the stock present
-        self.growth_factor = 0                                                                                          # initialise value for growth factor
+        self.growth_factor = 1                                                                                          # initialise value for growth factor
         self.initialize_standard_stock(stock_distribution=stock_distribution, init_stock=init_stock, sd_init_stock=sd_init_stock, minimum_stock=minimum_stock, maximum_stock=maximum_stock, growth_factor=growth_factor)                                        # loads proper initialization, overwriting the stock and growth factor with specified values
         self.stock_type = 'singular'                                                                                    # indicates the structure of the stock (e.g. singular/age class)
         self.stock_growth_type = 'exponential'                                                                          # indicator for the way the stock grows
         #self.dynamics_handler = DynamicsHandler(self, dynamics_scenario=stock_distribution)
 
-    # TODO: Call below method to initialise over current roundabout way
     def initialize_standard_stock(self, stock_distribution, init_stock, sd_init_stock, minimum_stock, maximum_stock, growth_factor=1):
         """draws and sets an initial stock size in the choice option drawn from
         a normal distribution with a given  mean and sd"""
         if stock_distribution == 'normal_random_repeat':
-            self.resource_stock = self.__pos_normal(mean=init_stock, sd=sd_init_stock)                                 # generate random stock with given mean and standard deviation from a normal distribution
-            self.growth_factor = growth_factor                                                                              # set growth factor (in dynamic stock scenarios)
+            self.resource_stock = self.__pos_normal(mean=init_stock, sd=sd_init_stock)                                  # generate random stock with given mean and standard deviation from a normal distribution
+            self.growth_factor = growth_factor                                                                          # set growth factor (in dynamic stock scenarios)
 
         elif stock_distribution == 'uniform_random_repeat':
             self.init_uniform_standard_stock(minimum_stock=minimum_stock, maximum_stock=maximum_stock)
+            self.growth_factor = growth_factor
 
     def __pos_normal(self, mean, sd):
         """returns values from a normal distribution, cut off at 0 """
@@ -142,6 +144,7 @@ class DiscreteAlternative:
 
     def init_uniform_standard_stock(self, minimum_stock, maximum_stock):
         self.resource_stock = self.__pos_uniform(minimum_stock, maximum_stock)
+        print('new, reset, stock value is {}'.format(self.resource_stock))
 
     def __pos_uniform(self, minimum, maximum):
         x = np.random.uniform(low=minimum, high=maximum)
@@ -149,8 +152,8 @@ class DiscreteAlternative:
 
     def stock_growth(self):
         """Method placeholder for future implementation of dynamic stock, currently not great executed"""
-        # TODO: Assess if this hopelessly outdated and incomplete method needs to be removed or salvaged for later us.
-        #  functionality probably should be contained in a functionality dictionary (see CompetitionHandler object)
+        # TODO: Assess if this hopelessly outdated and incomplete method needs to be removed or salvaged for later use.
+        #  functionality probably should be contained in a functionality dictionary (see e.g. CompetitionHandler object)
         if self.stock_type == 'singular' and self.stock_growth_type == 'exponential':                                   # placeholder for stock growth, hopelessly outdated for now
             self.__resource_stock_growth_exp()
 

@@ -44,6 +44,7 @@ class ChoiceMaker:
         self.choice_indices = list(choice_set.discrete_alternatives.keys())                                             # initialise list of potential choice options the agent can choose from
         self.choice_instruction = self.__init_instructions()                                                            # initialise dictionary with all references to all potential functionality of a ChoiceMaker object
         self.choice_method = choice_method                                                                              # indication of the functionality this specific instance of ChoiceMaker should have
+        self.agent_id = agent.id
         self.relevant_agent_data = self.__init_relevant_data(agent)                                                     # using self.choice method, acquire references to the specific parts of an agent that this specific instance of ChoiceMaker should have access to
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -180,6 +181,7 @@ class ChoiceMaker:
         """method to choose an option based on either the full_heatmap or random methods,
         according to a fixed probability"""
         if random() < self.relevant_agent_data['explore_probability']:                                                  # if a random number between 0 and 1 is smaller than the explore probability, the ForagerAgent will explore a random cell
+            print("{} is exploring!".format(self.agent_id))
             chosen = self.__make_choice_random()
         else:                                                                                                           # if a random number between 0 and 1 is larger than the explore probability, the ForagerAgent will choose based on the heatmap
             chosen = self.__make_choice_full_weighted_heatmap()

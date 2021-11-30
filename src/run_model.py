@@ -99,7 +99,8 @@ class ModelRunner:
                     if random.random() < stock_reset_chance:                                                            # if a random number between 0 and 1 is below the stock reset chance, we reset the stock
                         alternative_id = "alternative_" + str(alternative_tracker).zfill(len(str(nb_alternatives)))     # transform counter variable into actual choice option ID.
                         choice_set.discrete_alternatives[alternative_id].\
-                            initialize_standard_stock(init_stock=init_stock, sd_init_stock=sd_init_stock)               # reinitialise stock drawn from a normal distribution with goven mean and init stock
+                            initialize_standard_stock(init_stock=init_stock, sd_init_stock=sd_init_stock,
+                                                      stock_distribution=stock_reset_scenario, )               # reinitialise stock drawn from a normal distribution with goven mean and init stock
                     alternative_tracker += 1                                                                            # proceed to next choice option
 
             elif stock_reset_scenario == 'uniform_random_repeat':                                                       # if statement for repeating stocks
@@ -108,7 +109,7 @@ class ModelRunner:
                 while alternative_tracker < nb_alternatives:                                                            # Loop over all choice options
                     if random.random() < stock_reset_chance:                                                            # if a random number between 0 and 1 is below the stock reset chance, we reset the stock
                         alternative_id = "alternative_" + str(alternative_tracker).zfill(len(str(nb_alternatives)))     # transform counter variable into actual choice option ID.
-                        choice_set.discrete_alternatives[alternative_id]. \
+                        choice_set.discrete_alternatives[alternative_id].\
                             init_uniform_standard_stock(max_stock, min_stock)                                           # reinitialise stock drawn from uniform distribution with given max and and min stock
                     alternative_tracker += 1
 

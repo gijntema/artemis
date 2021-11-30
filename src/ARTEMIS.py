@@ -86,20 +86,24 @@ agent_specific_data = pd.DataFrame()                                            
 fleet_time_series = pd.DataFrame()                                                                                      # intialize object to contain time series data on the agents in the model
 other_x_catch_data = pd.DataFrame()                                                                                     # intialize object to contain a data series for catch and any desired otehr variable to correlate with catch
 
-output_file_suffix = '_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}_#Gr{}_T{}_Ssd{}'.format(
-    shared_alternatives,
-    share_partners,
-    int(explore_probability * 100),
-    number_of_agents,
-    int(chance_reset_stock * 100),
-    sharing_strategy,
-    pick_receiver_strategy,
-    receiving_strategy,
-    stock_reset_scenario,
-    number_of_groups,
-    duration,
-    sd_init_stock
-)
+if not scenario_name:
+    output_file_suffix = '_20211125_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}_#Gr{}_T{}_Ssd{}'.format(
+        shared_alternatives,
+        share_partners,
+        int(explore_probability * 100),
+        number_of_agents,
+        int(chance_reset_stock * 100),
+        sharing_strategy,
+        pick_receiver_strategy,
+        receiving_strategy,
+        stock_reset_scenario,
+        number_of_groups,
+        duration,
+        sd_init_stock
+    )
+
+else:
+    output_file_suffix = scenario_name
 
 # initialize class objects that are part of operational structure
 # object_initializer = ObjectInitializer()                                                                              # initialize the object with the functionality to initialize agents and choice options

@@ -210,6 +210,10 @@ class AgentFleet:                                         # to be implemented, n
         for agent in self.agents:                                                                                       # Loop over Agents (1) to transform an agent heatmap into a probability map --> what is the chance an agent will i each option
             agent_data = self.agents[agent]                                                                             # define agent data to keep the script visually pleasing
             sum_heatmap_entries = sum(agent_data.heatmap.values())                                                      # calculate sum of heatmap entries (e.g. memories of grid cells) for later use
+
+            # print('{} with sum heatmap entries: {}\t and full heatmap: \t {}'.format(agent,
+            #                                                                        sum_heatmap_entries,
+            #                                                                        agent_data.heatmap))
             probability_of_exploration = agent_data.explore_probability                                                 # get probability of picking a random option for late ruse
 
             probability_map = copy.deepcopy(agent_data.heatmap)                                                         # create copy of heatmap to overwrite with new data (still contains the regular heatmap entries, but ensures same data structure)

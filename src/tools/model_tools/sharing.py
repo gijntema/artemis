@@ -232,16 +232,16 @@ class HeatmapExchanger:
         share_partner_counter = 0                                                                                       # initialise counter to loop over the agents data will be shared to
         while share_partner_counter < self.relevant_data['number_of_agents_shared_with']:                               # loop over all agents that are picked to receive data
 
-            print('<{}> Choosing receiver according to <{}>'.format(self.relevant_data['agent_id'],
-                                                                    self.pick_receiver_strategy))
+#            print('<{}> Choosing receiver according to <{}>'.format(self.relevant_data['agent_id'],
+#                                                                    self.pick_receiver_strategy))
             picked_receiver = self.functionality['pick_receiver'][self.pick_receiver_strategy]['execute']()             # pick the agent that will receive information
-            print('<{}> Sharing data according to <{}>'.format(self.relevant_data['agent_id'],
-                                                               self.sharing_strategy))
+#            print('<{}> Sharing data according to <{}>'.format(self.relevant_data['agent_id'],
+#                                                               self.sharing_strategy))
             shared_data = self.functionality['sharing'][self.sharing_strategy]['execute']()                             # pick data to be given to the considered receiver agent
-
+#
             receiver_agent = agent_set.agents[picked_receiver].heatmap_exchanger                                        # shorten the reference to the receiver agents Heatmap exchanger tool for visual aid in the script
-            print('<{}> Receiving data according to <{}>'.format(receiver_agent.relevant_data['agent_id'],
-                                                                 receiver_agent.receiving_strategy))
+#            print('<{}> Receiving data according to <{}>'.format(receiver_agent.relevant_data['agent_id'],
+#                                                                 receiver_agent.receiving_strategy))
             receiver_agent.functionality['receiving'][receiver_agent.receiving_strategy]['execute'](shared_data)        # make the receiver agent accept/reject the given data based on their receiving strategy
 
             self.__save_received_timestamp(shared_data)                                                                 # TODO: CHECK WHAT I WANTED TO DO HERE
@@ -300,13 +300,6 @@ class HeatmapExchanger:
 
     def __pick_receiver_random(self):
         receiver_agent = random.choice(self.relevant_data['other_agent_indices'])
-
-        if 'group_allegiance' in self.relevant_data:                                                                    # simple check to find out if the agent is really only sharing within its own group
-            print('<{}> with allegiance <{}> has chosen <{}> as receiver of the heatmap sharing'\
-                  .format(self.relevant_data['agent_id'],
-                          self.relevant_data['group_allegiance'],
-                          receiver_agent))
-
         return receiver_agent
 
 # ----------------------------------------------------------------------------------------------------------------------

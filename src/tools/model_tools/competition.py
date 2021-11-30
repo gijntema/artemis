@@ -210,6 +210,7 @@ class CompetitionHandler:
             self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the competition methods specified
 
         # update agent Trackers
+        print('{} with catch {}\t in {}'.format(agent_id, corrected_catch, choice_id))
         agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents itself
         # agent_set.update_memory                                                                                       # TODO: Still necessary?
         # Update grid cell trackers
