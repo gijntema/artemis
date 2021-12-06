@@ -159,7 +159,7 @@ while iteration_counter < number_of_iterations:
                                init_stock=init_stock,
                                sd_init_stock=sd_init_stock,
                                competition_handler=competition_handler,
-                               stock_reset_chance=chance_reset_stock,                                                   # TODO: Move as internal Attribite of DiscreteAlternative Objects, to allow for flexibility
+                               stock_reset_chance=chance_reset_stock,                                                   # TODO: Move as internal Attribute of DiscreteAlternative Objects, to allow for flexibility
                                iteration_id=iteration_counter,
                                max_stock=max_stock,
                                min_stock=min_stock)
