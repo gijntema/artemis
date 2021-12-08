@@ -45,6 +45,8 @@ import os
 import copy
 import pandas as pd
 from collections import defaultdict
+from src.config.init.param_to_config_mapping import ParamConverter
+from src.config.init.config_template import template
 
 class ConfigHandler:
     """class the reads configurations from a file and provides the appropriate
@@ -64,105 +66,109 @@ class ConfigHandler:
         """returns a template filled with (old) default values,
         to initialise the attributes needed to construct configuration with"""
 
-        return \
-            {
-                'model':
-                    {
-                        'duration': 50,
-                        'nb_iterations': 1,
-                        'reporting': True
-                    },
-                'agents':
-                    {
-                        'nb_agents': 100,
-                        'catchability_coefficient': 0.2,
-                        'choice_method':
-                            {
-                                'name': 'explore_weighted_heatmap',
-                                'explore_attributes':
-                                    {
-                                        'explore_probability': 0.2,
-                                    },
-                                'heatmap_attributes':
-                                    {
-                                        'init_nb_alternative_known': 4
-                                    }
-                            },
-                        'sharing':
-                            {
-                                'sharing':
-                                    {
-                                        'name': 'random_sharing',
-                                        'no_sharing_attributes': 'DICTIONARY_PLACEHOLDER',
-                                        'random_sharing_attributes': 'DICTIONARY_PLACEHOLDER',
-                                        'nb_options_shared': 10
-                                    },
-                                'receiver_choice':
-                                    {
-                                        'name': 'static_group_choice',
-                                        'group_attributes':
-                                            {
-                                                'nb_groups': 1,
-                                                'group_formation': "equal_mutually_exclusive_groups",
-                                                'group_dynamics': False
-                                            },
-                                        'random_choice_attributes': 'DICTIONARY_PLACEHOLDER',
-                                        'nb_receivers': 10
-                                    },
-                                'receiving':
-                                    {
-                                        'name': 'combine_receiver'
-                                    }
-                            },
-                    },
-                'options':
-                    {
-                        'nb_options': 20,
-                        'growth':
-                            {
-                                'growth_type': 'static',
-                                'growth_attributes':
-                                    {
-                                        'growth_factor=1'
-                                    }
-
-                            },
-                        'stock_reset':
-                            {
-                                'name': 'uniform_random_repeat',
-                                'reset_probability': 0.1,
-                                'uniform_attributes':
-                                    {
-                                        'min_stock': 0,
-                                        'max_stock': 200
-                                    },
-                                'normal_attributes':
-                                    {
-                                        'init_stock': 100,
-                                        'sd_init_stock': 25
-                                    }
-                            }
-                    },
-                'competition':
-                    {
-                        'name': 'interference-simple',
-                        'interference_attributes':
-                            {
-                                'interference_factor': 0.8
-                            }
-                    }
-            }
+        return template
+#        return \
+#            {
+#                'model':
+#                    {
+#                        'duration': 50,
+#                        'nb_iterations': 1,
+#                        'reporting': True
+#                    },
+#                'agents':
+#                    {
+#                        'nb_agents': 100,
+#                        'catchability_coefficient': 0.2,
+#                        'choice_method':
+#                            {
+#                                'name': 'explore_weighted_heatmap',
+#                                'explore_attributes':
+#                                    {
+#                                        'explore_probability': 0.2,
+#                                    },
+#                                'heatmap_attributes':
+#                                    {
+#                                        'init_nb_alternative_known': 4
+#                                    }
+#                           },
+#                        'sharing':
+#                            {
+#                                'sharing':
+#                                    {
+#                                        'name': 'random_sharing',
+#                                        'no_sharing_attributes': 'DICTIONARY_PLACEHOLDER',
+#                                        'random_sharing_attributes': 'DICTIONARY_PLACEHOLDER',
+#                                        'nb_options_shared': 10
+#                                    },
+#                                'receiver_choice':
+#                                    {
+#                                        'name': 'static_group_choice',
+#                                        'group_attributes':
+#                                            {
+#                                                'nb_groups': 1,
+#                                                'group_formation': "equal_mutually_exclusive_groups",
+#                                                'group_dynamics': False
+#                                            },
+#                                        'random_choice_attributes': 'DICTIONARY_PLACEHOLDER',
+#                                        'nb_receivers': 10
+#                                    },
+#                                'receiving':
+#                                    {
+#                                        'name': 'combine_receiver'
+#                                    }
+#                            },
+#                    },
+#               'options':
+#                    {
+#                        'nb_options': 20,
+#                        'growth':
+#                            {
+#                                'growth_type': 'static',
+#                                'growth_attributes':
+#                                    {
+#                                        'growth_factor': 1
+#                                    }
+#
+#                            },
+#                        'stock_reset':
+#                            {
+#                                'name': 'uniform_random_repeat',
+#                                'reset_probability': 0.1,
+#                                'uniform_attributes':
+#                                    {
+#                                        'min_stock': 0,
+#                                        'max_stock': 200
+#                                    },
+#                                'normal_attributes':
+#                                    {
+#                                        'init_stock': 100,
+#                                        'sd_init_stock': 25
+#                                    }
+#                           }
+#                    },
+#                'competition':
+#                    {
+#                        'name': 'interference-simple',
+#                        'interference_attributes':
+#                            {
+#                                'interference_factor': 0.8
+#                            }
+#                    }
+#            }
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------- Initialise configurations as defined in csv file ----------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __read_config_csv(self, filename, separator=';'):
+        """reads a config file with scenario settings in csv format"""
         data = pd.read_csv(filename, sep=separator)
         data = data[data['scenario_id'].notna()]
         return data
 
     def __init_scenarios(self, scenario_file, scenarios='ALL'):
+        """loads scenarios from a csv config file and loads these into an internal dictionary (self.scenarios_config),
+        by defining a list of scenario names (in strings), only a sub-selection of specified scenarios will be loaded"""
         df_scenarios = self.__read_config_csv(scenario_file)
         if scenarios is not 'ALL':
             df_scenarios = df_scenarios[df_scenarios.scenario_id.isin(scenarios)]
@@ -206,7 +212,13 @@ class ConfigHandler:
         for path, value in parameter_instructions:                                                                      # unpack every parameter change instruction in a for loop
             self.__adjust_parameters(config_key=path.split('|'), new_value=value, scenario_id=scenario_id)              # adjust the parameters in the template
 
-    def remake_scenario_file(self, output_file=None, separator=';'):  # PLACEHOLDER
+    def read_scenario_init_param(self):
+        """uses values defined in init_param.py to add a new configuration scenario,
+        based on the mapping provided by the class param_to_config_mapping.ParamConverter"""
+        scenario_id, parameter_instructions = ParamConverter().read_scenario()
+        self.add_new_scenario_manually(parameter_instructions=parameter_instructions, scenario_id=scenario_id)
+
+    def remake_scenario_file(self, output_file=None, separator=';'):
         """converts the internal data on scenarios to csv scenario files that can be read in model runs"""
         # 1) define output file
         if not output_file:
@@ -216,11 +228,10 @@ class ConfigHandler:
             output_file = '{}.'.join(output_file.split(".")).format('_with_adjusted_scenarios')
 
         # 2) read file structure from old file
-        file_structure = pd.read_csv('base_config.csv', sep=separator).columns                                          # TODO: Inflexible quick fix
+        file_structure = pd.read_csv('base_config.csv', sep=separator).columns                                          # TODO: Inflexible quick fix, hardcoded config file structure
         paths = [column for column in file_structure if column != 'scenario_id']
 
         # 3) convert internal file to pd.Dataframe by reading every scenario and building an intermediate dictionary
-        # TODO: faulty assignment for path 'options|growth|growth_attributes|growth_factor'
         dictionary_for_df = defaultdict(list)
         for scenario in self.scenarios_config:
             dictionary_for_df['scenario_id'].append(scenario)

@@ -34,7 +34,6 @@ Version Number:
 """
 
 # Module usable to define the exogenous variables of any ARTEMIS run
-# TODO: eventually change this module to read the specified information form a configuration file (e.g. .json file)
 # TODO: Main functionality Method as keyword in description of methods
 
 # model characteristics
@@ -49,7 +48,7 @@ init_number_of_alternatives_known = 4       # number of choice options each agen
 choice_method = 'explore_weighted_heatmap'  # defines the way an agent chooses what forage option to forage from
 
 # Resource characteristics
-choice_set_size = 20                    # number of discrete alternatives in the choice set
+choice_set_size = 20                # number of discrete alternatives in the choice set
 init_stock = 100                    # mean of initial stock present
 sd_init_stock = 25                  # standard deviation of initial stock present
 growth_factor = 1                   # per time step growth of stock (1 represents a static population in current Default settings)
@@ -90,6 +89,6 @@ interference_factor = 0.8                     # indicates the reduction in catch
 # ------------------------------------------------- Reporting Settings -------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 reporting = True                            # flag to turn on or off print reporting during the model runs
-scenario_name = 's37'
+scenario_name = 'TESTING_init_param_read'
 
 # EOF

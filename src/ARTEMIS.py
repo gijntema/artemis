@@ -71,9 +71,9 @@ from src.tools.output_tools.export_data import DataWriter                       
 # make an object that contains all config data and return the appropriate parameters in different sections of the model
 # cfg_file = "PLACEHOLDER"
 # config_reader = ConfigReader(cfg_file=cfg_file)
-config_handler = ConfigHandler(scenario_file='base_config.csv')
+config_handler = ConfigHandler(scenario_file='base_config.csv')                                                         # TODO: READ CONFIG key 'Model' entries
 
-# TODO: READ CONFIG key 'Model' entries
+
 
 print_blocker = PrintBlocker()
 if reporting is not True:                                                                                               # block printing if desired
