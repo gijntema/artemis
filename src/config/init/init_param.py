@@ -49,11 +49,16 @@ choice_method = 'explore_weighted_heatmap'  # defines the way an agent chooses w
 
 # Resource characteristics
 choice_set_size = 20                # number of discrete alternatives in the choice set
+
+# Parameters for normal_random_repeat stock rest scenario
 init_stock = 100                    # mean of initial stock present
 sd_init_stock = 25                  # standard deviation of initial stock present
+
 growth_factor = 1                   # per time step growth of stock (1 represents a static population in current Default settings)
+
+# Parameters for uniform_random_repeat stock rest scenario
 max_stock = 200                     # max for uniform distributions of the stock
-min_stock = 0                       # in for uniform_distributions of the stock
+min_stock = 0                       # min for uniform_distributions of the stock
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------- GROWTH SCENARIO PARAMETERS -----------------------------------------------
@@ -89,6 +94,6 @@ interference_factor = 0.8                     # indicates the reduction in catch
 # ------------------------------------------------- Reporting Settings -------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 reporting = True                            # flag to turn on or off print reporting during the model runs
-scenario_name = 'TESTING_init_param_read'
+scenario_name = 'TESTING_new_style'
 
 # EOF

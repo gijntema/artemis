@@ -215,7 +215,7 @@ class ConfigHandler:
     def read_scenario_init_param(self):
         """uses values defined in init_param.py to add a new configuration scenario,
         based on the mapping provided by the class param_to_config_mapping.ParamConverter"""
-        scenario_id, parameter_instructions = ParamConverter().read_scenario()
+        scenario_id, parameter_instructions = ParamConverter().read_init_param_scenario()
         self.add_new_scenario_manually(parameter_instructions=parameter_instructions, scenario_id=scenario_id)
 
     def remake_scenario_file(self, output_file=None, separator=';'):
@@ -236,14 +236,14 @@ class ConfigHandler:
         for scenario in self.scenarios_config:
             dictionary_for_df['scenario_id'].append(scenario)
             for path in paths:
-                dictionary_for_df[path].append(self.__get_config_value(config_key=path,
+                dictionary_for_df[path].append(self.get_config_value(config_key=path,
                                                                        scenario_id=scenario))
 
         # 4) export pd Dataframe to output csv
         intermediate_config_df = pd.DataFrame(dictionary_for_df)
         intermediate_config_df.to_csv(output_file, sep=separator, index=False)
 
-    def __get_config_value(self, config_key, scenario_id, config_data=None):
+    def get_config_value(self, config_key, scenario_id, config_data=None):
         if not config_data:
             config_data = self.scenarios_config[scenario_id]
 
@@ -251,7 +251,7 @@ class ConfigHandler:
             config_key = config_key.split('|')
 
         if isinstance(config_data[config_key[0]], dict):
-            parameter_value = self.__get_config_value(config_key=config_key[1:],
+            parameter_value = self.get_config_value(config_key=config_key[1:],
                                     scenario_id=scenario_id,
                                     config_data=config_data[config_key[0]])
 

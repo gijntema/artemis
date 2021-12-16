@@ -1,15 +1,11 @@
 from src.config.init.init_param import *
 
-
 class ParamConverter:
     """Converts parameter names in the model to keys for use in the ConfigHandler object internal dictionaries
     and vice versa provides mapping to generate parameters from the ConfigHandler internal dictionaries object """
 
-    def read_scenario(self):
-        """reads the parameter values in init_param.py and converts them
-        to parameter change instructions for the ConfigHandler object"""
-        scenario_id = scenario_name
-        config_instructions = \
+    def __init__(self):
+        self.config_instructions = config_instructions = \
             [('model|duration', duration),
              ('model|nb_iterations', number_of_iterations),
              ('model|reporting', reporting),
@@ -41,9 +37,16 @@ class ParamConverter:
              ('competition|name', competition_scenario),
              ('competition|interference_attributes|interference_factor', interference_factor)]
 
-        return scenario_id, config_instructions
+    def read_init_param_scenario(self):
+        """reads the parameter values in init_param.py and converts them
+        to parameter change instructions for the ConfigHandler object"""
+        scenario_id = scenario_name
+        return scenario_id, self.config_instructions
 
-    def reverse_read_scenario(self):  # UNIMPLEMENTED
-        pass
+    def reverse_read_scenario(self, config_handler, scenario_id):  # UNIMPLEMENTED
+        output_scenario_values = []
+        for key, value in self.config_instructions:
+            output_scenario_values.append(config_handler.get_config_value(config_key=key, scenario_id=scenario_id))
 
+        return output_scenario_values
 # EOF
