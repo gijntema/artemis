@@ -1,3 +1,38 @@
+# This file is part of ARTEMIS (https://git.wur.nl/artemis.git).
+# Copyright (c) 2021 Wageningen Marine Research
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+"""
+This Module is imed at translating parameters use din the model from one format into another
+
+(potential) Module inputs:
+-   parameters from init_param.py can be translated to ConfigHandler().config_scenario dictionary formats
+-   parameters from ConfigHandler().config_scenario dictionary formats can be translated to variables ARTEMIS.py needs
+
+Module Usage:
+-   Module is not used directly by any other modules in the model
+-   outputs from running this module include configuration csv foil ethat can be used in the main model to
+    run batches of scenarios
+
+Last Updated:
+    17-12-2021
+
+Version Number:
+    0.1
+"""
+
 from src.config.init.init_param import *
 
 class ParamConverter:
