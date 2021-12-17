@@ -90,7 +90,10 @@ class AgentFleet:                                         # to be implemented, n
         self.total_catch = 0                            # Tracker for total catch of all agents and time_steps combined
         self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
         self.average_expected_competitor_tracker = defaultdict(dict)                                                    # tracker to contain the average expected amount of competitors expected when picking any cell
-        self.forage_visit_tracker = defaultdict(dict)
+        self.forage_visit_tracker = defaultdict(dict)                                                                   # tracker to contain where agents have been forager in what time
+        self.heatmap_expectation_tracker = defaultdict(dict)                                                            # tracker to contain what agents were expecting to find in the chosen location
+        self.uncorrected_catch_tracker = defaultdict(dict)                                                              # tracker to contain what would have been an agents catch in a chose location if no competitors would have been present
+        self.realised_competition_tracker = defaultdict(dict)                                                           # tracker to contain the amount of competitors an agent has encountered in a given time step
 
         self.__init_time_data_trackers(duration_model=duration_model)
         self.group_former = self.__init_group_allegiances(number_of_groups=number_of_sharing_groups,                    # set up for better initialisation of group_former, reuiqres the best initiliasation of self.agents a few lines above
@@ -241,6 +244,14 @@ class AgentFleet:                                         # to be implemented, n
     def update_forage_visit_tracker(self, time_id, agent_id, chosen_alternative):
         self.forage_visit_tracker[time_id][agent_id] = chosen_alternative
 
+    def update_heatmap_expectation_tracker(self, time_id, agent_id, expected_catch):                                    # what was an agent expecting to catch when going somewhere
+        self.heatmap_expectation_tracker[time_id][agent_id] = expected_catch
+
+    def update_realised_competition_tracker(self, time_id, agent_id, realised_competition):
+        self.realised_competition_tracker[time_id][agent_id] = realised_competition
+
+    def update_uncorrected_catch_tracker(self, time_id, agent_id, uncorrected_catch):
+        self.uncorrected_catch_tracker[time_id][agent_id] = uncorrected_catch
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------- the ForagerAgent object -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -415,7 +426,7 @@ class ForagerAgent:
         shared_alternatives_indices = []                                                                                # empty list for later attchment of choice option indices to be shared
         shared_alternatives_data = []                                                                                   # empty list for later attchment of choice option contens to be shared
         if not isinstance(number_of_alternatives, int) and number_of_alternatives != 'ALL':                             # check if number of choice options to be shared is an integer or all
-           raise TypeError("number can only be an integer or ALL")
+            raise TypeError("number can only be an integer or ALL")
 
         elif number_of_alternatives == 'ALL':                                                                           # share all data
             shared_alternatives_indices = self.list_of_known_alternatives                                               # to be shared indices are all indices memory has an entry on

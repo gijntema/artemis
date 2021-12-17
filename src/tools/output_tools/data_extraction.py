@@ -108,7 +108,10 @@ class DataTransformer:
                         'catch': self.__extract_flat_agent_time_catch,
                         'competition': self.__extract_flat_agent_time_competition,
                         'knowledge_in_heatmap': self.__extract_flat_agent_time_knowledge,
-                        'forage_option_visit': self.__extract_flat_agent_time_forage_option_visit
+                        'forage_option_visit': self.__extract_flat_agent_time_forage_option_visit,
+                        'heatmap_expectation': self.__extract_flat_agent_time_heatmap_expectation,
+                        'uncorrected_catch': self.__extract_flat_agent_time_uncorrected_catch,
+                        'realised_competition': self.__extract_flat_agent_time_realised_competition
                         # INSERT FURTHER FUNCTIONALITY
                     }
 
@@ -610,13 +613,13 @@ class DataTransformer:
                 data_series_time.append(time_id)
                 data_series_agent.append(agent)
                 data_series_group_allegiance.append(input_data[agent].heatmap_exchanger.relevant_data['group_allegiance'])
-                data_series_catch.append(input_data[agent].time_step_catch[time_id])                                    # TODO Renaming ISSSUE FLEET VS Agent
+                data_series_catch.append(input_data[agent].time_step_catch[time_id])
 
         output_data['iteration_id'] = data_series_iteration
         output_data['time_id'] = data_series_time
         output_data['agent_id'] = data_series_agent
         output_data['group_allegiance'] = data_series_group_allegiance
-        output_data['catch'] = data_series_catch                                        # TODO: Migrate to other function
+        output_data['catch'] = data_series_catch                                                                        # TODO: Migrate to other function
 
         return output_data
 
@@ -654,8 +657,35 @@ class DataTransformer:
         output_data['forage_visit'] = data_series_forage_visits
         return output_data
 
+    def __extract_flat_agent_time_heatmap_expectation(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
+        input_data = agent_set.heatmap_expectation_tracker
+        data_series_heatmap_expectation = []
+        for time_id in tuple(input_data.keys()):
+            for agent in input_data[time_id]:
+                data_series_heatmap_expectation.append(input_data[time_id][agent])
+        output_data['heatmap_expected_catch'] = data_series_heatmap_expectation
+        return output_data
+
+    def __extract_flat_agent_time_uncorrected_catch(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
+        input_data = agent_set.uncorrected_catch_tracker
+        data_series_uncorrected_catch = []
+        for time_id in tuple(input_data.keys()):
+            for agent in input_data[time_id]:
+                data_series_uncorrected_catch.append(input_data[time_id][agent])
+        output_data['uncorrected_catch'] = data_series_uncorrected_catch
+        return output_data
+
+    def __extract_flat_agent_time_realised_competition(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
+        input_data = agent_set.realised_competition_tracker
+        data_series_realised_competition = []
+        for time_id in tuple(input_data.keys()):
+            for agent in input_data[time_id]:
+                data_series_realised_competition.append(input_data[time_id][agent])
+        output_data['realised_competition'] = data_series_realised_competition
+        return output_data
+
     def extract_time_x_group_catch(self, dataframe):
-        """QUICK AND DIRTY WAY TO GET GROUP SPECIFIC CATCH OVER TIME FOR A SINGLE SIMULATION""" # TODO: Check if still quick and dirty
+        """QUICK AND DIRTY WAY TO GET GROUP SPECIFIC CATCH OVER TIME FOR A SINGLE SIMULATION"""                         # TODO: Check if still quick and dirty
         data_dictionary = defaultdict(list)
         unique_values_time = dataframe['time_id'].unique()
         unique_values_group = dataframe['group_allegiance'].unique()
@@ -668,6 +698,8 @@ class DataTransformer:
 
         output_dataframe = pd.DataFrame(data_dictionary)
         return output_dataframe
+
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------- Methods to Extract Catch data for agent specific temporal patterns-----------------------------

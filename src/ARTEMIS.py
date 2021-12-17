@@ -53,8 +53,7 @@ import pandas as pd                                                             
 pd.options.plotting.backend = "plotly"                                                                                  # set a different, preffered over default,  style of plotting
 
 # Other Modules in the ARTEMIS model
-#from src.config.init.init_param import *                                                                                # module containing parameter and scenario settings manually defined in a script
-#from src.config.init.init_param import scenario_name
+# from src.config.init.init_param import *                                                                                # module containing parameter and scenario settings manually defined in a script
 # from src.config.init.init_read_param import ConfigReader                                                                # module to read parameters for the model from a config file -- CURRENTLY NOT IMPLEMENTED
 
 from src.config.init.make_config import ConfigHandler
@@ -71,9 +70,10 @@ from src.tools.output_tools.outcome_visualization import GraphConstructor       
 from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
 
 # make an object that contains all config data and return the appropriate parameters in different sections of the model
-# cfg_file = "PLACEHOLDER"
-# config_reader = ConfigReader(cfg_file=cfg_file)
-config_handler = ConfigHandler(scenario_file='base_config_with_adjusted_scenarios.csv')
+config_handler = ConfigHandler(scenario_file='base_config.csv')                                                         # define batch file csv containing the parameters for each scenario to run
+
+if len(config_handler.scenarios_config) < 1:
+    raise ReferenceError("Config File Contains No Scenarios to Run")
 
 # loop over all scenarios found in the config file
 for scenario in config_handler.scenarios_config:
@@ -111,9 +111,8 @@ for scenario in config_handler.scenarios_config:
     interference_factor = \
         ParamConverter().reverse_read_scenario(config_handler=config_handler, scenario_id=scenario_name)
 
-
     print_blocker = PrintBlocker()
-    if reporting is not True:                                                                                               # block printing if desired
+    if not reporting:                                                                                                   # block printing if desired
         print_blocker.block_print()
 
     iteration_counter = 0                                                                                                   # initliazation of counter for iteration loops
@@ -389,13 +388,13 @@ for scenario in config_handler.scenarios_config:
     # ----------------------------------------------------------------------------------------------------------------------
     # produce data and graphical outputs - intricate measure for the mean number of competitors (over all options) per agent
     # ----------------------------------------------------------------------------------------------------------------------
-    competitor_df = data_transformer.extract_average_expected_competition(fleet_output)                                 # make a pd.Dataframe from the data on the average amount of competitors in a given choice option
-    graph_constructor.plot_line_pandas(competitor_df,
-                                       x_values='time_step_id', y_values=None,
-                                       img_name='test_average_competitors',
-                                       y_label='average expected number of competitors'
-                                       , legend_title='Agents',
-                                       y_range=[0.2, 0.3])                                                             # make plot from data containgin data of agents average competitors per cell over time
+    # competitor_df = data_transformer.extract_average_expected_competition(fleet_output)                                 # make a pd.Dataframe from the data on the average amount of competitors in a given choice option
+    # graph_constructor.plot_line_pandas(competitor_df,
+    #                                   x_values='time_step_id', y_values=None,
+    #                                   img_name='test_average_competitors',
+    #                                   y_label='average expected number of competitors'
+    #                                   , legend_title='Agents',
+    #                                   y_range=[0.2, 0.3])                                                             # make plot from data containgin data of agents average competitors per cell over time
 
     # ----------------------------------------------------------------------------------------------------------------------
     # produce database outputs (e.g. .csv or .json)

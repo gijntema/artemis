@@ -15,7 +15,7 @@
 #
 
 """
-This Module is imed at translating parameters use din the model from one format into another
+This Module is aimed at translating parameters use din the model from one format into another
 
 (potential) Module inputs:
 -   parameters from init_param.py can be translated to ConfigHandler().config_scenario dictionary formats
@@ -23,7 +23,7 @@ This Module is imed at translating parameters use din the model from one format 
 
 Module Usage:
 -   Module is not used directly by any other modules in the model
--   outputs from running this module include configuration csv foil ethat can be used in the main model to
+-   outputs from running this module include configuration csv file that can be used in the main model to
     run batches of scenarios
 
 Last Updated:

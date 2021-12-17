@@ -5,7 +5,7 @@ template = {
         {
             'duration': 50,
             'nb_iterations': 1,
-            'reporting': True
+            'reporting': False
         },
     'agents':
         {

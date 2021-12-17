@@ -72,18 +72,7 @@ class CompetitionHandler:
                     "load": self.__load_interference,
                     "correct": self.__correct_interference_simple
                 },
-            'uptake':                                                                                                   # competition is modelled through resource uptake, leaving less for other agents
-                {   # UNSUPPORTED
-                    "init": self.__init_uptake,
-                    "load": self.__load_uptake,
-                    "correct": self.__correct_uptake
-                },
-            'price-simple':                                                                                             # competition is modelled for human agents by correcting the sale prices with the total catch
-                {   # UNSUPPORTED
-                    "init": self.__init_price,
-                    "load": self.__load_price,
-                    "correct": self.__correct_price_simple
-                },
+
             'split-catch':
                 {
                     # relic code = obsolete
@@ -141,20 +130,6 @@ class CompetitionHandler:
         relevant_data['agent_choices'] = dict()
         return relevant_data
 
-    def __init_uptake(self):
-        """method to initialise a function for harvest to remove stock present /fishing mortality in a grid cell
-        #TODO: Migrate to the other location --  future functionality"""
-        relevant_data = dict()
-        relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
-        relevant_data['agent_choices'] = dict()
-        return relevant_data
-
-    def __init_price(self):
-        """method to initialise a function for harvest to affect market price."""
-        relevant_data = dict()
-        relevant_data['effort_tracker'] = defaultdict(float)                                                            # dictionary that creates and returns a float 0.0 if a key is called that is not already in
-        relevant_data['agent_choices'] = dict()
-        return relevant_data
 
     def __init_split_catch(self):
         """method to initialise a function for splitting the catch"""
@@ -181,13 +156,6 @@ class CompetitionHandler:
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id                                           # remember what agent choose which choice option
         self.relevant_data['interference_factor'] = interference_factor                                                 # TODO: migrate interference factor to initialisation of relevant data
                                                                                                                         # TODO DOUBLE CHECK FOR DUPLICATE FUNCTIONALITY
-    def __load_uptake(self, chosen_alternative_id, agent_id, interference_factor=0):
-        """Placeholder --> Functionality currently not supported"""
-        pass
-
-    def __load_price(self, chosen_alternative_id, agent_id):
-        """Placeholder --> Functionality currently not supported"""
-        pass
 
     def __load_split_catch(self, chosen_alternative_id, agent_id, interference_factor=0):
         """loads data on the agent and chosen choice option""" #TODO KW: specify which data
@@ -206,26 +174,26 @@ class CompetitionHandler:
         uncorrected_catch = choice_set.discrete_alternatives[choice_id].resource_stock \
                             * agent_set.agents[agent_id].catchability_coefficient                                       # extract hypothetical catch if competition was absent
 
-        corrected_catch, correction_tag = \
+        corrected_catch, competitors_encountered = \
             self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the competition methods specified
 
         # update agent Trackers
-        print('{} with catch {}\t in {}'.format(agent_id, corrected_catch, choice_id))
         agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents itself
-        # agent_set.update_memory                                                                                       # TODO: Still necessary?
+        agent_set.update_uncorrected_catch_tracker(time_id=time_id, agent_id=agent_id,
+                                                   uncorrected_catch=uncorrected_catch)
+        agent_set.update_realised_competition_tracker(time_id=time_id, agent_id=agent_id,
+                                                      realised_competition=competitors_encountered)
+
         # Update grid cell trackers
         choice_set.catch_map[choice_id] += corrected_catch                                                              # update tracker of the choice set for total catch in a choice option
         choice_set.effort_map[choice_id] += 1                                                                           # update tracker of the choice set for effort in a choice option
         choice_set.time_visit_map[choice_id][time_id] += 1
 
-        if 'uptake' in self.competition_method:                                                                         # TODO migrat euptake to other location
-            choice_set.discrete_alternatives[choice_id].resource_stock_harvest(corrected_catch)                         # quick and dirty fix of blocking out the piece of code that reduces the resource stoc
-
     def __correct_absent(self, choice_id, uncorrected_catch):
         """empty function to prevent errors, does not correct catch in any way but adds a tag"""
         corrected_catch = uncorrected_catch                                                                             # don't correct data, purely for visual aid to what happens
-        correction_tag = "<absent_competition>"                                                                         # output expects a tag for interference, default given as interference is not presnet in this scenario
-        return corrected_catch, correction_tag
+        competitors_encountered = -99                                                                                   # output expects a tag for interference, default given as interference is not presnet in this scenario
+        return corrected_catch, competitors_encountered
 
     def __correct_interference_simple(self, choice_id, uncorrected_catch):
         """method to correct catch using interference by using the interference factor
@@ -233,23 +201,16 @@ class CompetitionHandler:
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
         corrected_catch = uncorrected_catch * (self.relevant_data['interference_factor']**(number_of_competitors-1))    # correct using interference fatctro^(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
 
-        correction_tag = str(number_of_competitors-1) + " other foragers"
-        return corrected_catch, correction_tag
+        competitors_encountered = number_of_competitors - 1
+        return corrected_catch, competitors_encountered
 
     def __correct_split_catch(self, choice_id, uncorrected_catch):
         """method to correct catch by dividing over the number of competitors, creates very strong competition"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
         corrected_catch = uncorrected_catch / number_of_competitors                                                     # prone to DividedByZeroError, but as this method should never be called if no foraging occurs in a choice option, this should be a nice test for functioning
-        correction_tag = str(number_of_competitors - 1) + " other foragers"                                             # generate interference tag for later use in reporting
-        return corrected_catch, correction_tag
+        competitors_encountered = number_of_competitors - 1                                                             # generate interference tag for later use in reporting
+        return corrected_catch, competitors_encountered
 
-    def __correct_uptake(self, choice_id, uncorrected_catch):
-        """Placeholder --> Functionality currently not supported -- future planned resource uptake as competition"""
-        pass
-
-    def __correct_price_simple(self, choice_id, uncorrected_catch):
-        """Placeholder --> Functionality currently not supported -- future planned market price change as competition"""
-        pass
 
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------- Methods to reset the saved content to start from empty relevant data--------------------------

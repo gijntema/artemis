@@ -73,7 +73,7 @@ class ConfigHandler:
 #                    {
 #                        'duration': 50,
 #                        'nb_iterations': 1,
-#                        'reporting': True
+#                        'reporting': false
 #                    },
 #                'agents':
 #                    {
@@ -170,7 +170,7 @@ class ConfigHandler:
         """loads scenarios from a csv config file and loads these into an internal dictionary (self.scenarios_config),
         by defining a list of scenario names (in strings), only a sub-selection of specified scenarios will be loaded"""
         df_scenarios = self.__read_config_csv(scenario_file)
-        if scenarios is not 'ALL':
+        if scenarios != 'ALL':
             df_scenarios = df_scenarios[df_scenarios.scenario_id.isin(scenarios)]
 
         param_columns = [x for x in df_scenarios.columns if x != 'scenario_id']

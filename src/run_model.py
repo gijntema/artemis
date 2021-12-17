@@ -75,7 +75,11 @@ class ModelRunner:
                                                      agent_id=agent,
                                                      chosen_alternative=alternative_index)                              # update the tracker that keeps track of where agents have gone to: TODO: QUICK and DIRTY implemented fo rnow
 
-                # load the chosen alternative
+                # load the expected catch in the chosen location to the fleet tracker
+                fleet.update_heatmap_expectation_tracker(time_id=time_id, agent_id=agent,
+                                                         expected_catch=fleet.agents[agent].heatmap[alternative_index])
+
+                # load the chosen alternative to the object that will introduce competition between agents
                 competition_handler.load_competition_data(alternative_index, agent)
 
             for agent in agent_index_list:                                                                              # Second agent loop to execute choices --> second loop is needed to account for competition
@@ -100,7 +104,7 @@ class ModelRunner:
                         alternative_id = "alternative_" + str(alternative_tracker).zfill(len(str(nb_alternatives)))     # transform counter variable into actual choice option ID.
                         choice_set.discrete_alternatives[alternative_id].\
                             initialize_standard_stock(init_stock=init_stock, sd_init_stock=sd_init_stock,
-                                                      stock_distribution=stock_reset_scenario, )               # reinitialise stock drawn from a normal distribution with goven mean and init stock
+                                                      stock_distribution=stock_reset_scenario)                          # reinitialise stock drawn from a normal distribution with goven mean and init stock
                     alternative_tracker += 1                                                                            # proceed to next choice option
 
             elif stock_reset_scenario == 'uniform_random_repeat':                                                       # if statement for repeating stocks

@@ -16,7 +16,7 @@
 #
 
 """
-This Module is a tool to add scenarios as defined in init_param.py to exisiting or newly made config files
+This Module is a tool to add scenarios as defined in init_param.py to existing or newly made config files (csv)
 
 Module inputs:
 -   make_config.py, specifically the ConfigHandler Object
@@ -24,7 +24,7 @@ Module inputs:
 
 Module Usage:
 -   Module is not used directly by any other modules in the model
--   outputs from running this module include configuration csv foil ethat can be used in the main model to
+-   outputs from running this module include configuration csv file that can be used in the main model to
     run batches of scenarios
 
 Last Updated:
@@ -38,7 +38,7 @@ import os
 from src.config.init.make_config import ConfigHandler
 
 # Definitions needed for functioning (file names and removal flags)
-output_file = 'test_config.csv'          # file that the new scenario will be written to
+output_file = 'test_config.csv'                 # file that the new scenario will be written to (appended)
 base_file = 'base_config.csv'                   # template file used if the output file does not exist yet
 keep_default_when_using_base = False            # Indicate if the default scenario in the template file should be kept
 
@@ -47,7 +47,7 @@ keep_default_when_using_base = False            # Indicate if the default scenar
 old_dir = os.getcwd()
 os.chdir(old_dir.removesuffix('\\tools\\config_tools'))
 
-# check if output file already exists, used to add scenarios to existing scenario csv's
+# check if output file already exists, used to add scenarios (append) to existing scenario csv's
 if os.path.isfile(output_file):
     # read output file to identify the scenarios that are already in there
     config_handler = ConfigHandler(output_file)
