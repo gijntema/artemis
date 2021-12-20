@@ -48,7 +48,7 @@ class CompetitionHandler:
 # ------------------------------------ Dictionary dictating all functionality ------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, competition_method, interference_factor=0.8):
+    def __init__(self, competition_method, interference_factor):
         """"initialize competition """
         self.competition_instruction = self.__init_instructions()
         self.competition_method = competition_method

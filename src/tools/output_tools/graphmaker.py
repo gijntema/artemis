@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import matplotlib
 matplotlib.rcParams.update({'errorbar.capsize': 2})
-from mapping import scenario_map
+#from mapping import scenario_map
 
 class GraphMaker:
 
@@ -116,7 +116,7 @@ class GraphMaker:
         # plot
         ax = new_df.plot.scatter(x='x', xlabel='#sharing',
                                  y='y', ylabel='avg_catch_per agent', yerr='y_err',
-                                 s=50, c='z', colormap='rgb')
+                                 s=50, c='z', colormap='Accent_r')
 
 
 

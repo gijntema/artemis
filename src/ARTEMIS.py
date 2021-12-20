@@ -70,7 +70,7 @@ from src.tools.output_tools.outcome_visualization import GraphConstructor       
 from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
 
 # make an object that contains all config data and return the appropriate parameters in different sections of the model
-config_handler = ConfigHandler(scenario_file='base_config.csv')                                                         # define batch file csv containing the parameters for each scenario to run
+config_handler = ConfigHandler(scenario_file='scenario_testing_x.csv')                                                  # define batch file csv containing the parameters for each scenario to run
 
 if len(config_handler.scenarios_config) < 1:
     raise ReferenceError("Config File Contains No Scenarios to Run")
@@ -144,7 +144,8 @@ for scenario in config_handler.scenarios_config:
     # initialize class objects that are part of operational structure
     # object_initializer = ObjectInitializer()                                                                              # initialize the object with the functionality to initialize agents and choice options
     model_runner = ModelRunner()                                                                                            # initialize the object with the functionality to run a simulation with the initialized agents and choice options
-    competition_handler = CompetitionHandler(competition_method=competition_scenario)                                       # object that will ensure competition feedbacks are executed for in the model
+    competition_handler = CompetitionHandler(competition_method=competition_scenario,
+                                             interference_factor=interference_factor)                                       # object that will ensure competition feedbacks are executed for in the model
     data_transformer = DataTransformer()                                                                                    # initialize the object with the functionality to extract output data from model objects
     graph_constructor = GraphConstructor(output_file_suffix)                                                                # initialize the object with the functionality to make graphs from output data
     data_writer = DataWriter(output_file_suffix)                                                                            # initialize the object with the functionality to export data files from output data
