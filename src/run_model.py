@@ -32,7 +32,7 @@ Version Number:
 """
 
 import random
-
+import copy
 
 class ModelRunner:
 
@@ -41,16 +41,16 @@ class ModelRunner:
 
     def run_model(self,
                   choice_set,                                           # the choice options in the model
-                  fleet,                                            # the agents in the model
-                  duration=10,                                          # duration of the model (no. time steps)
-                  stock_reset_scenario='no-reset',                      # default is a non dynamics stock
-                  init_stock=100,                                       # default if a non dynamic stock is 100 units
-                  sd_init_stock=25,                                     # default sd if a non-dynamic stock is sd=25
-                  competition_handler=None,                             # object that ensures the effects of competition are implemented
-                  stock_reset_chance=0.9,                               # the chance at the stock being reset to default initialisation (mean +-sd)
-                  iteration_id=-99,                                     # for reporting on iterations
-                  min_stock=0,
-                  max_stock=100):
+                  fleet,                                                # the agents in the model
+                  duration,                                          # duration of the model (no. time steps)
+                  stock_reset_scenario,                      # default is a non dynamics stock
+                  init_stock,                                       # default if a non dynamic stock is 100 units
+                  sd_init_stock,                                     # default sd if a non-dynamic stock is sd=25
+                  competition_handler,                             # object that ensures the effects of competition are implemented
+                  stock_reset_chance,                               # the chance at the stock being reset to default initialisation (mean +-sd)
+                  iteration_id,                                     # for reporting on iterations
+                  min_stock,
+                  max_stock):
 
         agent_index_list = list(fleet.agents.keys())                # identify the id of every agent in a list
 
@@ -63,11 +63,16 @@ class ModelRunner:
                   )
             time_id = str(time_tracker).zfill(len(str(duration)))
             random.shuffle(agent_index_list)                                                                            # shuffle agent order for equal opportunities
-            fleet.update_memory_trackers(time_id)                                                                   # record knowledge on the choice options at the start of a time period
-            fleet.update_average_expected_competitor_tracker(time_id)                                               # update tracker for the expected amount of competitors
+            fleet.update_memory_trackers(time_id)                                                                       # record knowledge on the choice options at the start of a time period
+            fleet.update_average_expected_competitor_tracker(time_id)                                                   # update tracker for the expected amount of competitors
+
+            # save real stock of the environment (choice_set) into a tracker
+            choice_set.update_environmental_stock_tracker(time_id=time_id)
 
             # loop for every agent
             for agent in agent_index_list:                                                                              # begin choice loop for every agent
+                # save current perception of the full environment (heatmap) into a tracker
+                fleet.update_heatmap_tracker(time_id=time_id, agent_id=agent, heatmap=fleet.agents[agent].heatmap)
 
                 # forage event occurs and agents choose an optimal or random alternative
                 alternative_index = fleet.agents[agent].make_choice(choice_set)
@@ -77,7 +82,7 @@ class ModelRunner:
 
                 # load the expected catch in the chosen location to the fleet tracker
                 fleet.update_heatmap_expectation_tracker(time_id=time_id, agent_id=agent,
-                                                         expected_catch=fleet.agents[agent].heatmap[alternative_index])
+                                                         expected_catch=copy.deepcopy(fleet.agents[agent].heatmap[alternative_index]))
 
                 # load the chosen alternative to the object that will introduce competition between agents
                 competition_handler.load_competition_data(alternative_index, agent)

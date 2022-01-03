@@ -40,6 +40,7 @@ Version Number:
 
 from collections import defaultdict, OrderedDict
 from sys import exit
+import copy
 
 class CompetitionHandler:
     """class to implement competition mechanisms / feedbacks in the model"""
@@ -141,23 +142,25 @@ class CompetitionHandler:
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------- Methods to load agent choice functionality -------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-    def load_competition_data(self, chosen_alternative_id, agent_id, interference_factor=0.8):                          # TODO: Migrate interference factor to relevant data and remove hardcoded data
+    def load_competition_data(self, chosen_alternative_id, agent_id, interference_factor=None):                          # TODO: Migrate interference factor to relevant data and remove hardcoded data
         """main functionality method for loading data on the agent and chosen choice option""" # TODO which data is loaded?
+        if interference_factor is None:
+            interference_factor=self.relevant_data['interference_factor']
         self.competition_instruction[self.competition_method]['load'](chosen_alternative_id, agent_id, interference_factor)
 
-    def __load_absent(self, chosen_alternative_id, agent_id, interference_factor=0):
+    def __load_absent(self, chosen_alternative_id, agent_id, interference_factor):
         """loads data on the agent and chosen choice option"""  # TODO check if all comments are unique
         self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id                                           # remember what agent choose which choice option
 
-    def __load_interference(self, chosen_alternative_id, agent_id, interference_factor=0.8):
+    def __load_interference(self, chosen_alternative_id, agent_id, interference_factor):
         """loads data on the agent and chosen choice option"""
         self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id                                           # remember what agent choose which choice option
-        self.relevant_data['interference_factor'] = interference_factor                                                 # TODO: migrate interference factor to initialisation of relevant data
+#        self.relevant_data['interference_factor'] = interference_factor                                                 # TODO: migrate interference factor to initialisation of relevant data
                                                                                                                         # TODO DOUBLE CHECK FOR DUPLICATE FUNCTIONALITY
 
-    def __load_split_catch(self, chosen_alternative_id, agent_id, interference_factor=0):
+    def __load_split_catch(self, chosen_alternative_id, agent_id, interference_factor):
         """loads data on the agent and chosen choice option""" #TODO KW: specify which data
         self.relevant_data['effort_tracker'][chosen_alternative_id] += 1                                                # add agents chocie to overall predicted effort distribution
         self.relevant_data['agent_choices'][agent_id] = chosen_alternative_id
@@ -171,7 +174,7 @@ class CompetitionHandler:
 
         choice_id = self.relevant_data['agent_choices'][agent_id]
 
-        uncorrected_catch = choice_set.discrete_alternatives[choice_id].resource_stock \
+        uncorrected_catch = copy.deepcopy(choice_set.discrete_alternatives[choice_id].resource_stock) \
                             * agent_set.agents[agent_id].catchability_coefficient                                       # extract hypothetical catch if competition was absent
 
         corrected_catch, competitors_encountered = \
@@ -181,6 +184,8 @@ class CompetitionHandler:
         agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents itself
         agent_set.update_uncorrected_catch_tracker(time_id=time_id, agent_id=agent_id,
                                                    uncorrected_catch=uncorrected_catch)
+        agent_set.update_corrected_catch_tracker(time_id=time_id, agent_id=agent_id,
+                                                 corrected_catch=corrected_catch)
         agent_set.update_realised_competition_tracker(time_id=time_id, agent_id=agent_id,
                                                       realised_competition=competitors_encountered)
 
@@ -219,7 +224,7 @@ class CompetitionHandler:
     def reset_relevant_data(self): #TODO: add the relevant data explicitly
         """full reset of the relevant data trackers to ensure this will not interfere
         with competition handling in the next time_step"""
-        self.relevant_data = self.__init_relevant()                                                                     # Reinitialise relevant data
+        self.relevant_data = self.__init_relevant() | {'interference_factor': self.relevant_data['interference_factor']}                                                                     # Reinitialise relevant data
 
 
 # EOF

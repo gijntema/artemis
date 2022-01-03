@@ -72,7 +72,6 @@ class AgentFleet:                                         # to be implemented, n
                  group_dynamics=False):
 #TODO KW: ensure that the hard wired values above are not used in the first time step. these need to come from init_param from time=0 onwards
 
-        # self.agents = {}                                # dictionary with all agents as ForagerAgent objects            # TODO: migrate initilisation of agents from Init_objects.py EDIT: WORKING ON IT - see line below and init methods below
         self.agents = self.__init_agents(
                                nb_agents=nb_agents,
                                choice_set=choice_set,
@@ -93,7 +92,9 @@ class AgentFleet:                                         # to be implemented, n
         self.forage_visit_tracker = defaultdict(dict)                                                                   # tracker to contain where agents have been forager in what time
         self.heatmap_expectation_tracker = defaultdict(dict)                                                            # tracker to contain what agents were expecting to find in the chosen location
         self.uncorrected_catch_tracker = defaultdict(dict)                                                              # tracker to contain what would have been an agents catch in a chose location if no competitors would have been present
+        self.corrected_catch_tracker = defaultdict(dict)
         self.realised_competition_tracker = defaultdict(dict)                                                           # tracker to contain the amount of competitors an agent has encountered in a given time step
+        self.heatmap_tracker = defaultdict(dict)
 
         self.__init_time_data_trackers(duration_model=duration_model)
         self.group_former = self.__init_group_allegiances(number_of_groups=number_of_sharing_groups,                    # set up for better initialisation of group_former, reuiqres the best initiliasation of self.agents a few lines above
@@ -252,6 +253,12 @@ class AgentFleet:                                         # to be implemented, n
 
     def update_uncorrected_catch_tracker(self, time_id, agent_id, uncorrected_catch):
         self.uncorrected_catch_tracker[time_id][agent_id] = uncorrected_catch
+
+    def update_corrected_catch_tracker(self, time_id, agent_id, corrected_catch):
+        self.corrected_catch_tracker[time_id][agent_id] = corrected_catch
+
+    def update_heatmap_tracker(self, time_id, agent_id, heatmap):
+        self.heatmap_tracker[time_id][agent_id] = copy.deepcopy(heatmap)
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------- the ForagerAgent object -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------

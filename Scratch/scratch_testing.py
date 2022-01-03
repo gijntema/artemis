@@ -138,4 +138,21 @@ container = ContainerTest(init_stock=init_stock, init_stock_sd=init_stock_sd)
 container.double_packer.test_value_changer(test_value)
 print(container.data['value'])
 
+
+# ---------------------------------------------------------------------------------------------------------------------
+
+import pandas as pd
+import os
+
+old_wd = os.getcwd()
+os.chdir(old_wd.split('Scratch')[0] + '{}'.format('src\\output\\data_output'))
+
+counter = 101
+data_dict = dict()
+base_filename = 'flat_time_x_agent_resultsS{}.csv'
+
+while counter < 229:
+    data_dict[str(counter)] = pd.read_csv(base_filename.format(str(counter)))
+    counter += 1
+
 # EOF

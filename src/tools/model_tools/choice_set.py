@@ -48,6 +48,7 @@ Version Number:
 """
 
 import numpy as np
+import copy
 from collections import defaultdict
 from src.tools.model_tools.alternative_dynamics import DynamicsHandler
 
@@ -65,6 +66,8 @@ class ChoiceSet:
         self.effort_map = {}                                                                                            # tracker variable for effort (effort = 1 -> a single forage event) exerted to each choice options
         self.catch_map = {}                                                                                             # tracker variable for total catch gained from each choice options
         self.time_visit_map = defaultdict(dict)
+        self.stock_time_tracker = defaultdict(dict)
+
         self.__init_attributes(nb_alternatives=nb_alternatives, stock_distribution=stock_distribution,
                                init_stock=init_stock, sd_init_stock=sd_init_stock, growth_factor=growth_factor,
                                duration=duration, maximum_stock=maximum_stock, minimum_stock=minimum_stock)
@@ -88,8 +91,10 @@ class ChoiceSet:
                 duration_counter += 1
             alternative_tracker += 1                                                                                    # proceed to next choice_option
 
-    def load_observed_alternatives(self, dataset):                                                                      # placeholder for later use in loading real world data
-        pass
+    def update_environmental_stock_tracker(self, time_id):
+        for alternative in self.discrete_alternatives:
+            stock = copy.deepcopy(self.discrete_alternatives[alternative].resource_stock)
+            self.stock_time_tracker[time_id][alternative] = stock
 
 
 class SpatialChoiceSet(ChoiceSet):                                                                                      # placeholder for future functionality
