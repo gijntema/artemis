@@ -47,45 +47,44 @@ Version Number:
 # Import External Modules needed for ARTEMIS functionality
 # ----------------------------------------------------------------------------------------------------------------------
 
-import timeit                                                                                                           # import module to track runtime
-start = timeit.default_timer()                                                                                          # start timer for model run
-import pandas as pd                                                                                                     # pandas daytaframe as data structure tool
+import timeit                                                                                                           # Import module to track runtime
+start = timeit.default_timer()                                                                                          # Start timer for model run
+import pandas as pd                                                                                                     # Pandas dataframe as data structure tool
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Import Internal Modules built for ARTEMIS functionality
 # ----------------------------------------------------------------------------------------------------------------------
 
-from src.config.init.make_config import ConfigHandler
-from src.config.init.param_to_config_mapping import ParamConverter
-from src.run_model import ModelRunner                                                                                   # module to run the model using initialized agents and choices
+from src.config.init.make_config import ConfigHandler                                                                   # Module to save and access the configuration settings from a simulations scenario config file
+from src.config.init.param_to_config_mapping import ParamConverter                                                      # Modules that converts paraneters form ConfigHandler objects to variables with a specific name
+from src.run_model import ModelRunner                                                                                   # Module to run the model using initialized agents and choices
 
-from src.tools.model_tools.agents import AgentFleet                                                                     # module with agents (and groups of agents) functionality
-from src.tools.model_tools.choice_set import ChoiceSet                                                                  # module with choice option (e.g. grid cells) functionality
-from src.tools.model_tools.competition import CompetitionHandler                                                        # module that handles model feedbacks as a result of competition between agents
+from src.tools.model_tools.agents import AgentFleet                                                                     # Module with agents (and groups of agents) functionality
+from src.tools.model_tools.choice_set import ChoiceSet                                                                  # Module with choice option (e.g. grid cells) functionality, representing the physical environment agents operate in
+from src.tools.model_tools.competition import CompetitionHandler                                                        # Module that handles model feedbacks as a result of competition between agents
 
-from src.tools.output_tools.printing import PrintBlocker                                                                # module that allows for blocking of print statements in the scripts
-from src.tools.output_tools.raw_data_extraction import DataExtractor                                                    # module to generate output data from the objects in the model
-from src.tools.output_tools.export_data import DataWriter                                                               # module to write datafiles from the output data
+from src.tools.output_tools.printing import PrintBlocker                                                                # Module that allows for blocking of print statements in the scripts
+from src.tools.output_tools.raw_data_extraction import DataExtractor                                                    # Module to generate output data (as pandas dataframes) from the objects in the model
+from src.tools.output_tools.export_data import DataWriter                                                               # Module to write datafiles from the output data
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Set up structure for configuration of the model (The ConfigHandler object)
 # ----------------------------------------------------------------------------------------------------------------------
 
-# make an object that contains all config data and return the appropriate parameters in different sections of the model
-config_handler = ConfigHandler(scenario_file='base_config_20211222.csv')                                                # define batch file csv containing the parameters for each scenario to run
+config_handler = ConfigHandler(scenario_file='base_config.csv')                                                         # define and load batch file csv containing the parameters for each scenario to run
 
 if len(config_handler.scenarios_config) < 1:
-    raise ReferenceError("Config File Contains No Scenarios to Run")
+    raise ReferenceError("Config File Contains No Scenarios to Run")                                                    # raise error if scenario file is empty
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Start Looping over the scenarios defined in configuration
 # ----------------------------------------------------------------------------------------------------------------------
-# loop over all scenarios found in the config file
-for scenario in config_handler.scenarios_config:
-    scenario_name = scenario
-    print('starting simulations(s) for scenario {}'.format(scenario_name))
 
-    # read all parameters from the ConfigHandler object
+for scenario in config_handler.scenarios_config:                                                                        # loop over all scanarios read form the batch file csv
+    scenario_name = scenario                                                                                            # define tag for scenario name
+    print('starting simulations(s) for scenario {}'.format(scenario_name))                                              # print what scenario that is now being run
+
+    # TODO quick and dirty fix based on old structure, can be done more better for runtime improvement
     duration, \
     number_of_iterations,\
     reporting,\
@@ -116,13 +115,13 @@ for scenario in config_handler.scenarios_config:
     sd_init_stock,\
     competition_scenario,\
     interference_factor = \
-        ParamConverter().reverse_read_scenario(config_handler=config_handler, scenario_id=scenario_name)
+        ParamConverter().reverse_read_scenario(config_handler=config_handler, scenario_id=scenario_name)                # convert all parameters and settings for the current scenario to the variable names needed
 
-    print_blocker = PrintBlocker()
-    if not reporting:                                                                                                   # block printing if desired
+    print_blocker = PrintBlocker()                                                                                      # define objetcto block printing
+    if not reporting:                                                                                                   # block printing if desired (if reporting is False)
         print_blocker.block_print()
 
-    if not scenario_name:
+    if not scenario_name:                                                                                               # if the scenario name is missing, add a file tag indicating the values for every simulation
         output_file_suffix = '_20211125_SA{}_SP{}_Pe%{}_J{}_Pr%{}_SS{}_PRS{}_RS{}_SCS{}_#Gr{}_T{}_Ssd{}'.format(
             shared_alternatives,
             share_partners,
@@ -138,41 +137,44 @@ for scenario in config_handler.scenarios_config:
             sd_init_stock
         )
 
-    else:
+    else:                                                                                                               # define current scenario name as suffix to any output file
         output_file_suffix = scenario_name
 
-    # initialize class objects that are part of operational structure
+    # TODO: move ModelRunner object initialisation outside of simulation loop
     model_runner = ModelRunner()                                                                                        # initialize the object with the functionality to run a simulation with the initialized agents and choice options
 
     # TODO: Move CompetitionHandler object to run_model.py
     competition_handler = CompetitionHandler(competition_method=competition_scenario,
                                              interference_factor=interference_factor)                                   # object that will ensure competition feedbacks are executed for in the model
+
+    # TODO: Move DataExtractor object initialisation outside of simulation loop
     data_extractor = DataExtractor()                                                                                    # initialize the object with the functionality to extract output data from model objects
     data_writer = DataWriter(output_file_suffix)                                                                        # initialize the object with the functionality to export data files from output data
 
-    # initialize data containers for loading output data to
     time_x_agent_data = pd.DataFrame()                                                                                  # intialize object to contain a data series for output data that has data on individual time steps and individual agent
     time_x_environment_data = pd.DataFrame()                                                                            # intialize object to contain a data series for output data that has data on individual time steps and environmental units (DiscreteAlternatives or Gridcells)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Started Iteration loop
 # ----------------------------------------------------------------------------------------------------------------------
-    iteration_counter = 0                                                                                               # initliazation of counter for iteration loops
+    iteration_counter = 0                                                                                               # initialization of counter for iteration loops
     while iteration_counter < number_of_iterations:
-        print('-------------------------------------------------------------------------------------------------------',# print statement for user to idnetify the progression of th emodel
+        print('-------------------------------------------------------------------------------------------------------',# print statement for user to identify the progression of th emodel
               '\nStarting Iteration no.{} \n'.format(str(iteration_counter)),
               "-------------------------------------------------------------------------------------------------------"
               )
+
 # ----------------------------------------------------------------------------------------------------------------------
 # initialize the Environment (choice set), containing all discrete alternatives and the fleet, containing all agents
 # ----------------------------------------------------------------------------------------------------------------------
-        # TODO: Move intialization to run_model.py
-        choice_set = ChoiceSet(choice_set_size,
+
+        # TODO: Move initialization to run_model.py
+        choice_set = ChoiceSet(nb_alternatives=choice_set_size,
                                stock_distribution=stock_reset_scenario,
                                init_stock=init_stock,
                                sd_init_stock=sd_init_stock,
                                growth_factor=growth_factor,
-                               duration=duration, maximum_stock=max_stock, minimum_stock=min_stock)                     # initialize the potential option in the model (e.g. the grid with cells to fish in)
+                               duration=duration, maximum_stock=max_stock, minimum_stock=min_stock)                     # initialize the potential options in the model (e.g. the grid with cells to fish in), representing the physical environment agents operate in
 
         fleet = AgentFleet(
                                 nb_agents=number_of_agents,                                                             # initialize the forager agents in the model (e.g. fishermen)
@@ -204,7 +206,7 @@ for scenario in config_handler.scenarios_config:
                                    init_stock=init_stock,
                                    sd_init_stock=sd_init_stock,
                                    competition_handler=competition_handler,
-                                   stock_reset_chance=chance_reset_stock,                                               # TODO: Move as internal Attribute of DiscreteAlternative Objects, to allow for flexibility
+                                   stock_reset_chance=chance_reset_stock,                                               # TODO: Move  stock_reset chance as internal Attribute of DiscreteAlternative Objects, to allow for flexibility
                                    iteration_id=iteration_counter,
                                    max_stock=max_stock,
                                    min_stock=min_stock)
@@ -216,13 +218,13 @@ for scenario in config_handler.scenarios_config:
         time_x_agent_data = \
             time_x_agent_data.append(
                 data_extractor.get_time_x_agent_data(agent_set=fleet,
-                                                     iteration_id=iteration_counter)).reset_index(drop=True)            # Get desired explanatory variables x Catch dataframe
+                                                     iteration_id=iteration_counter)).reset_index(drop=True)            # Get Dataframe with data specific per unit of time and agent (e.g. actual catch obtained, competition encountered)
 
         time_x_environment_data = \
             time_x_environment_data.append(
                data_extractor.get_time_x_environment_data(agent_set=fleet,
                                                           choice_set=choice_set,
-                                                          iteration_id=iteration_counter)).reset_index(drop=True)
+                                                          iteration_id=iteration_counter)).reset_index(drop=True)       # Get Dataframe with data specific per unit of time and choice option/environmental subsection (e.g. real stock present, agents catch expectation of each option)
 
         iteration_counter += 1                                                                                          # progress to the next iteration
 
@@ -230,11 +232,11 @@ for scenario in config_handler.scenarios_config:
 # Export generated data in every scenario
 # ----------------------------------------------------------------------------------------------------------------------
 
-    data_writer.write_csv(time_x_agent_data, 'flat_time_x_agent_results')
-    data_writer.write_csv(time_x_environment_data, 'flat_time_x_environment_results')
+    data_writer.write_csv(time_x_agent_data, 'flat_time_x_agent_results')                                               # write csv output file for data specific per unit of time and agent
+    data_writer.write_csv(time_x_environment_data, 'flat_time_x_environment_results')                                   # write csv output file for data specific per unit of time and choice option/environmental subsection
 
     # Enable Printing
-    print_blocker.enable_print()                                                                                        # enable printing to report on runtime and other prints that are always wanted
+    print_blocker.enable_print()                                                                                        # enable printing to report on runtime and other prints that are always desired regardless of print blocking
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Runtime tracking and reporting

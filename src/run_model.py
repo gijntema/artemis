@@ -100,7 +100,7 @@ class ModelRunner:
                 choice_set.discrete_alternatives[alternative].stock_growth()
 
             # reset the stocks if chosen for a static stock format - otherwise keep old stock
-            # TODO: migrate if-statement functionality to library dictionary with functions for flexibility
+            # TODO: migrate if-statement(s) functionality to library dictionary with functions for flexibility
             if stock_reset_scenario == 'normal_random_repeat':                                                          # if statement for repeating stocks
                 alternative_tracker = 0                                                                                 # initialise counter for loop functionality
                 nb_alternatives = len(choice_set.discrete_alternatives)                                                 # extract a list of choice option IDs

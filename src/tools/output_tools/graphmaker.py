@@ -128,15 +128,15 @@ class GraphMaker:
 
 
     def time_x_ncorrect_heatmap_y_sharing_z(self, starting_point_csv_nb, end_point):
-        base_name = 'GI20211222\\flat_time_x_agent_resultsS{}.csv'
+        base_name = 'GI20220103\\flat_time_x_agent_resultsS{}.csv'
         real_csv_counter = copy.deepcopy(starting_point_csv_nb)
         starting_point_csv_nb -= 100
         end_point -= 100
         list_of_csv = []
         relative_csv_counter = starting_point_csv_nb
         while relative_csv_counter < end_point:
-            if ((csv_counter + 8) % 8) % 3 == 1:
-                list_of_csv.append(base_name.format('{}'.format(str(csv_counter + 100))))
+            if ((relative_csv_counter + 8) % 8) % 3 == 1:
+                list_of_csv.append(base_name.format('{}'.format(str(relative_csv_counter + 100))))
             relative_csv_counter += 1
             real_csv_counter += 1
 
@@ -192,7 +192,6 @@ class GraphMaker:
             df = pd.read_csv(csv, sep=',')
 
             # pick random agent to follow for every scenario
-#            considered_agent = random.choice(df['agent_id'])                                                            # SAVE
             considered_agent = 'agent_012'
 
             # X Axis Values

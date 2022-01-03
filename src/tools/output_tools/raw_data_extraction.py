@@ -53,148 +53,290 @@ class DataExtractor:
 
         self.functionality_extraction = self.__init_functionality_extraction()                                          # functionality to extract data as tracked by the model
 
-    def __init_functionality_extraction(self):  # PLACE HOLDER FOR future reworking of the structure
-        """intialises a dictionary containing all possible functionality
-        for extracting and formatting directly tracked data in the model"""
+    def __init_functionality_extraction(self):
+        """initialises a dictionary containing all possible functionality
+        for extracting and formatting directly tracked data
+        (that does not require additional calculations) in the model"""
         functionality = \
             {
-                'time_x_agent':
+                'time_x_agent':                                                                                         # data specific for individual time steps and individual agent
                     {
-                        'catch': self.__extract_flat_agent_time_catch,
-                        'forage_option_visit': self.__extract_flat_agent_time_forage_option_visit,
-                        'competition': self.__extract_flat_agent_time_competition,
-                        'realised_competition': self.__extract_flat_agent_time_realised_competition,
-                        'knowledge_in_heatmap': self.__extract_flat_agent_time_knowledge,
-                        'heatmap_expectation': self.__extract_flat_agent_time_heatmap_expectation,
-                        'uncorrected_catch': self.__extract_flat_agent_time_uncorrected_catch,
-                        'corrected_catch': self.__extract_flat_agent_time_corrected_catch
+                        'general': self.__extract_flat_agent_time_general,                                              # Add generic data series always needed -> Iteration ID, Time ID, Agent ID, Agent Group ID
+                        'forage_option_visit': self.__extract_flat_agent_time_forage_option_visit,                      # What Environment subsection / choice option / DiscreteAlternative did the agent forage in
+                        'average_expected_competition': self.__extract_flat_agent_time_average_expected_competition,    # What is the theoretical amount of competitors an agent would encounter on the grid - MEASURE NOT RELIABLE
+                        'realised_competition': self.__extract_flat_agent_time_realised_competition,                    # What is the actual amount of other agents and agent encountered while foraging
+                        'knowledge_in_heatmap': self.__extract_flat_agent_time_knowledge,                               # How many environment subsections / choice options / DiscreteAlternatives does agent have memory on
+                        'heatmap_expectation': self.__extract_flat_agent_time_heatmap_expectation,                      # What did the agent expect he was going to catch while foraging in the chosen environmental subsection / choice option / DiscreteAlternative
+                        'uncorrected_catch': self.__extract_flat_agent_time_uncorrected_catch,                          # What would and agent have caught in the chosen environmental subsection / choice option / DiscreteAlternative, if competition did not affect the catch
+                        'realised_catch': self.__extract_flat_agent_time_realised_catch                                 # What did an agent actually catch while foraging in a given time step
                         # INSERT FURTHER FUNCTIONALITY
                     },
-                'time_x_environment':
+                'time_x_environment':                                                                                   # data specific for individual time steps and individual environmental subsection / choice option / DiscreteAlternative
                     {
-                        'environmental_stock': self.__extract_flat_environment_time_resource_stock,
-                        'agent_perceptions': self.__extract_flat_environment_time_agent_perceptions
+                        'environmental_stock': self.__extract_flat_environment_time_resource_stock,                     # What is the stock in every environmental subsection / choice option / DiscreteAlternative
+                        'agent_perceptions': self.__extract_flat_environment_time_agent_perceptions                     # What did every agent (seperate data series for every agent) expect he was going to catch in  every environmental subsection / choice option / DiscreteAlternative
                         # INSERT FURTHER FUNCTIONALITY
                     }
 
-                # INSERT POTENTIAL OTHER DATA TYPES HERE
+                # INSERT POTENTIAL OTHER OUTPUT DATA TYPES HERE
             }
         return functionality
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------ Extract Raw Agent by Time data --------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-    def get_time_x_agent_data(self, agent_set, iteration_id):
-        """Extract unaggregated agent by time data for all implemented functionality"""
-        data_output = pd.DataFrame()
-        for data_series_extractor in self.functionality_extraction['time_x_agent']:                                     # loop over all data series, as potential explanatory variables to catch, we have functionality on in the functionality dictionary (quick and dirty fix, could be adapted to choose specific functionality)
-            data_output = self.functionality_extraction['time_x_agent'][data_series_extractor](agent_set,
-                                                                                                data_output,
-                                                                                                iteration_id)
+
+    def get_time_x_agent_data(self, agent_set, iteration_id, wanted_data='ALL'):
+        """Method to extract data series that are specific for time and agents,
+        desired outcome data can be defined as a list of names
+        as a subset of the dictionary keys in the functionality dictionary,
+        if 'wanted_data' is left emtpy all currently implemented data series are returned
+        if wanted data is defined, it is recommended to include 'general' as id tags for all data series"""
+
+        data_output = pd.DataFrame()                                                                                    # prepare output data container
+
+        if wanted_data == 'ALL':
+            for data_series_extractor in self.functionality_extraction['time_x_agent']:                                 # loop over all data series we have functionality on in the functionality dictionary and add each series to the pandas.Dataframe data container
+                data_output = self.functionality_extraction['time_x_agent'][data_series_extractor](agent_set,
+                                                                                                    data_output,
+                                                                                                    iteration_id)
+        elif isinstance(wanted_data, list):
+            for data_series_extractor in wanted_data:
+                if data_series_extractor not in self.functionality_extraction['time_x_agent']:                          # error handling: let user know wanted data series is not supported and print the data series that are supported)
+                    raise NotImplementedError(
+                        'defined data series {} is not supported as output data series,'.format(data_series_extractor) +
+                        'supported functionalities are:\t{}'.format(
+                            list(self.functionality_extraction['time_x_agent'].keys())))
+
+                else:                                                                                                   # loop over all wanted data series and add each series to the pandas.Dataframe data container
+                    data_output = self.functionality_extraction['time_x_agent'][data_series_extractor](agent_set,
+                                                                                                   data_output,
+                                                                                                   iteration_id)
+        else:
+            raise TypeError('Wanted data not specified properly, should be a list')                                     # error handling: when wanted data is not a list, rais error
+
         return data_output
 
+    def __extract_flat_agent_time_general(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
+        """Extracts the ID columns for the data frame:
+        iteration id, time step id, agent id, agent group id"""
+
+        input_data = agent_set.agents                                                                                   # define what part of the agent fleet the data is at
+
+        data_series_iteration = []                                                                                      # prepare data container for iteration id tags in the output data
+        data_series_time = []                                                                                           # prepare data container for time id tags in the output data
+        data_series_agent = []                                                                                          # prepare data container for agent id tags in the output data
+        data_series_group_allegiance = []                                                                               # prepare data container for agent group id tags in the output data
+        # data_series_catch = []
+
+        for time_id in tuple(input_data[next(iter(input_data))].time_step_catch.keys()):                                # loop over the items (time_steps) in an immutable list of time_steps as logged in the time_step_catch tracker of the first agent in the model
+            for agent in input_data:
+                data_series_iteration.append(iteration_id)                                                              # fill data container for iteration id tags in the output data
+                data_series_time.append(time_id)                                                                        # fill data container for time id tags in the output data
+                data_series_agent.append(agent)                                                                         # fill data container for agent id tags in the output data
+                data_series_group_allegiance.append(
+                    input_data[agent].heatmap_exchanger.relevant_data['group_allegiance'])                              # fill data container for agent group id tags in the output data
+                # data_series_catch.append(input_data[agent].time_step_catch[time_id])
+
+        output_data['iteration_id'] = data_series_iteration                                                             # load data container for iteration id tags to match desired output data format
+        output_data['time_id'] = data_series_time                                                                       # load data container for time id tags to match desired output data format
+        output_data['agent_id'] = data_series_agent                                                                     # load data container for agent id tags to match desired output data format
+        output_data['group_allegiance'] = data_series_group_allegiance                                                  # load data container for agent group id tags to match desired output data format
+        # output_data['catch'] = data_series_catch
+        # TODO Move 'Catch' to separate method - Done but see one line below
+        # TODO: Catch as tracked above seems to be bugging, other tracker for catch yields other, more logical data -- DOUBLE Check functionality
+
+        return output_data                                                                                              # return output data
+
+    def __extract_flat_agent_time_forage_option_visit(self, agent_set, output_data=pd.DataFrame(), iteration=-99):
+        """Extracts the Environment subsection/Choice option/ DiscreteAlternative
+        visited for every time step and agent"""
+
+        input_data = agent_set.forage_visit_tracker                                                                     # define what part of the agent fleet the data is at
+
+        data_series_forage_visits = []                                                                                  # prepare data container for the considered data series to load into the output data
+
+        for time_id in tuple(input_data.keys()):                                                                        # fill data container for the considered data by looping over time and agents in the tracker variable
+            for agent in input_data[time_id]:
+                data_series_forage_visits.append(input_data[time_id][agent])                                            # add time and agent specific data point to prepared data container
+
+        output_data['forage_visit'] = data_series_forage_visits                                                         # load data container into desired output data format
+
+        return output_data                                                                                              # return output data
+
+    def __extract_flat_agent_time_average_expected_competition(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
+        """Extracts the average expected competition for every time step and agent - Theoretical concept"""
+
+        input_data = agent_set.average_expected_competitor_tracker                                                      # define what part of the agent fleet the data is at
+
+        data_series_competition = []                                                                                    # prepare data container for the considered data series to load into the output data
+
+        for time_id in tuple(input_data.keys()):                                                                        # fill data container for the considered data by looping over time and agents in the tracker variable
+            for agent in input_data[time_id]:
+                data_series_competition.append(input_data[time_id][agent])                                              # add time and agent specific data point to prepared data container
+
+        output_data['average_expected_competitors'] = data_series_competition                                           # load data container into desired output data format
+
+        return output_data                                                                                              # return output data
+
+    def __extract_flat_agent_time_realised_competition(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
+        """Extract the competition encountered (as number other agents foraging in the same choice)
+         by every individual agent for every time step"""
+
+        input_data = agent_set.realised_competition_tracker                                                             # define what part of the agent fleet the data is at
+
+        data_series_realised_competition = []                                                                           # prepare data container for the considered data series to load into the output data
+
+        for time_id in tuple(input_data.keys()):                                                                        # fill data container for the considered data by looping over time and agents in the tracker variables
+            for agent in input_data[time_id]:
+                data_series_realised_competition.append(input_data[time_id][agent])                                     # add time and agent specific data point to prepared data container
+
+        output_data['realised_competition'] = data_series_realised_competition                                          # load data container into desired output data format
+
+        return output_data                                                                                              # return output data
+
+    def __extract_flat_agent_time_knowledge(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
+        """Extracts the heatmap fill (as number of choice options with a memory entry)
+         for every time step and agent"""
+
+        input_data = agent_set.agents                                                                                   # define what part of the agent fleet the data is at
+
+        data_series_knowledge = []                                                                                      # prepare data container for the considered data series to load into the output data
+
+        for time_id in tuple(input_data[next(iter(input_data))].knowledge_evolution_tracker.keys()):                    # fill data container for the considered data by looping over time and agents in the tracker variables
+            for agent in input_data:
+                data_series_knowledge.append(len(input_data[agent].knowledge_evolution_tracker[time_id]))               # add time and agent specific data point to prepared data container
+
+        output_data['knowledge_in_heatmap'] = data_series_knowledge                                                     # load data container into desired output data format
+
+        return output_data                                                                                              # return output data
+
+    def __extract_flat_agent_time_heatmap_expectation(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
+        """Extracts the expected amount of catch (as entry in an agent's heatmap entry for the chosen choice options)
+         for every time step and agent"""
+
+        input_data = agent_set.heatmap_expectation_tracker                                                              # define what part of the agent fleet the data is at
+
+        data_series_heatmap_expectation = []                                                                            # prepare data container for the considered data series to load into the output data
+
+        for time_id in tuple(input_data.keys()):                                                                        # fill data container for the considered data by looping over time and agents in the tracker variables
+            for agent in input_data[time_id]:
+                data_series_heatmap_expectation.append(input_data[time_id][agent])                                      # add time and agent specific data point to prepared data container
+
+        output_data['heatmap_expected_catch'] = data_series_heatmap_expectation                                         # load data container into desired output data format
+
+        return output_data                                                                                              # return output data
+
+    def __extract_flat_agent_time_uncorrected_catch(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
+        """Extracts the theoretical catch that would have been achieved in the absence of competition,
+         for every time step and agent"""
+
+        input_data = agent_set.uncorrected_catch_tracker                                                                # define what part of the agent fleet the data is at
+
+        data_series_uncorrected_catch = []                                                                              # prepare data container for the considered data series to load into the output data
+
+        for time_id in tuple(input_data.keys()):                                                                        # fill data container for the considered data by looping over time and agents in the tracker variables
+            for agent in input_data[time_id]:
+                data_series_uncorrected_catch.append(input_data[time_id][agent])                                        # add time and agent specific data point to prepared data container
+
+        output_data['uncorrected_catch'] = data_series_uncorrected_catch                                                # load data container into desired output data format
+
+        return output_data                                                                                              # return output data
+
+    def __extract_flat_agent_time_realised_catch(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
+        """Extracts the realised catch that is achieved
+         for every time step and agent"""
+
+        input_data = agent_set.corrected_catch_tracker                                                                  # define what part of the agent fleet the data is at
+
+        data_series_realised_catch = []                                                                                 # prepare data container for the considered data series to load into the output data
+
+        for time_id in tuple(input_data.keys()):                                                                        # fill data container for the considered data by looping over time and agents in the tracker variables
+            for agent in input_data[time_id]:
+                data_series_realised_catch.append(input_data[time_id][agent])                                           # add time and agent specific data point to prepared data container
+
+        output_data['realised_catch'] = data_series_realised_catch                                                      # load data container into desired output data format
+
+        return output_data                                                                                              # return output data
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# --------------------------------- Extract Raw Environment/Choice Set by Time data ------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+    def get_time_x_environment_data(self, agent_set, choice_set, iteration_id):
+        """Extract unaggregated time by individual choice option/ environment subsection data
+        for all implemented functionality"""
+
+        input_data = choice_set.stock_time_tracker                                                                      # define what part of the choice set/environment object the data is at
+
+        data_output = pd.DataFrame()                                                                                    # prepare output data container
+
+        # get basic information data series (iteration data series, time series and alternative ID series)
+        data_series_iteration = []                                                                                      # prepare data container for iteration id tag data series to load into the output data container
+        data_series_time = []                                                                                           # prepare data container for time id tag data series to load into the output data
+        data_series_alternatives = []                                                                                   # prepare data container for choice_option/environment subsection tag data series to load into the output data
+
+        for time_id in input_data:                                                                                      # fill data container for the considered data by looping over time and choice options in the tracker variables
+            for alternative in choice_set.discrete_alternatives:
+                data_series_iteration.append(iteration_id)                                                              # fill data container for iteration id tags in the output data
+                data_series_time.append(time_id)                                                                        # fill data container for time id tags in the output data
+                data_series_alternatives.append(alternative)                                                            # fill data container for choice option/ environment subsection id tags in the output data
+
+        data_output['iteration_id'] = data_series_iteration                                                             # load iteration id tag data container into desired output data format
+        data_output['time_id'] = data_series_time                                                                       # load time id tag data container into desired output data format
+        data_output['alternative_id'] = data_series_alternatives                                                        # load choice option tag data container into desired output data format
+
+        # include iteration ID, time_id and alternative ID
+        for data_series_extractor in self.functionality_extraction['time_x_environment']:                               # loop over all data series we have functionality on in the functionality dictionary and add each series to the pandas.Dataframe data container
+
+            data_output = \
+                self.functionality_extraction['time_x_environment'][data_series_extractor](agent_set=agent_set,
+                                                                                           choice_set=choice_set,
+                                                                                           data_output=data_output,
+                                                                                           iteration_id=iteration_id)
+        return data_output                                                                                              # return output data
+
+    def __extract_flat_environment_time_resource_stock(self, agent_set, choice_set, data_output, iteration_id):
+
+        input_data = choice_set.stock_time_tracker                                                                      # define what part of the choice set/environment object the data is at
+
+        data_series_stock = []                                                                                          # prepare data container for the considered data series to load into the output data
+
+        for time_id in input_data:                                                                                      # fill data container for the considered data by looping over time and choice options in the tracker variables
+            for alternative in input_data[time_id]:
+                data_series_stock.append(input_data[time_id][alternative])                                              # add time and choice option specific data point to prepared data container
+
+        data_output['real_stock'] = data_series_stock                                                                   # load data container into desired output data format
+
+        return data_output                                                                                              # return output data
+
+    def __extract_flat_environment_time_agent_perceptions(self, agent_set, choice_set, data_output, iteration_id):
+
+        input_data = agent_set.heatmap_tracker                                                                          # define what part of the agent fleet the data is at
+
+        for agent in agent_set.agents:                                                                                  # loop over every agent to get a seperate data series for every individual agent
+            agent_expected_catch_series = []                                                                            # prepare data container for the considered data series to load into the output data
+            for time in input_data:                                                                                     # fill data container for the considered data by looping over time and choice options in the tracker variables
+                for alternative in input_data[time][agent]:
+                    agent_expected_catch_series.append(input_data[time][agent][alternative])                            # add time and choice option specific data point to prepared data container
+
+            data_output[agent + '_catch_expectation_heatmap'] = agent_expected_catch_series                             # load data container (for a specific agent) into desired output data format
+
+        return data_output                                                                                              # return output data
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ----------------- Junk/ Relic methods that need to be checked if still usable/necessary/salvageable ------------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+    # TODO: relic methods: Check if still needed
     def extract_average_expected_competition(self, agent_set):
-        """Theoretical expected competition over time for every agent"""
+        """extract data series on Theoretical expected competition over time for every agent"""
         data_output = pd.DataFrame(agent_set.average_expected_competitor_tracker).transpose()                           # make a pd.Dataframe from the data on the average number of competitors in a given choice option
         data_output.insert(loc=0, column='time_step_id', value=data_output.index)                                       # repair small error in tracker->pd.dataframe conversion --> get time_step column from index
         data_output.reset_index(inplace=True)                                                                           # reset index values to default indices
         data_output.drop(columns='index', inplace=True)                                                                 # remove newly created redundant column 'index'
         return data_output
-
-    def __extract_flat_agent_time_catch(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
-        """Extracts the ID columns for the data frame: iterations, time step, agent ID  and catch"""
-        input_data = agent_set.agents
-        data_series_iteration = []
-        data_series_time = []
-        data_series_agent = []
-        data_series_group_allegiance = []
-        data_series_catch = []
-
-        for time_id in tuple(input_data[next(iter(input_data))].time_step_catch.keys()):                                # loop over the items (time_steps) in an immutable list of time_steps as logged in the time_step_catch tracker of the first agent in the model
-            for agent in input_data:
-                data_series_iteration.append(iteration_id)
-                data_series_time.append(time_id)
-                data_series_agent.append(agent)
-                data_series_group_allegiance.append(input_data[agent].heatmap_exchanger.relevant_data['group_allegiance'])
-                data_series_catch.append(input_data[agent].time_step_catch[time_id])
-
-        output_data['iteration_id'] = data_series_iteration
-        output_data['time_id'] = data_series_time
-        output_data['agent_id'] = data_series_agent
-        output_data['group_allegiance'] = data_series_group_allegiance
-        output_data['catch'] = data_series_catch                                                                        # TODO: Migrate to other function
-        # TODO Move 'Catch' to separate method
-
-        return output_data
-
-    def __extract_flat_agent_time_competition(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
-        """Extracts the average expected competition for every time step and agent"""
-        data_series_competition = []
-        input_data = agent_set.average_expected_competitor_tracker
-        for time_id in tuple(input_data.keys()):
-            for agent in input_data[time_id]:
-                data_series_competition.append(input_data[time_id][agent])
-
-        output_data['average_expected_competitors'] = data_series_competition
-
-        return output_data
-
-    def __extract_flat_agent_time_knowledge(self, agent_set, output_data=pd.DataFrame(), iteration_id=-99):
-        """Extracts the heatmap fill for every time step and agent"""
-        data_series_knowledge = []
-        input_data = agent_set.agents
-        for time_id in tuple(input_data[next(iter(input_data))].knowledge_evolution_tracker.keys()):
-            for agent in input_data:
-                data_series_knowledge.append(len(input_data[agent].knowledge_evolution_tracker[time_id]))
-
-        output_data['knowledge_in_heatmap'] = data_series_knowledge
-        return output_data
-
-    def __extract_flat_agent_time_forage_option_visit(self, agent_set, output_data=pd.DataFrame(), iteration=-99):
-        data_series_forage_visits = []
-        """Extracts the Choice option visited for every time step and agent"""
-        input_data = agent_set.forage_visit_tracker
-        for time_id in tuple(input_data.keys()):
-            for agent in input_data[time_id]:
-                data_series_forage_visits.append(input_data[time_id][agent])
-        output_data['forage_visit'] = data_series_forage_visits
-        return output_data
-
-    def __extract_flat_agent_time_heatmap_expectation(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
-        input_data = agent_set.heatmap_expectation_tracker
-        data_series_heatmap_expectation = []
-        for time_id in tuple(input_data.keys()):
-            for agent in input_data[time_id]:
-                data_series_heatmap_expectation.append(input_data[time_id][agent])
-        output_data['heatmap_expected_catch'] = data_series_heatmap_expectation
-        return output_data
-
-    def __extract_flat_agent_time_uncorrected_catch(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
-        input_data = agent_set.uncorrected_catch_tracker
-        data_series_uncorrected_catch = []
-        for time_id in tuple(input_data.keys()):
-            for agent in input_data[time_id]:
-                data_series_uncorrected_catch.append(input_data[time_id][agent])
-        output_data['uncorrected_catch'] = data_series_uncorrected_catch
-        return output_data
-
-    def __extract_flat_agent_time_realised_competition(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
-        input_data = agent_set.realised_competition_tracker
-        data_series_realised_competition = []
-        for time_id in tuple(input_data.keys()):
-            for agent in input_data[time_id]:
-                data_series_realised_competition.append(input_data[time_id][agent])
-        output_data['realised_competition'] = data_series_realised_competition
-        return output_data
-
-    def __extract_flat_agent_time_corrected_catch(self, agent_set, output_data=pd.DataFrame(), iteration_id=99):
-        input_data = agent_set.corrected_catch_tracker
-        data_series_corrected_catch = []
-        for time_id in tuple(input_data.keys()):
-            for agent in input_data[time_id]:
-                data_series_corrected_catch.append(input_data[time_id][agent])
-        output_data['corrected_catch'] = data_series_corrected_catch
-        return output_data
 
     # TODO: Decide what to do with this method, Do we still need it or this more for a data transformer module, rather then a data extractor module?
     def extract_time_x_group_catch(self, dataframe):
@@ -207,63 +349,9 @@ class DataExtractor:
             data_dictionary['time_id'].append(time_id)
             for group in unique_values_group:
                 temp_group_df = time_temp_df[dataframe.group_allegiance == group]
-                data_dictionary[group].append(temp_group_df['catch'].sum())
+                data_dictionary[group].append(temp_group_df['corrected_catch'].sum())
 
         output_dataframe = pd.DataFrame(data_dictionary)
         return output_dataframe
-
-# ----------------------------------------------------------------------------------------------------------------------
-# --------------------------------- Extract Raw Environment/Choice Set by Time data ------------------------------------
-# ----------------------------------------------------------------------------------------------------------------------
-
-    def get_time_x_environment_data(self, agent_set, choice_set, iteration_id):
-        """Extract unaggregated environment by time data for all implemented functionality"""
-        input_data = choice_set.stock_time_tracker
-        data_output = pd.DataFrame()
-
-        # get basic information data series (iteration data series, time series and alternative ID series)
-        data_series_iteration = []
-        data_series_time = []
-        data_series_alternatives = []
-        for time_id in input_data:
-            for alternative in choice_set.discrete_alternatives:
-                data_series_iteration.append(iteration_id)
-                data_series_time.append(time_id)
-                data_series_alternatives.append(alternative)
-
-        data_output['iteration_id'] = data_series_iteration
-        data_output['time_id'] = data_series_time
-        data_output['alternative_id'] = data_series_alternatives
-
-        # include iteration ID, time_id and alternative ID
-        for data_series_extractor in self.functionality_extraction['time_x_environment']:                                     # loop over all data series, as potential explanatory variables to catch, we have functionality on in the functionality dictionary (quick and dirty fix, could be adapted to choose specific functionality)
-
-            data_output = \
-                self.functionality_extraction['time_x_environment'][data_series_extractor](agent_set=agent_set,
-                                                                                           choice_set=choice_set,
-                                                                                           data_output=data_output,
-                                                                                           iteration_id=iteration_id)
-        return data_output
-
-    def __extract_flat_environment_time_resource_stock(self, agent_set, choice_set, data_output, iteration_id):
-        input_data = choice_set.stock_time_tracker
-        data_series_stock = []
-        for time_id in input_data:
-            for alternative in input_data[time_id]:
-                data_series_stock.append(input_data[time_id][alternative])
-
-        data_output['real_stock'] = data_series_stock
-        return data_output
-
-    def __extract_flat_environment_time_agent_perceptions(self, agent_set, choice_set, data_output, iteration_id):
-        input_data = agent_set.heatmap_tracker
-        for agent in agent_set.agents:
-            agent_expected_catch_series = []
-            for time in input_data:
-                for alternative in input_data[time][agent]:
-                    agent_expected_catch_series.append(input_data[time][agent][alternative])
-            data_output[agent + '_catch_expectation_heatmap'] = agent_expected_catch_series
-
-        return data_output
 
 # EOF
