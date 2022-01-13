@@ -37,12 +37,24 @@ Version Number:
 import pandas as pd
 
 class DataWriter:
-    """contains a set of methods to transform a pandas Dataframe object into output files"""
+    """contains a set of methods to export a pandas Dataframe object into output files (e.g. csv, json etc.)
+    with a defined suffix text"""
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Methods to initialise object
+# ----------------------------------------------------------------------------------------------------------------------
 
     def __init__(self, output_file_suffix=""):
         self.output_file_suffix = output_file_suffix
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Methods to write/export data files
+# ----------------------------------------------------------------------------------------------------------------------
+
     def write_csv(self, pd_dataframe, filename):
+        """writes data to a csv file in the output/data_output folder of the model directory, and naming the new file
+        using a specified filename and a standard suffix"""
+
         if isinstance(pd_dataframe, pd.DataFrame) and isinstance(filename, str):
             file_path = "output/data_output/{}{}.csv".format(filename, self.output_file_suffix)                         # attach path to desired output folder
             pd_dataframe.to_csv(file_path)
@@ -50,6 +62,9 @@ class DataWriter:
             raise TypeError("Method only supports pandas.Dataframe objects as input and filename as strings")           # error handling: only pandas.Dataframes are accepted and only string filenames
 
     def write_json(self, pd_dataframe, filename):
+        """writes data to a json file in the output/data_output folder of the model directory, and naming the new file
+        using a specified filename and a standard suffix"""
+
         if isinstance(pd_dataframe, pd.DataFrame) and isinstance(filename, str):
             file_path = "output/data_output/{}{}.json".format(filename, self.output_file_suffix)                        # attach path to desired output folder
             pd_dataframe.to_json(file_path)

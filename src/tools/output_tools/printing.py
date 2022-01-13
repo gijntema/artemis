@@ -31,12 +31,16 @@ Version Number:
     0.1
 """
 
-import sys,os
+import sys
+import os
 
 class PrintBlocker:
+    """ Class to enable or disable the execution of print statements in scripts"""
 
     def block_print(self):
+        """"blocks printing until the method enable_print is executed"""
         sys.stdout = open(os.devnull, 'w')
 
     def enable_print(self):
+        """"allows for printing again, removes the effect of method block_printing"""
         sys.stdout = sys.__stdout__

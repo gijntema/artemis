@@ -26,11 +26,11 @@ Module inputs:
 -   Module only works on objects defined in the modules agents.py and choice_set.py
 
 Module Usage:
--   methods of the DataTransformer object are used in ARTEMIS.py,
-    outputs generated there are then used as input for export_data.py and outcome_visualization.py
+-   methods of the DataExtractor object are used in ARTEMIS.py to write output data,
+    outputs generated there are then used as input for export_data.py to write .csv data files
 
 Last Updated:
-    01-10-2021
+    04-01-2021
 
 Version Number:
     0.1
@@ -39,6 +39,8 @@ Version Number:
 # import external packages
 import pandas as pd
 from collections import defaultdict
+from src.tools.model_tools.competition import CompetitionHandler
+from src.ARTEMIS import competition_scenario, interference_factor
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------ Main Functionality Method -------------------------------------------------------------
@@ -47,11 +49,12 @@ from collections import defaultdict
 class DataExtractor:
     """" Restructures the raw data outputs from the model to a usable data format (a pandas.Dataframe object)"""
     def __init__(self):
-        """make a functionality dictionary,
+        """initialisation method: make a functionality dictionary,
         only for future functionality/flexibility,
         aids runtime and readability"""
 
         self.functionality_extraction = self.__init_functionality_extraction()                                          # functionality to extract data as tracked by the model
+        self.theoretical_competition_extractor = TheoreticalCompetitionDataExtractor()                                  # seperate class that extracts more complex theorectical what if data from competition
 
     def __init_functionality_extraction(self):
         """initialises a dictionary containing all possible functionality
@@ -69,12 +72,20 @@ class DataExtractor:
                         'heatmap_expectation': self.__extract_flat_agent_time_heatmap_expectation,                      # What did the agent expect he was going to catch while foraging in the chosen environmental subsection / choice option / DiscreteAlternative
                         'uncorrected_catch': self.__extract_flat_agent_time_uncorrected_catch,                          # What would and agent have caught in the chosen environmental subsection / choice option / DiscreteAlternative, if competition did not affect the catch
                         'realised_catch': self.__extract_flat_agent_time_realised_catch                                 # What did an agent actually catch while foraging in a given time step
+
+                        # more statistical measures, not sure if this is right place to calculate them
+                        #'heatmap_mean_square_error': 'PLACEHOLDER',
+                        #'heatmap_mean_absolute_error': "PLACEHOLDER",
+                        #'heatmap_inlier_ratio': "PLACEHOLDER"
+
                         # INSERT FURTHER FUNCTIONALITY
                     },
                 'time_x_environment':                                                                                   # data specific for individual time steps and individual environmental subsection / choice option / DiscreteAlternative
                     {
                         'environmental_stock': self.__extract_flat_environment_time_resource_stock,                     # What is the stock in every environmental subsection / choice option / DiscreteAlternative
-                        'agent_perceptions': self.__extract_flat_environment_time_agent_perceptions                     # What did every agent (seperate data series for every agent) expect he was going to catch in  every environmental subsection / choice option / DiscreteAlternative
+                        'nb_agents_visited': self.__extract_flat_time_environment_time_nb_agents,
+                        'agent_perceptions': self.__extract_flat_environment_time_agent_perceptions,                    # What did every agent (seperate data series for every agent) expect he was going to catch in  every environmental subsection / choice option / DiscreteAlternative
+                        'agent_potential_real_catch': self.__extract_flat_time_x_environment_agent_potential_catch
                         # INSERT FURTHER FUNCTIONALITY
                     }
 
@@ -149,7 +160,7 @@ class DataExtractor:
         return output_data                                                                                              # return output data
 
     def __extract_flat_agent_time_forage_option_visit(self, agent_set, output_data=pd.DataFrame(), iteration=-99):
-        """Extracts the Environment subsection/Choice option/ DiscreteAlternative
+        """Extracts the Environment unit/Choice option/ DiscreteAlternative
         visited for every time step and agent"""
 
         input_data = agent_set.forage_visit_tracker                                                                     # define what part of the agent fleet the data is at
@@ -259,7 +270,6 @@ class DataExtractor:
 
         return output_data                                                                                              # return output data
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------- Extract Raw Environment/Choice Set by Time data ------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
@@ -298,6 +308,8 @@ class DataExtractor:
         return data_output                                                                                              # return output data
 
     def __extract_flat_environment_time_resource_stock(self, agent_set, choice_set, data_output, iteration_id):
+        """Extracts the resource stock that is present
+         for every time step and individual Choice Option/Environment Unit/ DiscreteAlternative"""
 
         input_data = choice_set.stock_time_tracker                                                                      # define what part of the choice set/environment object the data is at
 
@@ -311,7 +323,26 @@ class DataExtractor:
 
         return data_output                                                                                              # return output data
 
+    def __extract_flat_time_environment_time_nb_agents(self, agent_set, choice_set, data_output, iteration_id):
+        """Extracts the number of agents that has visited
+         for every time step and individual Choice Option/Environment Unit/ DiscreteAlternative"""
+
+        input_data = choice_set.time_visit_map                                                                          # define what part of the choice set/environment object the data is at
+
+        data_series_nb_agents = []                                                                                      # prepare data container for the considered data series to load into the output data
+
+        for time_id in input_data[next(iter(input_data))]:
+            for alternative in input_data:
+                data_series_nb_agents.append(input_data[alternative][time_id])
+
+        data_output['nb_agents_visited'] = data_series_nb_agents                                                        # load data container into desired output data format
+
+        return data_output                                                                                              # return output data
+
+    # TODO: potential issue with 'perceptions' in nomenclature, is used in stock assessment terminology on a regular basis for other variables
     def __extract_flat_environment_time_agent_perceptions(self, agent_set, choice_set, data_output, iteration_id):
+        """Extracts the catch for every agent (separate data series/column) expects to achieve when fishing,
+         for every time step and individual Choice Option/Environment Unit/ DiscreteAlternative"""
 
         input_data = agent_set.heatmap_tracker                                                                          # define what part of the agent fleet the data is at
 
@@ -325,25 +356,47 @@ class DataExtractor:
 
         return data_output                                                                                              # return output data
 
+    def __extract_flat_time_x_environment_agent_potential_catch(self, agent_set, choice_set, data_output, iteration_id):
+        """Extracts the catch that every agent (separate data series/column) could have achieved when fishing
+        (not taking into account competition),
+        for every time step and individual Choice Option/Environment Unit/ DiscreteAlternative"""
+
+        input_data = agent_set.catch_potential_tracker                                                                  # define what part of the agent fleet the data is at
+
+        for agent in agent_set.agents:                                                                                  # loop over every agent to get a seperate data series for every individual agent
+            agent_catch_potential_series = []                                                                           # prepare data container for the considered data series to load into the output data
+            for time in input_data:                                                                                     # fill data container for the considered data by looping over time and choice options in the tracker variables
+                for alternative in input_data[time][agent]:
+                    agent_catch_potential_series.append(input_data[time][agent][alternative])                           # add time and choice option specific data point to prepared data container
+
+            data_output[agent + '_catch_potential'] = agent_catch_potential_series                                      # load data container (for a specific agent) into desired output data format
+            # TODO: Quick and dirty fix does not take competition into account
+        return data_output                                                                                              # return output data
+
 # ----------------------------------------------------------------------------------------------------------------------
-# ----------------- Junk/ Relic methods that need to be checked if still usable/necessary/salvageable ------------------
+# ---------------- Junk/ Remnant methods that need to be checked if still usable/necessary/salvageable -----------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-    # TODO: relic methods: Check if still needed
+    # TODO: relic method: Check if still needed
     def extract_average_expected_competition(self, agent_set):
         """extract data series on Theoretical expected competition over time for every agent"""
+
         data_output = pd.DataFrame(agent_set.average_expected_competitor_tracker).transpose()                           # make a pd.Dataframe from the data on the average number of competitors in a given choice option
         data_output.insert(loc=0, column='time_step_id', value=data_output.index)                                       # repair small error in tracker->pd.dataframe conversion --> get time_step column from index
         data_output.reset_index(inplace=True)                                                                           # reset index values to default indices
         data_output.drop(columns='index', inplace=True)                                                                 # remove newly created redundant column 'index'
+
         return data_output
 
-    # TODO: Decide what to do with this method, Do we still need it or this more for a data transformer module, rather then a data extractor module?
+    # TODO: Move to module derive_statistics to keep raw data extraction and derived data separate
     def extract_time_x_group_catch(self, dataframe):
         """QUICK AND DIRTY WAY TO GET GROUP SPECIFIC CATCH OVER TIME FOR A SINGLE SIMULATION"""                         # TODO: Check if still quick and dirty
+
         data_dictionary = defaultdict(list)
+
         unique_values_time = dataframe['time_id'].unique()
         unique_values_group = dataframe['group_allegiance'].unique()
+
         for time_id in unique_values_time:
             time_temp_df = dataframe[dataframe.time_id == time_id]
             data_dictionary['time_id'].append(time_id)
@@ -352,6 +405,26 @@ class DataExtractor:
                 data_dictionary[group].append(temp_group_df['corrected_catch'].sum())
 
         output_dataframe = pd.DataFrame(data_dictionary)
+
         return output_dataframe
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ------------ Separate objects intended as attribute of DataExtractor to assist in complex data extraction ------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+class TheoreticalCompetitionDataExtractor(CompetitionHandler):
+    # UNFINISHED - SUPPOSED TO BE AN INTERNAL ATTRIBUTE OF THE DataExtractor OBJECT
+    """class set up to extract the data needed based on theoretical composition
+    (what if an agent had chosen a DiscreteAlternative, what would have been the competition in that choice option)"""
+    def __init__(self):
+        CompetitionHandler.__init__(self,
+                                    competition_method=competition_scenario,
+                                    interference_factor=interference_factor)
+
+        self.occurred_forage_visitors = pd.DataFrame()
+
+    def load_occurred_competition(self, output_dataframe):
+        self.occurred_forage_visitors = output_dataframe
 
 # EOF

@@ -97,7 +97,9 @@ class CompetitionHandler:
         elif isinstance(self.competition_method, tuple):                                                                # if multiple competition types are specified - currently not supported
             relevant = self.__init_relevant_multiple()
         else:
-            raise TypeError("competition definition is only allowed as string or tuple")                                # if competition is specified in an unsupported format
+            raise TypeError("competition definition is only allowed as string or tuple \n"
+                            "competition is currently defined as {} of type {}".format(self.competition_method,
+                                                                                       type(self.competition_method)))                                # if competition is specified in an unsupported format
 
         return relevant
 

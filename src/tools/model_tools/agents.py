@@ -95,6 +95,7 @@ class AgentFleet:                                         # to be implemented, n
         self.corrected_catch_tracker = defaultdict(dict)
         self.realised_competition_tracker = defaultdict(dict)                                                           # tracker to contain the amount of competitors an agent has encountered in a given time step
         self.heatmap_tracker = defaultdict(dict)
+        self.catch_potential_tracker = defaultdict(dict)
 
         self.__init_time_data_trackers(duration_model=duration_model)
         self.group_former = self.__init_group_allegiances(number_of_groups=number_of_sharing_groups,                    # set up for better initialisation of group_former, reuiqres the best initiliasation of self.agents a few lines above
@@ -257,8 +258,16 @@ class AgentFleet:                                         # to be implemented, n
     def update_corrected_catch_tracker(self, time_id, agent_id, corrected_catch):
         self.corrected_catch_tracker[time_id][agent_id] = corrected_catch
 
-    def update_heatmap_tracker(self, time_id, agent_id, heatmap):
-        self.heatmap_tracker[time_id][agent_id] = copy.deepcopy(heatmap)
+    def update_heatmap_tracker(self, time_id, agent_id):
+        self.heatmap_tracker[time_id][agent_id] = copy.deepcopy(self.agents[agent_id].heatmap)
+
+    def update_catch_potential_tracker(self, time_id, agent_id, choice_set):
+        self.catch_potential_tracker[time_id][agent_id] = {}
+        for alternative_id in choice_set.discrete_alternatives:
+            self.catch_potential_tracker[time_id][agent_id][alternative_id] = \
+                copy.deepcopy(choice_set.discrete_alternatives[alternative_id].resource_stock)\
+                * self.agents[agent_id].catchability_coefficient
+
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------------- the ForagerAgent object -----------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------

@@ -15,7 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # TODO: ADJUST MODULE DESCRIPTION
-# TODO: UNFINISHED MODULE
+# TODO: UNFINISHED and UNIMPLEMENTED MODULE
 
 """
 This Module defines the DynamicsHandler object to change the attributes of the forage options (DiscreteAlternatives)

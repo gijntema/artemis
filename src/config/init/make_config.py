@@ -63,145 +63,68 @@ class ConfigHandler:
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __init_template_param(self):
-        """returns a template filled with (old) default values,
+        """returns a template filled with (old) default values (as defined in config_template.py,
         to initialise the attributes needed to construct configuration with"""
 
         return template
-#        return \
-#            {
-#                'model':
-#                    {
-#                        'duration': 50,
-#                        'nb_iterations': 1,
-#                        'reporting': false
-#                    },
-#                'agents':
-#                    {
-#                        'nb_agents': 100,
-#                        'catchability_coefficient': 0.2,
-#                        'choice_method':
-#                            {
-#                                'name': 'explore_weighted_heatmap',
-#                                'explore_attributes':
-#                                    {
-#                                        'explore_probability': 0.2,
-#                                    },
-#                                'heatmap_attributes':
-#                                    {
-#                                        'init_nb_alternative_known': 4
-#                                    }
-#                           },
-#                        'sharing':
-#                            {
-#                                'sharing':
-#                                    {
-#                                        'name': 'random_sharing',
-#                                        'no_sharing_attributes': 'DICTIONARY_PLACEHOLDER',
-#                                        'random_sharing_attributes': 'DICTIONARY_PLACEHOLDER',
-#                                        'nb_options_shared': 10
-#                                    },
-#                                'receiver_choice':
-#                                    {
-#                                        'name': 'static_group_choice',
-#                                        'group_attributes':
-#                                            {
-#                                                'nb_groups': 1,
-#                                                'group_formation': "equal_mutually_exclusive_groups",
-#                                                'group_dynamics': False
-#                                            },
-#                                        'random_choice_attributes': 'DICTIONARY_PLACEHOLDER',
-#                                        'nb_receivers': 10
-#                                    },
-#                                'receiving':
-#                                    {
-#                                        'name': 'combine_receiver'
-#                                    }
-#                            },
-#                    },
-#               'options':
-#                    {
-#                        'nb_options': 20,
-#                        'growth':
-#                            {
-#                                'growth_type': 'static',
-#                                'growth_attributes':
-#                                    {
-#                                        'growth_factor': 1
-#                                    }
-#
-#                            },
-#                        'stock_reset':
-#                            {
-#                                'name': 'uniform_random_repeat',
-#                                'reset_probability': 0.1,
-#                                'uniform_attributes':
-#                                    {
-#                                        'min_stock': 0,
-#                                        'max_stock': 200
-#                                    },
-#                                'normal_attributes':
-#                                    {
-#                                        'init_stock': 100,
-#                                        'sd_init_stock': 25
-#                                    }
-#                           }
-#                    },
-#                'competition':
-#                    {
-#                        'name': 'interference-simple',
-#                        'interference_attributes':
-#                            {
-#                                'interference_factor': 0.8
-#                            }
-#                    }
-#            }
 
 # ----------------------------------------------------------------------------------------------------------------------
-# ---------------------------------- Initialise configurations as defined in csv file ----------------------------------
+# -------------------------------- Read scenario configurations as defined in csv file ---------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
-
-    def __read_config_csv(self, filename, separator=';'):
-        """reads a config file with scenario settings in csv format"""
-        data = pd.read_csv(filename, sep=separator)
-        data = data[data['scenario_id'].notna()]
-        return data
-
     def __init_scenarios(self, scenario_file, scenarios='ALL'):
         """loads scenarios from a csv config file and loads these into an internal dictionary (self.scenarios_config),
         by defining a list of scenario names (in strings), only a sub-selection of specified scenarios will be loaded"""
-        df_scenarios = self.__read_config_csv(scenario_file)
-        if scenarios != 'ALL':
-            df_scenarios = df_scenarios[df_scenarios.scenario_id.isin(scenarios)]
 
-        param_columns = [x for x in df_scenarios.columns if x != 'scenario_id']
-        for index, row in df_scenarios.iterrows():
-            self.scenarios_config[row['scenario_id']] = copy.deepcopy(self.template_config)
-            for column in param_columns:
-                self.__adjust_parameters(config_key=column.split('|'),
-                                         new_value=row[column],
-                                         scenario_id=row['scenario_id'],
-                                         config_data=self.scenarios_config[row['scenario_id']])
+        df_scenarios = self.__read_config_csv(scenario_file)                                                            # read scenario csv file
+        if scenarios != 'ALL':                                                                                          # if specified that the model should not read all scenarios but only a specified subset
+            df_scenarios = df_scenarios[df_scenarios.scenario_id.isin(scenarios)]                                       # only include the scenarios that were specified
+
+        param_columns = [x for x in df_scenarios.columns if x != 'scenario_id']                                         # make a list of columns that need to be read to get parameter settings
+        for index, row in df_scenarios.iterrows():                                                                      # iterate over rows (indvidual scenarios)
+            self.scenarios_config[row['scenario_id']] = copy.deepcopy(self.template_config)                             # make an template entry (to be changed) for the scenario (scenario name as key) in the internal dictionary of the ConfigHandler object
+
+            for column in param_columns:                                                                                # loop over all parameters settings of an indiviudal scenario
+                self.__adjust_parameters(config_key=column.split('|'),                                                  # split the column name to get a list of dictionary keys
+                                         new_value=row[column],                                                         # access the parameter value for the considered scenario
+                                         scenario_id=row['scenario_id'],                                                # access the scenario name of the considered scenario
+                                         config_data=self.scenarios_config[row['scenario_id']])                         # change the considered parameter form the template value to the setting of the currently considered scenario
+
+    def __read_config_csv(self, filename, separator=';'):
+        """reads a config file with scenario settings in csv format, default separator
+        (if separator is not defined) is assumed to be ;"""
+
+        data = pd.read_csv(filename, sep=separator)                                                                     # read csv scenario file
+        data = data[data['scenario_id'].notna()]                                                                        # remove scenarios that have no scenario name
+
+        return data                                                                                                     # csv data return statement
 
 # ----------------------------------------------------------------------------------------------------------------------
 # -------------------------------------- Adjusting a single value in a config ------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     def __adjust_parameters(self, config_key, new_value, scenario_id, config_data=None):
-        if not config_data:
+        """"changes one specific value, based on a nest dictionary key given as a list,
+         in a ConfigHandler internal dictionary format that holds the information on all scenario parameter settings,
+         for a specified scenario in a given dictionary"""
+
+        if not config_data:                                                                                             # if the iternal dictionary to be changed is not specified, start at the top of the specified scenario entry in the ConfigHandler internal settings dictionary
             config_data = self.scenarios_config[scenario_id]
 
-        if isinstance(config_data[config_key[0]], dict):
-            self.__adjust_parameters(config_key=config_key[1:],
-                                     new_value=new_value,
-                                     scenario_id=scenario_id,
-                                     config_data=config_data[config_key[0]])
+        if isinstance(config_data[config_key[0]], dict):                                                                # handle nested levels in the dictionaries: access the data present using the first part of the key, if this does not lead to a value to change, take the second part of the key to look further etc.
+            self.__adjust_parameters(config_key=config_key[1:],                                                         # cut off the first part of the dictionary key
+                                     new_value=new_value,                                                               # repeat what value we are changing
+                                     scenario_id=scenario_id,                                                           # repeat what scenario we are changing
+                                     config_data=config_data[config_key[0]])                                            # define the nested dictionary found as the new dictionary to change a value in
 
-        else:
-            config_data[config_key[0]] = new_value
+        else:                                                                                                           # if the part of the dictionary that is accessed by the key is a value that can be changed:
+            config_data[config_key[0]] = new_value                                                                      # change the value
 
 # ----------------------------------------------------------------------------------------------------------------------
 # -------------------------------- Adding and Exporting scenario's outside of model runs -------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
+
+    # TODO: MOVE BELOW FUNCTIONALITY TO (CHILD) CLASS IN OTHER MODULE TO KEEP MODEL FUNCTIONALITY AND TOOLS SEPARATE
+
     def add_new_scenario_manually(self, parameter_instructions, scenario_id):
         """adds a scenario to the internal configuration scenario dictionary.
         adjusts the default values from the internal template (self.template_config) according to parameter instructions
@@ -215,50 +138,61 @@ class ConfigHandler:
     def read_scenario_init_param(self):
         """uses values defined in init_param.py to add a new configuration scenario,
         based on the mapping provided by the class param_to_config_mapping.ParamConverter"""
-        scenario_id, parameter_instructions = ParamConverter().read_init_param_scenario()
-        self.add_new_scenario_manually(parameter_instructions=parameter_instructions, scenario_id=scenario_id)
+
+        scenario_id, parameter_instructions = ParamConverter().read_init_param_scenario()                               # read init_param values
+        self.add_new_scenario_manually(parameter_instructions=parameter_instructions, scenario_id=scenario_id)          # load init_paran values as scenario in ConfigHandler internal dictionary
 
     def remake_scenario_file(self, output_file=None, separator=';'):
-        """converts the internal data on scenarios to csv scenario files that can be read in model runs"""
-        # 1) define output file
-        if not output_file:
-            output_file = self.scenario_filename
+        """converts the internal data on scenarios to csv scenario files that can be read in future model runs"""
 
-        if output_file == 'base_config.csv':
-            output_file = '{}.'.join(output_file.split(".")).format('_with_adjusted_scenarios')
+        # 1) define output file
+        if not output_file:                                                                                             # if an output file is not defined
+            output_file = self.scenario_filename                                                                        # use file that was read to construct current internal dictionary of ConfigHandler
+
+        if output_file == 'base_config.csv':                                                                            # ensure that base_config.csv is never overwritten, as it may be used as template file
+            output_file = '{}.'.join(output_file.split(".")).format('_with_adjusted_scenarios')                         # add a suffix to ensure base_config is not overwritten
 
         # 2) read file structure from old file
-        file_structure = pd.read_csv('base_config.csv', sep=separator).columns                                          # TODO: Inflexible quick fix, hardcoded config file structure
-        paths = [column for column in file_structure if column != 'scenario_id']
+        file_structure = pd.read_csv('base_config.csv', sep=separator).columns                                          # discern the structure (the columns that shoiul dbe in an output file) an ouput file should have by reading base_config.csv as template
+        paths = [column for column in file_structure if column != 'scenario_id']                                        # get the column names that parameter values need to be loaded to
 
         # 3) convert internal file to pd.Dataframe by reading every scenario and building an intermediate dictionary
-        dictionary_for_df = defaultdict(list)
-        for scenario in self.scenarios_config:
-            dictionary_for_df['scenario_id'].append(scenario)
-            for path in paths:
-                dictionary_for_df[path].append(self.get_config_value(config_key=path,
+        dictionary_for_df = defaultdict(list)                                                                           # make an empty data dictionary to load values to in the structure needed for exporting the scenario file
+        for scenario in self.scenarios_config:                                                                          # loop over all scenario settings currently loaded in the ConfigHandler object
+            dictionary_for_df['scenario_id'].append(scenario)                                                           # attach scenario id to intermediate dictionary
+            for path in paths:                                                                                          # for every column (as dictionary key):
+                dictionary_for_df[path].append(self.get_config_value(config_key=path,                                   # attach the value in the intermediate dictionary
                                                                        scenario_id=scenario))
 
         # 4) export pd Dataframe to output csv
-        intermediate_config_df = pd.DataFrame(dictionary_for_df)
-        intermediate_config_df.to_csv(output_file, sep=separator, index=False)
+        intermediate_config_df = pd.DataFrame(dictionary_for_df)                                                        # convert intermediate dictionary to pandas dataframe (easier for exporting)
+        intermediate_config_df.to_csv(output_file, sep=separator, index=False)                                          # Export pandas dataframe with scenario settings to scenario file
 
     def get_config_value(self, config_key, scenario_id, config_data=None):
+        """looks up and returns the value in the currently loaded scenario settings in the ConfigHandler object"""
         if not config_data:
             config_data = self.scenarios_config[scenario_id]
 
         if isinstance(config_key, str):
             config_key = config_key.split('|')
 
-        if isinstance(config_data[config_key[0]], dict):
-            parameter_value = self.get_config_value(config_key=config_key[1:],
-                                    scenario_id=scenario_id,
-                                    config_data=config_data[config_key[0]])
+        if isinstance(config_key, list):
+            if isinstance(config_data[config_key[0]], dict):                                                            # handle nested levels in the dictionaries: access the data present using the first part of the key, if this does not lead to a value to change, take the second part of the key to look further etc.
+                parameter_value = self.get_config_value(config_key=config_key[1:],                                      # cut off the first entry of the dictionary key
+                                                        scenario_id=scenario_id,                                        # repeat in what scenario a value is being looked up
+                                                        config_data=config_data[config_key[0]])                         # use the nested dictionary as new dictionary to look up the value
+
+            else:
+                parameter_value = config_data[config_key[0]]                                                            # if the key leads to a value
+                return parameter_value                                                                                  # return the value found
+
 
         else:
-            parameter_value = config_data[config_key[0]]
-            return parameter_value
+            raise TypeError("Config key to look up values for scenario settings can only be strings, "
+                            "value now is a {}".format(type(config_key)))
 
-        return parameter_value
+        return parameter_value                                                                                          # return the value found
+
+
 
 #EOF

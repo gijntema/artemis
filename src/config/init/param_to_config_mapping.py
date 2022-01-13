@@ -34,6 +34,7 @@ Version Number:
 """
 
 from src.config.init.init_param import *
+# TODO: DISENTANGLE THE ParamConverter MODEL FUNCTIONALITY AND TOOL FUNCTIONALITY
 
 class ParamConverter:
     """Converts parameter names in the model to keys for use in the ConfigHandler object internal dictionaries
@@ -78,7 +79,7 @@ class ParamConverter:
         scenario_id = scenario_name
         return scenario_id, self.config_instructions
 
-    def reverse_read_scenario(self, config_handler, scenario_id):  # UNIMPLEMENTED
+    def reverse_read_scenario(self, config_handler, scenario_id):
         output_scenario_values = []
         for key, value in self.config_instructions:
             output_scenario_values.append(config_handler.get_config_value(config_key=key, scenario_id=scenario_id))
