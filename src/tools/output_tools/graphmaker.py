@@ -1,3 +1,38 @@
+#
+# This file is part of ARTEMIS (https://git.wur.nl/ecodyn/artemis.git).
+# Copyright (c) 2021 Wageningen Marine Research
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+"""
+This Module is aimed at making graphs from the output data of the ARTEMIS model,
+as produced in by export_data.py in ARTEMIS.py and in ARTEMIS.py itself
+The Module is currently an outdated version and needs to be updated
+
+Module inputs:
+-   None, but the module specifically only supports pandas.DataFrame objects
+
+Module Usage:
+-   the GraphConstructor objects are former inputs of ARTEMIS.py, old version needs t
+
+Last Updated:
+    01-10-2021
+
+Version Number:
+    0.1
+"""
+
 import copy
 
 import pandas as pd

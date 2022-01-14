@@ -39,7 +39,7 @@ Version Number:
     0.2
 """
 
-# TODO: replace 'alternatives' with 'choices' or 'options' in all variable, method and function nomenclature -- Potential pother namem might be ChoiceSet--> Environment (used in computer science) and DiscreteAlternative --> Environment Unit
+# TODO: replace 'alternatives' with 'choices' or 'options' in all variable, method and function nomenclature -- Potential other name might be ChoiceSet--> Environment (used in computer science) and DiscreteAlternative --> Environment Unit
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Import External Modules needed for ARTEMIS functionality

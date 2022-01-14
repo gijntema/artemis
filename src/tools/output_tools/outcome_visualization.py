@@ -23,7 +23,7 @@ Module inputs:
 -   None, but the module specifically only supports pandas.DataFrame objects
 
 Module Usage:
--   the GraphConstructor objects are input for module ARTEMIS.py
+-   the GraphConstructor objects are former inputs of ARTEMIS.py, but redaundant in the current version of the model
 
 Last Updated:
     01-10-2021

@@ -1,7 +1,5 @@
 
-
-# TODO: UNFINSIHED MODULE
-
+# SEE BOTTOM FOR EXECUTION OF SCRIPT -- ALSO DEFINE PROPER SCENARIO FILE THERE
 
 from src.tools.output_tools.export_data import DataWriter
 import pandas as pd
@@ -104,17 +102,16 @@ class StatisticsDeriver:
         # 6) loop over unique agents
         for agent in agents:
             # 7) Make Agent Error column with the real value (potential_catch) - predicted value (heatmap expectation)
-            df = self.flat_time_x_environment_data                                                                    # give the data to be modified an additional, shorter, name for easier readability in the script
+            df = self.flat_time_x_environment_data                                                                      # give the data to be modified an additional, shorter, name for easier readability in the script
             df['{}_heatmap_error'.format(agent)] = \
-                df.apply(lambda row: self.__lambda_heatmap_errors(row=row, agent=agent), axis=1)
-#                self.flat_time_x_environment_data['{}_catch_potential'.format(agent)] - \
-#                self.flat_time_x_environment_data['{}_catch_expectation_heatmap'.format(agent)]
-
+                df.apply(lambda row: self.__lambda_heatmap_errors(row=row, agent=agent), axis=1)                        # Use function __lambda_heatmap_errot to calculate the errors for every row and
 
         # 8) export data
         self.__export_derivative_statistics_time_x_environment()
 
     def __lambda_heatmap_errors(self, row, agent):
+        """supporting function of derive __derive_statistics_flat_time_x_environment_heatmap_errors
+        that assesses the conditionals and does the actual calculations of errors"""
         if agent in row['agents_visited'].split('|'):
             corrected_catch = row['{}_catch_potential'.format(agent)] * row['occurred_competition_correction']
 
