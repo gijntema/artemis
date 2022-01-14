@@ -114,6 +114,7 @@ class ModelRunner:
                             init_uniform_standard_stock(max_stock, min_stock)                                           # reinitialise stock drawn from uniform distribution with given max and and min stock
                     alternative_tracker += 1
 
+            competition_handler.update_choice_set_competition_trackers(choice_set=choice_set, time_id=time_id)
             competition_handler.reset_relevant_data()                                                                   # ensure the competition_handler is reset to default to start next time_step fresh
             time_tracker += 1                                                                                           # proceed to the next time step
 

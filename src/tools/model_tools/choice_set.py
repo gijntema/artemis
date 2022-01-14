@@ -67,6 +67,8 @@ class ChoiceSet:
         self.catch_map = {}                                                                                             # tracker variable for total catch gained from each choice options
         self.time_visit_map = defaultdict(dict)
         self.stock_time_tracker = defaultdict(dict)
+        self.competition_correction = defaultdict(dict)                                                                 # tracks the correction in catch that has occurered
+        self.hypothetical_competition_correction = defaultdict(dict)                                                    # track the correction in catch that would have occured when one additional agent would have foraged
 
         self.__init_attributes(nb_alternatives=nb_alternatives, stock_distribution=stock_distribution,
                                init_stock=init_stock, sd_init_stock=sd_init_stock, growth_factor=growth_factor,

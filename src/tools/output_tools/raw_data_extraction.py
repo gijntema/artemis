@@ -39,8 +39,6 @@ Version Number:
 # import external packages
 import pandas as pd
 from collections import defaultdict
-from src.tools.model_tools.competition import CompetitionHandler
-from src.ARTEMIS import competition_scenario, interference_factor
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------ Main Functionality Method -------------------------------------------------------------
@@ -54,7 +52,6 @@ class DataExtractor:
         aids runtime and readability"""
 
         self.functionality_extraction = self.__init_functionality_extraction()                                          # functionality to extract data as tracked by the model
-        self.theoretical_competition_extractor = TheoreticalCompetitionDataExtractor()                                  # seperate class that extracts more complex theorectical what if data from competition
 
     def __init_functionality_extraction(self):
         """initialises a dictionary containing all possible functionality
@@ -64,28 +61,41 @@ class DataExtractor:
             {
                 'time_x_agent':                                                                                         # data specific for individual time steps and individual agent
                     {
-                        'general': self.__extract_flat_agent_time_general,                                              # Add generic data series always needed -> Iteration ID, Time ID, Agent ID, Agent Group ID
-                        'forage_option_visit': self.__extract_flat_agent_time_forage_option_visit,                      # What Environment subsection / choice option / DiscreteAlternative did the agent forage in
-                        'average_expected_competition': self.__extract_flat_agent_time_average_expected_competition,    # What is the theoretical amount of competitors an agent would encounter on the grid - MEASURE NOT RELIABLE
-                        'realised_competition': self.__extract_flat_agent_time_realised_competition,                    # What is the actual amount of other agents and agent encountered while foraging
-                        'knowledge_in_heatmap': self.__extract_flat_agent_time_knowledge,                               # How many environment subsections / choice options / DiscreteAlternatives does agent have memory on
-                        'heatmap_expectation': self.__extract_flat_agent_time_heatmap_expectation,                      # What did the agent expect he was going to catch while foraging in the chosen environmental subsection / choice option / DiscreteAlternative
-                        'uncorrected_catch': self.__extract_flat_agent_time_uncorrected_catch,                          # What would and agent have caught in the chosen environmental subsection / choice option / DiscreteAlternative, if competition did not affect the catch
-                        'realised_catch': self.__extract_flat_agent_time_realised_catch                                 # What did an agent actually catch while foraging in a given time step
-
-                        # more statistical measures, not sure if this is right place to calculate them
-                        #'heatmap_mean_square_error': 'PLACEHOLDER',
-                        #'heatmap_mean_absolute_error': "PLACEHOLDER",
-                        #'heatmap_inlier_ratio': "PLACEHOLDER"
-
+                        'general':
+                            self.__extract_flat_agent_time_general,                                                     # Add generic data series always needed -> Iteration ID, Time ID, Agent ID, Agent Group ID
+                        'forage_option_visit':
+                            self.__extract_flat_agent_time_forage_option_visit,                                         # What Environment subsection / choice option / DiscreteAlternative did the agent forage in
+                        'average_expected_competition':
+                            self.__extract_flat_agent_time_average_expected_competition,                                # What is the theoretical amount of competitors an agent would encounter on the grid - MEASURE NOT RELIABLE
+                        'realised_competition':
+                            self.__extract_flat_agent_time_realised_competition,                                        # What is the actual amount of other agents and agent encountered while foraging
+                        'knowledge_in_heatmap':
+                            self.__extract_flat_agent_time_knowledge,                                                   # How many environment subsections / choice options / DiscreteAlternatives does agent have memory on
+                        'heatmap_expectation':
+                            self.__extract_flat_agent_time_heatmap_expectation,                                         # What did the agent expect he was going to catch while foraging in the chosen environmental subsection / choice option / DiscreteAlternative
+                        'uncorrected_catch':
+                            self.__extract_flat_agent_time_uncorrected_catch,                                           # What would and agent have caught in the chosen environmental subsection / choice option / DiscreteAlternative, if competition did not affect the catch
+                        'realised_catch':
+                            self.__extract_flat_agent_time_realised_catch                                               # What did an agent actually catch while foraging in a given time step
                         # INSERT FURTHER FUNCTIONALITY
                     },
+
                 'time_x_environment':                                                                                   # data specific for individual time steps and individual environmental subsection / choice option / DiscreteAlternative
                     {
-                        'environmental_stock': self.__extract_flat_environment_time_resource_stock,                     # What is the stock in every environmental subsection / choice option / DiscreteAlternative
-                        'nb_agents_visited': self.__extract_flat_time_environment_time_nb_agents,
-                        'agent_perceptions': self.__extract_flat_environment_time_agent_perceptions,                    # What did every agent (seperate data series for every agent) expect he was going to catch in  every environmental subsection / choice option / DiscreteAlternative
-                        'agent_potential_real_catch': self.__extract_flat_time_x_environment_agent_potential_catch
+                        'id_agents_visited':
+                            self.__extract_flat_environment_time_agents_visited,                                        # Which agents have visited an individual environmental subsection / choice option / DiscreteAlternative
+                        'environmental_stock':
+                            self.__extract_flat_environment_time_resource_stock,                                        # What is the stock in an individual environmental subsection / choice option / DiscreteAlternative
+                        'nb_agents_visited':
+                            self.__extract_flat_time_environment_time_nb_agents,                                        # how many agents have visited in an individual environmental subsection / choice option / DiscreteAlternative
+                        'occurred_competition_correction':
+                            self.__extract_flat_time_environment_competition_correction_occurred,                       # What was the correction for catch applied in an individual environmental subsection / choice option / DiscreteAlternative
+                        'theoretical_competition_correction':
+                            self.__extract_flat_time_environment_competition_correction_hypothetical,                   # What would have been the correction for catch applied in an individual environmental subsection / choice option / DiscreteAlternative, if one more agent chose to forage there
+                        'agent_perceptions':
+                            self.__extract_flat_environment_time_agent_perceptions,                                     # What did every agent (seperate data series for every agent) expect he was going to catch in  every environmental subsection / choice option / DiscreteAlternative
+                        'agent_potential_real_catch':
+                            self.__extract_flat_time_environment_agent_potential_catch                                  # What could an agent (seperate data series for every agent) have caught in an individual environmental subsection / choice option / DiscreteAlternative if it had foraged there without competition
                         # INSERT FURTHER FUNCTIONALITY
                     }
 
@@ -154,8 +164,7 @@ class DataExtractor:
         output_data['agent_id'] = data_series_agent                                                                     # load data container for agent id tags to match desired output data format
         output_data['group_allegiance'] = data_series_group_allegiance                                                  # load data container for agent group id tags to match desired output data format
         # output_data['catch'] = data_series_catch
-        # TODO Move 'Catch' to separate method - Done but see one line below
-        # TODO: Catch as tracked above seems to be bugging, other tracker for catch yields other, more logical data -- DOUBLE Check functionality
+        # TODO: Catch as commented out above seems to be bugging, other tracker for catch yields other, more logical data -- DOUBLE Check functionality
 
         return output_data                                                                                              # return output data
 
@@ -307,6 +316,21 @@ class DataExtractor:
                                                                                            iteration_id=iteration_id)
         return data_output                                                                                              # return output data
 
+    def __extract_flat_environment_time_agents_visited(self, agent_set, choice_set, data_output, iteration_id):
+
+        input_data = agent_set.forage_visit_tracker                                                                     # define what part of the agent fleet the data is at
+
+        data_series_agents_visited = []                                                                                 # prepare data container for the considered data series to load into the output data
+
+        for time_id in input_data:
+            for alternative in choice_set.discrete_alternatives:                                                        # fill data container for the considered data by looping over time and choice options in the tracker variables
+                agents_visited = '|'.join([key for key, value in input_data[time_id].items() if value == alternative])  # construct data point using list comprehension (find what agents (keys) have chosen the considered choice_option/DiscretAlternative/Environment Unit (values)
+                data_series_agents_visited.append(agents_visited)                                                       # add time and choice option specific data point to prepared data container
+
+        data_output['agents_visited'] = data_series_agents_visited                                                      # load data container into desired output data format
+
+        return data_output                                                                                              # return output data
+
     def __extract_flat_environment_time_resource_stock(self, agent_set, choice_set, data_output, iteration_id):
         """Extracts the resource stock that is present
          for every time step and individual Choice Option/Environment Unit/ DiscreteAlternative"""
@@ -339,6 +363,40 @@ class DataExtractor:
 
         return data_output                                                                                              # return output data
 
+    def __extract_flat_time_environment_competition_correction_occurred(self, agent_set, choice_set, data_output,
+                                                                        iteration_id):
+        """Extracts the correction factor that was used to correct catch for any forager having foraged
+        for every time step and any given individual Choice Option/Environment Unit/ DiscreteAlternative """
+        input_data = choice_set.competition_correction                                                                  # define what part of the choice set/environment object the data is at
+
+        data_series_competition_correction = []                                                                         # prepare data container for the considered data series to load into the output data
+
+        for time_id in input_data:                                                                                      # fill data container for the considered data by looping over time and choice options in the tracker variables
+            for alternative in input_data[time_id]:
+                data_series_competition_correction.append(input_data[time_id][alternative])                             # add time and choice option specific data point to prepared data container
+
+        data_output['occurred_competition_correction'] = data_series_competition_correction                             # load data container into desired output data format
+
+        return data_output                                                                                              # return output data
+
+    def __extract_flat_time_environment_competition_correction_hypothetical(self, agent_set, choice_set, data_output,
+                                                                            iteration_id):
+        """Extracts the theoretical correction factor that would have been used to correct catch for any forager foraging
+        if the number of agents foraging in any given  Choice Option/Environment Unit/ DiscreteAlternative was increased
+        by one,
+        for every time step and any given individual Choice Option/Environment Unit/ DiscreteAlternative """
+        input_data = choice_set.hypothetical_competition_correction                                                     # define what part of the choice set/environment object the data is at
+
+        data_series_hypothetical_competition_correction = []                                                            # prepare data container for the considered data series to load into the output data
+
+        for time_id in input_data:                                                                                      # fill data container for the considered data by looping over time and choice options in the tracker variables
+            for alternative in input_data[time_id]:
+                data_series_hypothetical_competition_correction.append(input_data[time_id][alternative])                # add time and choice option specific data point to prepared data container
+
+        data_output['hypothetical_competition_correction'] = data_series_hypothetical_competition_correction            # load data container into desired output data format
+
+        return data_output                                                                                              # return output data
+
     # TODO: potential issue with 'perceptions' in nomenclature, is used in stock assessment terminology on a regular basis for other variables
     def __extract_flat_environment_time_agent_perceptions(self, agent_set, choice_set, data_output, iteration_id):
         """Extracts the catch for every agent (separate data series/column) expects to achieve when fishing,
@@ -356,7 +414,7 @@ class DataExtractor:
 
         return data_output                                                                                              # return output data
 
-    def __extract_flat_time_x_environment_agent_potential_catch(self, agent_set, choice_set, data_output, iteration_id):
+    def __extract_flat_time_environment_agent_potential_catch(self, agent_set, choice_set, data_output, iteration_id):
         """Extracts the catch that every agent (separate data series/column) could have achieved when fishing
         (not taking into account competition),
         for every time step and individual Choice Option/Environment Unit/ DiscreteAlternative"""
@@ -407,24 +465,3 @@ class DataExtractor:
         output_dataframe = pd.DataFrame(data_dictionary)
 
         return output_dataframe
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# ------------ Separate objects intended as attribute of DataExtractor to assist in complex data extraction ------------
-# ----------------------------------------------------------------------------------------------------------------------
-
-class TheoreticalCompetitionDataExtractor(CompetitionHandler):
-    # UNFINISHED - SUPPOSED TO BE AN INTERNAL ATTRIBUTE OF THE DataExtractor OBJECT
-    """class set up to extract the data needed based on theoretical composition
-    (what if an agent had chosen a DiscreteAlternative, what would have been the competition in that choice option)"""
-    def __init__(self):
-        CompetitionHandler.__init__(self,
-                                    competition_method=competition_scenario,
-                                    interference_factor=interference_factor)
-
-        self.occurred_forage_visitors = pd.DataFrame()
-
-    def load_occurred_competition(self, output_dataframe):
-        self.occurred_forage_visitors = output_dataframe
-
-# EOF

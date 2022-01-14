@@ -179,8 +179,9 @@ class CompetitionHandler:
         uncorrected_catch = copy.deepcopy(choice_set.discrete_alternatives[choice_id].resource_stock) \
                             * agent_set.agents[agent_id].catchability_coefficient                                       # extract hypothetical catch if competition was absent
 
-        corrected_catch, competitors_encountered = \
+        corrected_catch, competitors_encountered, correction, hypothetical_correction = \
             self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch)              # correct hypothetical catch using the competition methods specified
+
 
         # update agent Trackers
         agent_set.update_agent_trackers(agent_id, corrected_catch, choice_id, time_id)                                  # update trackers on the agents itself
@@ -196,27 +197,43 @@ class CompetitionHandler:
         choice_set.effort_map[choice_id] += 1                                                                           # update tracker of the choice set for effort in a choice option
         choice_set.time_visit_map[choice_id][time_id] += 1
 
+    def update_choice_set_competition_trackers(self, choice_set, time_id):
+        for choice_id in choice_set.discrete_alternatives:
+            corrected_catch, competitors_encountered, correction, hypothetical_correction = \
+                self.competition_instruction[self.competition_method]['correct'](choice_id, uncorrected_catch=1)
+
+            choice_set.competition_correction[time_id][choice_id] = correction
+            choice_set.hypothetical_competition_correction[time_id][choice_id] = hypothetical_correction
+
     def __correct_absent(self, choice_id, uncorrected_catch):
         """empty function to prevent errors, does not correct catch in any way but adds a tag"""
         corrected_catch = uncorrected_catch                                                                             # don't correct data, purely for visual aid to what happens
         competitors_encountered = -99                                                                                   # output expects a tag for interference, default given as interference is not presnet in this scenario
-        return corrected_catch, competitors_encountered
+        correction = 1
+        theoretical_correction = 1
+        return corrected_catch, competitors_encountered, correction, theoretical_correction
 
     def __correct_interference_simple(self, choice_id, uncorrected_catch):
         """method to correct catch using interference by using the interference factor
         as percentual decline of catch per competitor"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
-        corrected_catch = uncorrected_catch * (self.relevant_data['interference_factor']**(number_of_competitors-1))    # correct using interference fatctro^(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
-
         competitors_encountered = number_of_competitors - 1
-        return corrected_catch, competitors_encountered
+
+        correction = self.relevant_data['interference_factor'] ** competitors_encountered
+        hypothetical_correction = self.relevant_data['interference_factor'] ** number_of_competitors
+        corrected_catch = uncorrected_catch * correction                                                                # correct using interference fatctro^(number_competitors-1), prone to errors if called when 0 competitors are present, this should however not be possible
+
+        return corrected_catch, competitors_encountered, correction, hypothetical_correction
 
     def __correct_split_catch(self, choice_id, uncorrected_catch):
         """method to correct catch by dividing over the number of competitors, creates very strong competition"""
         number_of_competitors = self.relevant_data['effort_tracker'][choice_id]                                         # identify how many competitors forage in the same choice from the tracker variables
-        corrected_catch = uncorrected_catch / number_of_competitors                                                     # prone to DividedByZeroError, but as this method should never be called if no foraging occurs in a choice option, this should be a nice test for functioning
+        correction = 1/number_of_competitors
+        hypothetical_correction = 1/(number_of_competitors + 1)
+
+        corrected_catch = uncorrected_catch * correction                                                                # prone to DividedByZeroError, but as this method should never be called if no foraging occurs in a choice option, this should be a nice test for functioning
         competitors_encountered = number_of_competitors - 1                                                             # generate interference tag for later use in reporting
-        return corrected_catch, competitors_encountered
+        return corrected_catch, competitors_encountered, correction, hypothetical_correction
 
 
 # ----------------------------------------------------------------------------------------------------------------------
