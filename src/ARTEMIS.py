@@ -69,7 +69,7 @@ from src.tools.output_tools.export_data import DataWriter                       
 # Set up structure for configuration of the model (The ConfigHandler object and the scenario file csv)
 # ----------------------------------------------------------------------------------------------------------------------
 
-config_handler = ConfigHandler(scenario_file='base_config.csv')                                                         # define and load batch file csv containing the parameters for each scenario to run
+config_handler = ConfigHandler(scenario_file='base_config_20220120.csv')                                                         # define and load batch file csv containing the parameters for each scenario to run
 
 if len(config_handler.scenarios_config) < 1:
     raise ReferenceError("Config File Contains No Scenarios to Run")                                                    # raise error if scenario file is empty

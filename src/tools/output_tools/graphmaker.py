@@ -44,25 +44,127 @@ matplotlib.rcParams.update({'errorbar.capsize': 2})
 #from mapping import scenario_map
 import matplotlib.pyplot as plt
 
-old_wd = os.getcwd()
-os.chdir(old_wd.split('tools')[0] + 'output\\data_output')
 
 class GraphMaker:
 
-    def __init__(self, config_file):
-        self.desired_graphs = []
-        self.input_files = []
+    def __init__(self,
+                 config_file,
+                 data_folder_name='output/data_output/',
+                 output_folder_name='output/data_output/graphs/',
+                 flat_time_x_agent_file_name_template='flat_time_x_agent_results{}.csv',
+                 flat_time_x_environment_file_name_template='flat_time_x_environment_results{}.csv'):
+
+        self.config_file = pd.read_csv(config_file, sep=';')
         self.functionality = self.__init_functionality()
-        self.config_file = pd.read_csv(config_file)
+        self.temp_data = ""
+
+        #self.data_dictionary = self.__init_data_dictionary(flat_time_x_agent_file_name_template,
+        #                                                   flat_time_x_environment_file_name_template)
 
 
     def __init_functionality(self):
-        return \
-            {
-                'Sharing X avg_catch+-sd X nb_groups': self.sharing_x_avg_catch_y_nb_group_z,
-                'time X Ncorrect_heatmap X sharing': self.time_x_ncorrect_heatmap_y_sharing_z,
-                'time X heatmap_correct_perception X sharing': self.time_x_heatmap_correct_perception_y_sharing_z
-            }
+        return {}#'errors': self.make_graph_erros_agent_012}
+
+    def __init_data_dictionary(self,
+                               flat_time_x_agent_file_name_template,
+                               flat_time_x_environment_file_name_template):
+
+        """reads and loads the data files that resulted form the ARTEMIS scenario runs as defined in the config_file"""
+        data_dictionary = {}
+        for scenario in self.config_file['scenario_id'].values:
+            data_dictionary[scenario]['flat_time_x_agent_results'] = \
+                pd.read_csv(flat_time_x_agent_file_name_template.format(scenario))
+            data_dictionary[scenario]['flat_time_x_environment_results'] = \
+                pd.read_csv(flat_time_x_environment_file_name_template.format(scenario))
+
+        return data_dictionary
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Methods for making graphs
+# ----------------------------------------------------------------------------------------------------------------------
+
+    def make_graph_time_x_MAE_NoC(self, scenarios=False):
+        # 1) read config
+        scenario_file = self.config_file
+        if not scenarios:
+            scenarios = scenario_file['scenario_id'].values
+            scenarios = np.unique(scenarios)
+
+        # 2) prepare data container pd.Dataframe
+        constructed_data = pd.DataFrame()
+
+        for scenario in scenarios:
+            # 3) read data files (flat)
+            scenario_data = pd.read_csv('output/data_output/flat_time_x_agent_results_with_statistics_{}.csv'.format(scenario))
+            scenario_data = copy.deepcopy(scenario_data[scenario_data['agent_id'] == 'agent_012'])
+            self.temp_data = scenario_data
+            scenario_mae_data = copy.deepcopy(scenario_data['mean_absolute_errors'])
+
+            constructed_data['mea_{}'.format(scenario)] = scenario_mae_data
+            #constructed_data
+
+        constructed_data['time_id'] = scenario_data['time_id']
+
+        constructed_data.plot.line(x='time_id')
+
+    def make_graph_time_x_MPNE_NoC(self, scenarios=False):
+        # 1) read config
+        scenario_file = self.config_file
+        if not scenarios:
+            scenarios = scenario_file['scenario_id'].values
+            scenarios = np.unique(scenarios)
+
+        # 2) prepare data container pd.Dataframe
+        constructed_data = pd.DataFrame()
+
+        for scenario in scenarios:
+            # 3) read data files (flat)
+            scenario_data = pd.read_csv('output/data_output/flat_time_x_agent_results_with_statistics_{}.csv'.format(scenario))
+            scenario_data = copy.deepcopy(scenario_data[scenario_data['agent_id'] == 'agent_012'])
+            self.temp_data = scenario_data
+            scenario_mpe_data = copy.deepcopy(scenario_data['mean_positive_errors'])
+            scenario_mne_data = copy.deepcopy(scenario_data['mean_negative_errors'])
+
+            constructed_data['mpe_{}'.format(scenario)] = scenario_mpe_data
+            constructed_data['mne_{}'.format(scenario)] = scenario_mne_data
+
+        constructed_data['time_id'] = scenario_data['time_id']
+
+        constructed_data.plot.line(x='time_id')
+
+# ----------------------------------------------------------------------------------------------------------------------
+# EXECUTING THE SCRIPT
+# ----------------------------------------------------------------------------------------------------------------------
+
+# set proper Working directory to folder 'src'
+old_dir = os.getcwd()
+os.chdir(old_dir.removesuffix('\\tools\\output_tools'))
+considered_scenarios = ['2022_01_13_noC_s0', '2022_01_13_noC_s1', '2022_01_13_noC_s10']
+
+graph_maker = GraphMaker(config_file='base_config_20220120.csv')
+graph_maker.make_graph_time_x_MAE_NoC(scenarios=considered_scenarios)
+graph_maker.make_graph_time_x_MPNE_NoC(scenarios=considered_scenarios)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# JUNK PARTS OF GraphMaker, MOVED TO CHILD CLASS OldGraphMaker
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+class OldGraphMaker(GraphMaker):
+
+    def __init__(self):
+        GraphMaker.__init__(self)
+        self.desired_graphs = []
+        self.input_files = []
+        self.functionality_old = self.__init_functionality_old()
+
+
+    def __init_functionality_old(self):
+        return {
+            'Sharing X avg_catch+-sd X nb_groups': self.sharing_x_avg_catch_y_nb_group_z,
+            'time X Ncorrect_heatmap X sharing': self.time_x_ncorrect_heatmap_y_sharing_z,
+            'time X heatmap_correct_perception X sharing': self.time_x_heatmap_correct_perception_y_sharing_z
+        }
 
     def add_input_files(self, list_of_file_names):
 
@@ -282,15 +384,18 @@ class GraphMaker:
         starting_point_csv_nb -= 100
         end_point -= 100
 
-# Run File
-# GraphMaker().sharing_x_avg_catch_y_nb_group_z()
-starting_point = 101
-end_point = 109
-while end_point < 229:
-    output_df = GraphMaker(config_file='C:\\Users\\ijnte001\\ARTEMIS\\src\\base_config_20211222.csv')\
-        .time_x_ncorrect_heatmap_y_sharing_z(starting_point_csv_nb=starting_point,
-                                                                 end_point=end_point)
-    starting_point += 8
-    end_point += 8
+# ----------------------------------------------------------------------------------------------------------------------
+# Old Execution Script
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+#starting_point = 101
+#end_point = 109
+#while end_point < 229:
+#    output_df = GraphMaker(config_file='base_config_20211222.csv') \
+#        .time_x_ncorrect_heatmap_y_sharing_z(starting_point_csv_nb=starting_point,
+#                                             end_point=end_point)
+#    starting_point += 8
+#    end_point += 8
 
 # EOF
