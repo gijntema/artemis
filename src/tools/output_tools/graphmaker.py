@@ -105,7 +105,9 @@ class GraphMaker:
 
         constructed_data['time_id'] = scenario_data['time_id']
 
-        constructed_data.plot.line(x='time_id')
+        colours = ['black', 'blue', 'red', 'yellow', 'green']
+        constructed_data.plot.line(x='time_id', subplots=True, color=colours)
+
 
     def make_graph_time_x_MPNE_NoC(self, scenarios=False):
         # 1) read config
@@ -117,6 +119,7 @@ class GraphMaker:
         # 2) prepare data container pd.Dataframe
         constructed_data = pd.DataFrame()
 
+        colours = ['black', 'black', 'blue', 'blue', 'red', 'red', 'green', 'green', 'yellow', 'yellow']
         for scenario in scenarios:
             # 3) read data files (flat)
             scenario_data = pd.read_csv('output/data_output/flat_time_x_agent_results_with_statistics_{}.csv'.format(scenario))
@@ -130,7 +133,31 @@ class GraphMaker:
 
         constructed_data['time_id'] = scenario_data['time_id']
 
-        constructed_data.plot.line(x='time_id')
+        constructed_data.plot.line(x='time_id', subplots=True, color=colours)
+
+    def make_graph_error_hist(self,  scenarios=False, times=[300]):
+
+        # 1) read config
+        scenario_file = self.config_file
+        if not scenarios:
+            scenarios = scenario_file['scenario_id'].values
+            scenarios = np.unique(scenarios)
+
+
+        # 2) prepare data container pd.Dataframe
+        constructed_data = pd.DataFrame()
+
+        for scenario in scenarios:
+            # 3) read data files (flat)
+            scenario_data = pd.read_csv('output/data_output/flat_time_x_environment_results_with_statistics_{}.csv'.format(scenario))
+            for time in times:
+                scenario_data_temp = copy.deepcopy(scenario_data[scenario_data['time_id'] == time])
+                scenario_data_temp = copy.deepcopy(scenario_data_temp['agent_012_heatmap_error'])
+                constructed_data['error_{}_{}'.format('t{}_'.format(time), scenario)] = copy.deepcopy(scenario_data_temp)
+
+        colours = ['black', 'blue', 'red',  'green', 'yellow']
+        constructed_data.plot.hist(bins=16, subplots=True, color=colours, range=(-32, 32))
+        return constructed_data
 
 # ----------------------------------------------------------------------------------------------------------------------
 # EXECUTING THE SCRIPT
@@ -139,11 +166,14 @@ class GraphMaker:
 # set proper Working directory to folder 'src'
 old_dir = os.getcwd()
 os.chdir(old_dir.removesuffix('\\tools\\output_tools'))
-considered_scenarios = ['2022_01_13_noC_s0', '2022_01_13_noC_s1', '2022_01_13_noC_s10']
+considered_scenarios = ['2022_01_13_noC_s0', '2022_01_13_noC_s05', '2022_01_13_noC_s1', '2022_01_13_noC_s5','2022_01_13_noC_s10']
 
 graph_maker = GraphMaker(config_file='base_config_20220120.csv')
 graph_maker.make_graph_time_x_MAE_NoC(scenarios=considered_scenarios)
 graph_maker.make_graph_time_x_MPNE_NoC(scenarios=considered_scenarios)
+graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[150])
+graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[151])
+graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[152])
 
 # ----------------------------------------------------------------------------------------------------------------------
 # JUNK PARTS OF GraphMaker, MOVED TO CHILD CLASS OldGraphMaker
