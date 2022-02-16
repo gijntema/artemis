@@ -1,3 +1,21 @@
+#
+# This file is part of ARTEMIS (https://git.wur.nl/artemis.git).
+# Copyright (c) 2021 Wageningen Marine Research
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+
 
 # SEE BOTTOM FOR EXECUTION OF SCRIPT -- ALSO DEFINE PROPER SCENARIO FILE THERE
 
@@ -9,7 +27,7 @@ import os
 import numpy as np
 import statistics as stats
 
-class StatisticsDeriver:
+class MeasureDeriver:
     """Class to derive statistics and measures
     from two raw output data .csv files of ARTEMIS.py for a single run scenario"""
 # ----------------------------------------------------------------------------------------------------------------------
@@ -20,7 +38,8 @@ class StatisticsDeriver:
                  scenario_name,
                  output_folder_name='output/data_output/',
                  flat_time_x_agent_file_name_template='flat_time_x_agent_results{}.csv',
-                 flat_time_x_environment_file_name_template='flat_time_x_environment_results{}.csv'):
+                 flat_time_x_environment_file_name_template='flat_time_x_environment_results{}.csv',
+                 inplace=True):
 
         self.flat_time_x_agent_path_template = output_folder_name + flat_time_x_agent_file_name_template
         self.flat_time_x_environment_path_template = output_folder_name + flat_time_x_environment_file_name_template
@@ -33,7 +52,11 @@ class StatisticsDeriver:
         self.flat_time_x_environment_data['agents_visited'] = \
             self.flat_time_x_environment_data['agents_visited'].fillna('')                                              # convert nan values to empty strings to prevent bugging in later stages of the data analysis
 
-        self.output_suffix = "_with_statistics_{}".format(scenario_name)
+        if not inplace:
+            self.output_suffix = "_with_statistics_{}".format(scenario_name)
+        else:
+            self.output_suffix = scenario_name
+
         self.data_writer = DataWriter(output_file_suffix=self.output_suffix)
 
 
@@ -310,20 +333,27 @@ old_dir = os.getcwd()
 os.chdir(old_dir.removesuffix('\\tools\\output_tools'))
 
 # 1) read scenario_file and get list of scenarios
-scenarios = pd.read_csv('base_config_20220120.csv', sep=';')
+scenario_file = 'base_config_20220215.csv'
+suffix = scenario_file.split('.')[0].split('_')[-1]
+
+output_folder_suffix = 'GI{}/'.format(suffix)                                                                           # determines that the output should be written to a subfolder in the regular output folder
+output_folder_suffix += 'GI{}'.format(suffix)
+
+scenarios = pd.read_csv(scenario_file, sep=';')
 scenarios = scenarios['scenario_id'].values
 scenarios = np.unique(scenarios)
+
 
 # 2) loop over scenarios
 for scenario in scenarios:
     print('starting statistics for {}'.format(scenario))
     # 3) Initialise StatisticsDeriver for scenario (and read accompanying dat files)
-    deriver = StatisticsDeriver(scenario_name=scenario, output_folder_name='output/data_output/')
+    deriver = MeasureDeriver(scenario_name=scenario, output_folder_name='output/data_output/{}'.format(output_folder_suffix))
 
-    # 4) Derive environment statistics
+    # 4) Derive environment measures
     deriver.derive_statistics_flat_time_x_environment()
 
-    # 5) derive agent statistics
+    # 5) derive agent measures
     deriver.derive_statistics_flat_time_x_agent()
 
     # 6?) others statistics

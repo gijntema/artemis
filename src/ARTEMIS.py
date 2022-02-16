@@ -69,7 +69,10 @@ from src.tools.output_tools.export_data import DataWriter                       
 # Set up structure for configuration of the model (The ConfigHandler object and the scenario file csv)
 # ----------------------------------------------------------------------------------------------------------------------
 
-config_handler = ConfigHandler(scenario_file='base_config_20220120.csv')                                                         # define and load batch file csv containing the parameters for each scenario to run
+scenario_file = 'base_config_20220215.csv'
+output_subfolder = 'GI{}/'.format(scenario_file.split('.')[0].split('_')[-1])                                           # determines that the output should be written to a subfolder in the regular output folder
+
+config_handler = ConfigHandler(scenario_file=scenario_file)                                                             # define and load batch file csv containing the parameters for each scenario to run
 
 if len(config_handler.scenarios_config) < 1:
     raise ReferenceError("Config File Contains No Scenarios to Run")                                                    # raise error if scenario file is empty
@@ -220,8 +223,10 @@ for scenario in config_handler.scenarios_config:                                
 
     # ---- exit iteration loop ----
 
-    data_writer.write_csv(time_x_agent_data, 'flat_time_x_agent_results')                                               # write csv output file for data specific per unit of time and agent
-    data_writer.write_csv(time_x_environment_data, 'flat_time_x_environment_results')                                   # write csv output file for data specific per unit of time and choice option/environmental subsection
+    data_writer.write_csv(time_x_agent_data,
+                          '{}flat_time_x_agent_results'.format(output_subfolder))                                       # write csv output file for data specific per unit of time and agent
+    data_writer.write_csv(time_x_environment_data,
+                          '{}flat_time_x_environment_results'.format(output_subfolder))                                 # write csv output file for data specific per unit of time and choice option/environmental subsection
 
     # Enable Printing
     print_blocker.enable_print()                                                                                        # enable printing to report on runtime and other prints that are always desired regardless of print blocking

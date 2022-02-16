@@ -1,7 +1,7 @@
 # Output data description to interpret the (raw) results of ARTEMIS
 
 In this file the different outputs files are described and a legend is given for each column in the output
-As of the version of 4 February 2022, running  `ARTEMIS.py` creates two raw data outputs:
+As of the version of 15 February 2022, running  `ARTEMIS.py` creates two raw data outputs:
 
 - flat_time_x_environment_results<*scenario_name*>.csv
 - flat_time_x_agent_results<*scenario_name*>.csv
@@ -13,7 +13,7 @@ By running `derive_statistics.py`, additional measures calculated from the raw d
 
 alternatively by running `graphmaker.py` several graphs will be made: 
 
-IN THE FUTURE GRAPHMAKER IS HIGHLY TAILORED AND NOT FLEXIBLE YET
+**WILL BE ADDED IN THE FUTURE:** GRAPHMAKER IS HIGHLY TAILORED AND NOT FLEXIBLE YET
 
 Each of the above mentioned outputs is described in detail in the sections below.
 
@@ -28,10 +28,10 @@ Each of the above mentioned outputs is described in detail in the sections below
 |agents_visited|all agents (separated using vertical line) that visited a given alternative,for a given time and iteration|
 |real_stock|resource stock present in a given alternative,for a given time and iteration|
 |nb_agents_visited|number of agents that have visited a given alternative,for a given time and iteration|
-|occurred_competition_correction|catch correction als a result of competition that is applied to any catch gained from a given alternative,for a given time and iteration|
-|hypothetical_competition_correction|catch correction als a result of competition that would have been applied to any catch gained from a given alternative if a single extra competitor would have been present,for a given time and iteration|
-|<*agent_id*>_catch_expectation_heatmap|catch <*agent_id*> expected to gain according to their heatmap from a given alternative,for a given time and iteration|
-|<*agent_id*>_catch_potential|catch <*agent_id*> would have achieved if it would have foraged, in the absence of competition, in a given alternative,for a given time and iteration|
+|occurred_competition_correction|catch correction als a result of competition, caused by the amount of competitors each visiting agent has encountered (nb_agents_visited - 1), that is applied to any catch gained from a given alternative, for a given time and iteration|
+|hypothetical_competition_correction|catch correction als a result of competition caused by the amount of competitors each visiting agent would've encountered, if a single extra competitor would have been present (nb_agents_visited - 1 + 1), that would have been applied to any catch gained from a given alternative, for a given time and iteration|
+|<*agent_id*>_catch_expectation_heatmap|catch <*agent_id*> expected to gain according to their heatmap from a given alternative, for a given time and iteration|
+|<*agent_id*>_catch_potential|catch <*agent_id*> would have achieved if it would have foraged, in the absence of competition, in a given alternative, for a given time and iteration|
 
 
 ### flat_time_x_agents_results

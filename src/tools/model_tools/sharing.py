@@ -75,12 +75,8 @@ class HeatmapExchanger:
                             {
                                 "init": self.__init_relevant_random_sharing,
                                 "execute": self.__share_random_sharing
-                            },                                                                                          # information sharing in x random options to y random people
-                        "group_sharing":
-                            {
-                                "init": self.__init_relevant_group_sharing,
-                                "execute": self.__share_group_sharing
-                            }                                                                                           # information sharing as x random options to y random people that an agent shares group allegiance with
+                            },
+
                         # INSERT FURTHER SHARING FUNCTIONALITY HERE
                     },
                 "pick_receiver":
@@ -289,10 +285,6 @@ class HeatmapExchanger:
                 alternative_counter += 1
 
         return tuple((shared_alternatives_indices, shared_alternatives_data))
-
-    def __share_group_sharing(self):
-        shared_alternatives = tuple()
-        return shared_alternatives
 
 # ----------------------------------------------------------------------------------------------------------------------
 # -------------------------------------  Strategy Choice for picking a receiver ----------------------------------------

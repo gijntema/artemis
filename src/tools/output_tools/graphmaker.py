@@ -159,6 +159,58 @@ class GraphMaker:
         constructed_data.plot.hist(bins=16, subplots=True, color=colours, range=(-32, 32))
         return constructed_data
 
+    def make_graph_scatter(self, x, y, xlim, ylim, file_name, scenarios=False, start_time=0):
+
+        # 1) read config
+        scenario_file = self.config_file
+        if not scenarios:
+            scenarios = scenario_file['scenario_id'].values
+            scenarios = np.unique(scenarios)
+
+        for scenario in scenarios:
+            colours = ['black', 'blue', 'red',  'green', 'yellow']
+            colour_counter = 0
+            # 2) prepare data container pd.Dataframe
+            constructed_data_scenario = pd.DataFrame()
+
+            # 3) read data files (flat)
+            scenario_data = pd.read_csv('output/data_output/flat_time_x_{}_results_with_statistics_{}.csv'.format(file_name, scenario))
+            scenario_data = scenario_data[scenario_data['time_id'] >= start_time]
+            constructed_data_scenario = copy.deepcopy(scenario_data[[x, y]])
+
+            fig = plt.figure()
+            ax = plt.subplot(111)
+            if xlim:
+                ax.set_xlim(xlim)
+            if ylim:
+                ax.set_ylim(ylim)
+            ax.set_title('scenario = {}'.format(scenario))
+
+            constructed_data_scenario.plot(x=x, y=y,
+                                           ax=ax, kind='scatter', c=colours[colour_counter])
+
+            colour_counter += 1
+            if colour_counter == len(colours):
+                colour_counter -= len(colours)
+
+    def make_graph_hist_general(self, series_name, file, scenarios=False, start_time=0):
+        scenario_file = self.config_file
+
+        constructed_data = pd.DataFrame()
+        if not scenarios:
+            scenarios = scenario_file['scenario_id'].values
+            scenarios = np.unique(scenarios)
+
+        for scenario in scenarios:
+            scenario_data = pd.read_csv('output/data_output/flat_time_x_{}_results_with_statistics_{}.csv'.format(file, scenario))
+            scenario_data = scenario_data[scenario_data['time_id'] >= start_time]
+
+            scenario_data_temp = copy.deepcopy(scenario_data[series_name])
+            constructed_data['{}_scen_{}_t=<{}'.format(series_name, scenario, start_time)] = scenario_data_temp
+
+        colours = ['black', 'blue', 'red',  'green', 'yellow']
+        constructed_data.plot.hist(bins=20, subplots=True, color=colours)
+
 # ----------------------------------------------------------------------------------------------------------------------
 # EXECUTING THE SCRIPT
 # ----------------------------------------------------------------------------------------------------------------------
@@ -167,13 +219,24 @@ class GraphMaker:
 old_dir = os.getcwd()
 os.chdir(old_dir.removesuffix('\\tools\\output_tools'))
 considered_scenarios = ['2022_01_13_noC_s0', '2022_01_13_noC_s05', '2022_01_13_noC_s1', '2022_01_13_noC_s5','2022_01_13_noC_s10']
+start_time = 200
 
 graph_maker = GraphMaker(config_file='base_config_20220120.csv')
-graph_maker.make_graph_time_x_MAE_NoC(scenarios=considered_scenarios)
-graph_maker.make_graph_time_x_MPNE_NoC(scenarios=considered_scenarios)
-graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[150])
-graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[151])
-graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[152])
+#graph_maker.make_graph_time_x_MAE_NoC(scenarios=considered_scenarios)
+#graph_maker.make_graph_time_x_MPNE_NoC(scenarios=considered_scenarios)
+#graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[150])
+#graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[151])
+#graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[152])
+graph_maker.make_graph_scatter(x='nb_agents_visited', y='real_stock', xlim=[0, 20], ylim=[0, 200],
+                                     file_name='environment', scenarios=considered_scenarios, start_time=start_time)
+
+graph_maker.make_graph_scatter(x='mean_absolute_errors', y='realised_catch', xlim=False, ylim=False,
+                               file_name='agent', scenarios=considered_scenarios, start_time=start_time)
+
+hist_env_meas = ['nb_agents_visited', 'occurred_competition_correction']
+for data_series in hist_env_meas:
+    graph_maker.make_graph_hist_general(series_name=data_series, file='environment', scenarios=considered_scenarios,
+                                        start_time=start_time)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # JUNK PARTS OF GraphMaker, MOVED TO CHILD CLASS OldGraphMaker
