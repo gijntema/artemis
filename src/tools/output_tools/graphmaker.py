@@ -43,6 +43,7 @@ import numpy as np
 matplotlib.rcParams.update({'errorbar.capsize': 2})
 #from mapping import scenario_map
 import matplotlib.pyplot as plt
+import re
 
 
 class GraphMaker:
@@ -211,6 +212,154 @@ class GraphMaker:
         colours = ['black', 'blue', 'red',  'green', 'yellow']
         constructed_data.plot.hist(bins=20, subplots=True, color=colours)
 
+    def make_graph_hist_matrix_5D(self, file_name, data_subfolder, x_series_name, y_series_name, z_axis,
+                                  multi_axis_I, multi_axis_II, z_tag, I_tag, II_tag,
+                                  time_start, **scenario_selection_kwargs):
+        """"please format kwargs as follows: series_name=[list of values to accept],
+        Please note the kwargs make this method very flexible and accepting of many things that should not be accepted,
+        so be careful when defining series filters in kwargs --INFLEXIBILITY STILL BUILT IN"""
+
+        scenario_file = self.config_file
+        selected_scenarios = copy.deepcopy(scenario_file)
+
+        for series, values in scenario_selection_kwargs.items():
+            # only select acceptable values for every defined series
+            selected_scenarios = selected_scenarios[selected_scenarios[series].isin(values)]
+
+        # make pandas DataFrame with relevant_values
+        relevant_data = dict()
+        x_short = x_series_name.split('|')[-1]
+        y_short = y_series_name.split('|')[-1]
+
+        for scenario in selected_scenarios['scenario_id'].values:
+            scenario_data = pd.read_csv(
+                'output/data_output/{}/flat_time_x_{}_results{}.csv'.format(
+                    data_subfolder, file_name, scenario))
+            scenario_data = scenario_data[scenario_data['time_id'] <= time_start]
+            relevant_data[scenario] = pd.DataFrame()
+
+            relevant_data[scenario]['{}_{}'.format(scenario, x_short)] = copy.deepcopy(scenario_data[x_series_name])
+            relevant_data[scenario]['{}_{}'.format(scenario, y_short)] = copy.deepcopy(scenario_data[y_series_name])
+
+            relevant_data[scenario]['{}_{}_bins'.format(scenario, x_short)] = \
+                pd.cut(relevant_data[scenario]['{}_{}'.format(scenario, x_short)],
+                       bins=[0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200])
+
+            graph_prepared_data = relevant_data[scenario].groupby('{}_{}_bins'.format(scenario, x_short), as_index=False)['{}_{}'.format(scenario, y_short)].mean()
+            plot = graph_prepared_data.plot.bar(x='{}_{}_bins'.format(scenario, x_short), y='{}_{}'.format(scenario, y_short))
+
+            plot.figure.savefig('{}.png'.format(scenario))
+
+        # Quick and dirty fix
+
+        #for value_I in selected_scenarios[multi_axis_I].unique():
+        #    for value_II in selected_scenarios[multi_axis_II].unique():
+
+    def make_graph_stock_expectation_boxplot(self, file_name, data_subfolder, y_series_name, x_series_name, time_start,
+                                  **scenario_selection_kwargs):
+
+        scenario_file = self.config_file
+        selected_scenarios = copy.deepcopy(scenario_file)
+
+        for series, values in scenario_selection_kwargs.items():
+            # only select acceptable values for every defined series
+            selected_scenarios = selected_scenarios[selected_scenarios[series].isin(values)]
+
+        # make pandas DataFrame with relevant_values
+        relevant_data = dict()
+        x_short = x_series_name.split('|')[-1]
+        y_short = y_series_name.split('|')[-1]
+
+        for scenario in selected_scenarios['scenario_id'].values:
+            # read scenario data
+            scenario_data = pd.read_csv(
+                'output/data_output/{}/flat_time_x_{}_results{}.csv'.format(
+                    data_subfolder, file_name, scenario))
+            scenario_data = scenario_data[scenario_data['time_id'] >= time_start]
+            # prepare dataframe to build a graph from
+            relevant_data[scenario] = pd.DataFrame()
+
+            # get a single stock bins data series
+            relevant_data[scenario]['{}_{}'.format(scenario, x_short)] = copy.deepcopy(scenario_data[x_series_name])
+            relevant_data[scenario]['{}_{}_bins'.format(scenario, x_short)] = \
+                pd.cut(relevant_data[scenario]['{}_{}'.format(scenario, x_short)],
+                       bins=[0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200])
+
+            # find columns containing agents
+            # 0) define pattern to search for in column names using regular expressions
+            regex = re.compile(r'(agent_\d*)')
+
+            # 1) # get Column names
+            column_names = copy.deepcopy(list(scenario_data.columns))
+
+            # 2) list comprehension in combination with regular expression to find agent names
+            agents = [re.findall(regex, column) for column in column_names]
+
+            # 3) select only columns that refer to an a value for an individual agent (have 'agent_<##>' in the column name)
+            agents = [column for column in agents if len(column) > 0]
+
+            # 4) list comprehension fist instance of list in list is new list entry (re.findall returns a list with values)
+            agents = [agent[0] for agent in agents]
+
+            # 5) find only unique agents in columns (the set object can only obtain unique values)
+            agents = set(agents)
+            agents = list(agents)
+            agents.sort()
+
+            # loop over agent columns
+            prepared_data = pd.DataFrame()
+            for agent in agents:
+                temp_data = pd.DataFrame()
+
+                temp_data['{}_{}_bins'.format(scenario, x_short)] = copy.deepcopy(relevant_data[scenario]['{}_{}_bins'.format(scenario, x_short)])
+                y_column_name = y_series_name.format(agent)
+                temp_data['{}_{}'.format(scenario, y_short)] = copy.deepcopy(scenario_data[y_column_name])
+                prepared_data = pd.concat([prepared_data, copy.deepcopy(temp_data)])
+
+            # create boxplot
+            plot = prepared_data.boxplot(column='{}_{}'.format(scenario, y_short),
+                                            by='{}_{}_bins'.format(scenario, x_short))
+
+            plot.figure.savefig('boxplots_{}.png'.format(scenario))
+
+    def make_graph_hist_cumulative_catch_per_agent(self, file_name, data_subfolder, time_start, x_bin_range, nb_bins,
+                                                   **scenario_selection_kwargs):
+
+        scenario_file = self.config_file
+        selected_scenarios = copy.deepcopy(scenario_file)
+
+        for series, values in scenario_selection_kwargs.items():
+            # only select acceptable values for every defined series
+            selected_scenarios = selected_scenarios[selected_scenarios[series].isin(values)]
+
+        # make pandas DataFrame with relevant_values
+        relevant_data = dict()
+        #x_short = x_series_name.split('|')[-1]
+        #y_short = y_series_name.split('|')[-1]
+
+        for scenario in selected_scenarios['scenario_id'].values:
+            # read scenario data
+            scenario_data = pd.read_csv(
+                'output/data_output/{}/flat_time_x_{}_results{}.csv'.format(
+                    data_subfolder, file_name, scenario))
+            scenario_data = scenario_data[scenario_data['time_id'] >= time_start]
+
+            # prepare dataframe to build a graph from
+            relevant_data[scenario] = copy.deepcopy(scenario_data[['agent_id', 'realised_catch']])
+            relevant_data[scenario] = copy.deepcopy(relevant_data[scenario].groupby(['agent_id']).sum())
+            relevant_data[scenario].rename(columns={'realised_catch': 'realised_catch_{}'.format(scenario)}, inplace=True)
+
+            bins = []
+            bin_counter = 0
+            while bin_counter < nb_bins + 1:
+                bins.append(x_bin_range[0] + ((x_bin_range[1] - x_bin_range[0])/nb_bins) * bin_counter)
+                bin_counter += 1
+
+            # make graph
+            plot = relevant_data[scenario].plot.hist(by='realised_catch', bins=bins)
+            plot.figure.savefig('cum_catch_hist_per_agent_{}.png'.format(scenario))
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # EXECUTING THE SCRIPT
 # ----------------------------------------------------------------------------------------------------------------------
@@ -218,25 +367,58 @@ class GraphMaker:
 # set proper Working directory to folder 'src'
 old_dir = os.getcwd()
 os.chdir(old_dir.removesuffix('\\tools\\output_tools'))
-considered_scenarios = ['2022_01_13_noC_s0', '2022_01_13_noC_s05', '2022_01_13_noC_s1', '2022_01_13_noC_s5','2022_01_13_noC_s10']
-start_time = 200
+# considered_scenarios = ['2022_01_13_noC_s0', '2022_01_13_noC_s05', '2022_01_13_noC_s1', '2022_01_13_noC_s5','2022_01_13_noC_s10']
+start_time = 400
 
-graph_maker = GraphMaker(config_file='base_config_20220120.csv')
+# graph_maker = GraphMaker(config_file='base_config_20220120.csv')
+# graph_maker = GraphMaker(config_file='base_config_20220215.csv')
+graph_maker = GraphMaker(config_file='base_config_20220218.csv')
+
 #graph_maker.make_graph_time_x_MAE_NoC(scenarios=considered_scenarios)
 #graph_maker.make_graph_time_x_MPNE_NoC(scenarios=considered_scenarios)
 #graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[150])
 #graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[151])
 #graph_maker.make_graph_error_hist(scenarios=considered_scenarios, times=[152])
-graph_maker.make_graph_scatter(x='nb_agents_visited', y='real_stock', xlim=[0, 20], ylim=[0, 200],
-                                     file_name='environment', scenarios=considered_scenarios, start_time=start_time)
+#graph_maker.make_graph_scatter(x='nb_agents_visited', y='real_stock', xlim=[0, 20], ylim=[0, 200],
+#                                     file_name='environment', scenarios=considered_scenarios, start_time=start_time)
 
-graph_maker.make_graph_scatter(x='mean_absolute_errors', y='realised_catch', xlim=False, ylim=False,
-                               file_name='agent', scenarios=considered_scenarios, start_time=start_time)
+#graph_maker.make_graph_scatter(x='mean_absolute_errors', y='realised_catch', xlim=False, ylim=False,
+#                               file_name='agent', scenarios=considered_scenarios, start_time=start_time)
 
-hist_env_meas = ['nb_agents_visited', 'occurred_competition_correction']
-for data_series in hist_env_meas:
-    graph_maker.make_graph_hist_general(series_name=data_series, file='environment', scenarios=considered_scenarios,
-                                        start_time=start_time)
+#hist_env_meas = ['nb_agents_visited', 'occurred_competition_correction']
+#for data_series in hist_env_meas:
+#    graph_maker.make_graph_hist_general(series_name=data_series, file='environment', scenarios=considered_scenarios,
+#                                        start_time=start_time)
+comp_values = [1, 0.95, 0.9, 0.85, 0.8]
+share_values = [0, 0.5, 2, 5]
+Preset_values = [0.01, 0.1, 0.25, 0.33, 0.5, 0.9]
+
+
+#graph_maker.make_graph_hist_matrix_5D(file_name='environment', data_subfolder='GI20220218', x_series_name='real_stock',
+#                                      y_series_name='nb_agents_visited', z_axis='agents|sharing|sharing|nb_options_shared',
+#                                      multi_axis_I='options|stock_reset|reset_probability',
+#                                      multi_axis_II='competition|interference_attributes|interference_factor',
+#                                      z_tag=None, I_tag=None,II_tag=None, time_start=400,
+#                                      **{'agents|sharing|sharing|nb_options_shared': share_values,
+#                                         'options|stock_reset|reset_probability': Preset_values,
+#                                         'competition|interference_attributes|interference_factor': comp_values})
+
+#graph_maker.make_graph_stock_expectation_boxplot(file_name='environment',
+#                                                 data_subfolder='GI20220218',
+#                                                 x_series_name='real_stock',
+#                                                 y_series_name='{}_catch_expectation_heatmap',
+#                                                 time_start=start_time,
+#                                                 **{'agents|sharing|sharing|nb_options_shared': share_values,
+#                                                    'options|stock_reset|reset_probability': Preset_values,
+#                                                    'competition|interference_attributes|interference_factor': comp_values})
+
+graph_maker.make_graph_hist_cumulative_catch_per_agent(file_name='agent',
+                                                       data_subfolder='GI20220218',
+                                                       time_start=start_time,
+                                                       x_bin_range=[0, 4000], nb_bins=40,
+                                                       **{'agents|sharing|sharing|nb_options_shared': share_values,
+                                                          'options|stock_reset|reset_probability': Preset_values,
+                                                          'competition|interference_attributes|interference_factor': comp_values})
 
 # ----------------------------------------------------------------------------------------------------------------------
 # JUNK PARTS OF GraphMaker, MOVED TO CHILD CLASS OldGraphMaker

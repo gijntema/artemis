@@ -333,11 +333,11 @@ old_dir = os.getcwd()
 os.chdir(old_dir.removesuffix('\\tools\\output_tools'))
 
 # 1) read scenario_file and get list of scenarios
-scenario_file = 'base_config_20220215.csv'
+scenario_file = 'base_config_20220218.csv'
 suffix = scenario_file.split('.')[0].split('_')[-1]
 
 output_folder_suffix = 'GI{}/'.format(suffix)                                                                           # determines that the output should be written to a subfolder in the regular output folder
-output_folder_suffix += 'GI{}'.format(suffix)
+# output_folder_suffix += 'GI{}'.format(suffix)
 
 scenarios = pd.read_csv(scenario_file, sep=';')
 scenarios = scenarios['scenario_id'].values

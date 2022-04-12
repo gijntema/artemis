@@ -69,8 +69,13 @@ from src.tools.output_tools.export_data import DataWriter                       
 # Set up structure for configuration of the model (The ConfigHandler object and the scenario file csv)
 # ----------------------------------------------------------------------------------------------------------------------
 
-scenario_file = 'base_config_20220215.csv'
-output_subfolder = 'GI{}/'.format(scenario_file.split('.')[0].split('_')[-1])                                           # determines that the output should be written to a subfolder in the regular output folder
+# -- specification of the files specific for the Configurations of Gerben IJntema only --
+scenario_file = 'base_config_20220412LastEventSharing.csv'  # Config file that needs to be run
+output_subfolder = 'GI{}/'.format(scenario_file.split('.')[0].split('_')[-1])                                           # determines that the output should be written to a subfolder in the regular output folder (if not define output_subfolder = '')
+
+# default specifications of the model
+# scenario_file = 'base_config.csv'  # Config file that needs to be run
+# output_subfolder = ''   # subfolder of the results that the data should be exported to '' results in no subfolder, Please don't forge to make the actual subfolder before running the model'
 
 config_handler = ConfigHandler(scenario_file=scenario_file)                                                             # define and load batch file csv containing the parameters for each scenario to run
 

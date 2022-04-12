@@ -35,7 +35,7 @@ Last Updated:
 Version Number:
     0.1
 """
-
+import copy
 from random import choice, random, choices
 
 
@@ -46,6 +46,7 @@ class ChoiceMaker:
         self.choice_method = choice_method                                                                              # indication of the functionality this specific instance of ChoiceMaker should have
         self.agent_id = agent.id
         self.relevant_agent_data = self.__init_relevant_data(agent)                                                     # using self.choice method, acquire references to the specific parts of an agent that this specific instance of ChoiceMaker should have access to
+        self.last_choice_id = ''
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Methods that initialise the functionality of the ChoiceMaker
@@ -140,6 +141,8 @@ class ChoiceMaker:
         """method that chooses the data based on the choice method provided
         as key for the internal instructions dictionary"""
         chosen = self.choice_instruction[self.choice_method]['choose']()
+        self.last_choice_id = chosen
+        print('{} has chosen {} to forage in in this instance and last_choice_id is updated'.format(self.agent_id, self.last_choice_id))
         return chosen
 
 # ----------------------------------------------------------------------------------------------------------------------

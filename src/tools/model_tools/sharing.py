@@ -38,7 +38,7 @@ Version Number:
     0.1
 """
 import random
-
+import copy
 
 # TODO: UNIMPLEMENTED CODE
 class HeatmapExchanger:
@@ -77,6 +77,11 @@ class HeatmapExchanger:
                                 "execute": self.__share_random_sharing
                             },
 
+                        "last_event_sharing":
+                            {
+                                "init": self.__init_relevant_last_event_sharing,
+                                "execute": self.__share_last_event_sharing
+                            }
                         # INSERT FURTHER SHARING FUNCTIONALITY HERE
                     },
                 "pick_receiver":
@@ -155,6 +160,14 @@ class HeatmapExchanger:
         relevant_data['agent_id'] = agent.id
         relevant_data['heatmap'] = agent.heatmap
         relevant_data['known_alternatives'] = agent.list_of_known_alternatives
+        return relevant_data
+
+    def __init_relevant_last_event_sharing(self, agent):
+        """Defines references to the attributes of the agent that should be used inside sharing methods"""
+        relevant_data = dict()
+        relevant_data['agent_id'] = agent.id
+        relevant_data['heatmap'] = agent.heatmap
+        relevant_data['choice_maker'] = agent.choice_maker
         return relevant_data
 
     def __init_relevant_group_sharing(self, agent):
@@ -285,6 +298,12 @@ class HeatmapExchanger:
                 alternative_counter += 1
 
         return tuple((shared_alternatives_indices, shared_alternatives_data))
+
+    def __share_last_event_sharing(self):
+        shared_alternatives = copy.deepcopy(self.relevant_data['choice_maker'].last_choice_id)
+        print('{} is now sharing last forage event data on {}'.format(self.relevant_data['agent_id'], shared_alternatives))
+        shared_alternative_data = self.relevant_data['heatmap'][shared_alternatives]
+        return tuple((tuple([shared_alternatives]), tuple([shared_alternative_data])))
 
 # ----------------------------------------------------------------------------------------------------------------------
 # -------------------------------------  Strategy Choice for picking a receiver ----------------------------------------
