@@ -18,7 +18,7 @@ these are discussed further below the main table. All functionality reported her
 |agents &#124; choice_method &#124; name|**string**|Determines how an agent chooses an alternative to forage in (e.g. in what Grid Cell)| in the Current Version supports the following values: <ul><li>random</li><li>full_heatmap</li><li>explore_heatmap</li><li>full_weighted_heatmap</li><li>explore_weighted_heatmap</li></ul>|
 |agents &#124; choice_method &#124; explore_attributes &#124; explore_probability|**float**|if the choice_method includes 'explore' in the value, this value represents the chance an agent forages in a random alternative|values outside of 0 and 1 are not realistic from a real world perspective (more than 100% or less than 0% chance of picking a random alternative) |
 |agents &#124; choice_method &#124; heatmap_attributes &#124; init_nb_alternative_known|**integer**|determines the initial fill of an agents' heatmap: how many options are known |a value from 0 to the number options in the model (impossible to know more than can be known from a real-world perspective)|
-|agents &#124; sharing &#124; sharing &#124; name|**string**|Determines what (alternatives) an agent shares (e.g. information on what Grid Cells)|in the Current Version supports the following values: <ul><li>no_sharing</li><li>random_sharing</li></ul>|
+|agents &#124; sharing &#124; sharing &#124; name|**string**|Determines what (alternatives) an agent shares (e.g. information on what Grid Cells)|in the Current Version supports the following values: <ul><li>no_sharing</li><li>random_sharing</li><li>last_event_sharing</li></ul>|
 |agents &#124; sharing &#124; sharing &#124; nb_options_shared|**integer** or **float**|Determines information on how many cells is shared with other agents. Whole values are always shared, if the value has decimals the decimals represent the chance at sharing information on 1 additional alternative| value has to be in the range 0 and the total number of alternatives (options &#124; nb_options)|
 |agents &#124; sharing &#124; sharing &#124; no_sharing_attributes|**-**|*Placeholder* : column added if future functionality requires more parameters to execute the 'no_sharing' style of sharing data in the model |*Placeholder* : Not Functional in this version of the model|
 |agents &#124; sharing &#124; sharing &#124; random_sharing_attributes|**-**|*Placeholder* : column added if future functionality requires more parameters to execute the 'random_sharing' style of sharing data in the model |*Placeholder* : Not Functional in this version of the model|
@@ -57,8 +57,8 @@ these are discussed further below the main table. All functionality reported her
 |Parameter Value (Name)|Description of Value|Further Parameters Employed|
 | ----------- | ----------- | ----------- |
 |no_sharing|agents share no data with others|-|
-|random_sharing|[**FUNCTIONALITY NEEDS TO BE REPAIRED**] agents share information on a number of random alternatives|nb_options_shared determines information on how many cells is shared|
-
+|random_sharing| agents share information on a number of random alternatives|nb_options_shared determines information on how many cells is shared|
+|no_sharing|agents share the data on the last alternative they foraged in|-|
 
 ### Sharing Information - with whom (agents|sharing|receiver_choice|name)
 |Parameter Value (Name)|Description of Value|Further Parameters Employed|
