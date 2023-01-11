@@ -135,7 +135,7 @@ for scenario in config_handler.scenarios_config:                                
     if not reporting:                                                                                                   # block printing if desired (if reporting is False in a given scenario setting)
         print_blocker.block_print()
 
-    # TODO: Move CompetitionHandler object to run_model.py
+
     competition_handler = CompetitionHandler(competition_method=competition_scenario,
                                              interference_factor=interference_factor)                                   # object that will ensure competition feedbacks are executed for in the model
 
@@ -158,7 +158,6 @@ for scenario in config_handler.scenarios_config:                                
 # initialize the Environment (choice set), containing all discrete alternatives and the fleet, containing all agents
 # ----------------------------------------------------------------------------------------------------------------------
 
-        # TODO: Move initialization to run_model.py
         choice_set = ChoiceSet(                                                                                         # initialize the potential options/ environmental units in the model (e.g. the grid with cells to fish in), representing the environment agents operate in
                                 nb_alternatives=choice_set_size,
                                 stock_distribution=stock_reset_scenario,

@@ -40,7 +40,6 @@ Version Number:
 import random
 import copy
 
-# TODO: UNIMPLEMENTED CODE
 class HeatmapExchanger:
 
     def __init__(self, agent,
