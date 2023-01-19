@@ -1,5 +1,8 @@
 # ARTEMIS model
 
+##TEST UPDATE 20230119
+Test push to see if ARTEMIS is once again connected right to remote
+
 ## Introduction
 The Agents in Resource Tracking and Extracting Model for Information Strategies (ARTEMIS) 
 is a general investigation into the role of informed decision making 
