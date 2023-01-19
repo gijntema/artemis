@@ -1,8 +1,5 @@
 # ARTEMIS model
 
-##TEST UPDATE 20230119
-Test push to see if ARTEMIS is once again connected right to remote
-
 ## Introduction
 The Agents in Resource Tracking and Extracting Model for Information Strategies (ARTEMIS) 
 is a general investigation into the role of informed decision making 
@@ -24,9 +21,7 @@ see src/package_versions.txt for python packages and versions employed
 
 
 ### Clone remote repository ARTEMIS to a local git repository
-First make sure you have git installed.
-
-https://git-scm.com/
+First make sure you have git installed from; https://git-scm.com/
 
 Define the desired local location of the model
 
