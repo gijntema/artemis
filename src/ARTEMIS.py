@@ -99,7 +99,7 @@ for scenario in config_handler.scenarios_config:                                
     print('starting simulations(s) for scenario {}'.format(scenario_name))                                              # print what scenario that is now being run
     output_file_suffix = scenario_name                                                                                  # define current scenario name as suffix to any output file
 
-    # TODO quick and dirty fix based on old structure, can be done better for runtime improvement
+    # TODO quick and dirty fix based on old structure, can be done better for runtime improvement                       # TODO EDO
     duration, \
     number_of_iterations,\
     reporting,\
