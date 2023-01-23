@@ -53,12 +53,14 @@ Enter into terminal:
 
 
 ### Adjust initial parameters (if not running the basic version of the model)
-Open **src/config/init_param.py** and enter desired parameters defined there
+Create a .csv file (**base_config.csv** is a template) to define the correct variables to be used per scenario, see **src/input_descriptions.md** 
+for descriptions of the different variables that can be adjusted
 
 ### Starting the model
+open src/ARTEMIS.py and define .csv file that contains defined input variables (**line 72**)
 run **src/ARTEMIS.py**
 
 ### Tips for adjusting the Model
 Please realise that a testing framework **tests/test_functionality.py** is present to test if any adjustments hinder 
 the functionality of the model. New functionality test can also be included in this framework. Simply run the script 
-to test the functionality
+to test the functionality **OUTDATED SHOULD BE CHECKED FOR FUNCTIONALITY**
