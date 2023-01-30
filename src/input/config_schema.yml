@@ -1,0 +1,80 @@
+required:
+- scenario_id
+- model
+- agents
+- fleet
+- options
+- competition
+properties:
+  scenario_id: 
+    type: string
+    description: scenario identifier
+  model: 
+    type: object
+    required:
+    - duration
+    - nb_iterations
+    - reporting
+  agents: 
+    type: array
+  fleet:
+    type: object
+    required:
+    - receiver_choice
+    properties:
+      receiver_choice:
+        type: object
+        required:
+        - group_attributes
+        properties:
+          group_attributes:
+            type: object
+            required:
+            - nb_groups
+            - group_formation
+            - group_dynamics
+  options: 
+    type: object
+    required:
+    - nb_options
+    - growth
+    - stock_reset
+    properties:
+      growth:
+        type: object
+        required:
+        - growth_type
+        - growth_attributes
+        properties:
+          growth_attributes:
+            type: object
+            required:
+            - growth_factor
+      stock_reset:
+        type: object
+        required:
+        - name
+        - reset_probability
+        - uniform_attributes
+        - normal_attributes
+        properties:
+          uniform_attributes:
+            type: object
+            required:
+            - min_stock
+            - max_stock
+          normal_attributes:
+            type: object
+            required:
+            - init_stock
+            - sd_init_stock
+  competition: 
+    type: object
+    required:
+    - name
+    - interference_attributes
+    properties:
+      interference_attributes:
+        type: object
+        required:
+        - interference_factor

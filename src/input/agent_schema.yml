@@ -1,0 +1,49 @@
+required:
+- name
+- nb_agents
+- catchability_coefficient
+- choice_method
+- sharing
+properties:
+  name:
+    type: string
+  nb_agents: 
+    type: number
+  catchability_coefficient: 
+    type: number
+  choice_method: 
+    type: object
+    required:
+    - name
+    - explore_attributes
+    - heatmap_attributes
+    properties:
+      explore_attributes:
+        type: object
+        required:
+        - explore_probability
+      heatmap_attributes:
+        type: object
+        required:
+        - init_nb_alternative_known
+  sharing: 
+    type: object
+    required:
+    - sharing
+    - receiver_choice
+    - receiving
+    properties:
+      sharing:
+        type: object
+        required:
+        - name
+        - nb_options_shared
+      receiver_choice:
+        type: object
+        required:
+        - name
+        - nb_receivers
+      receiving:
+        type: object
+        required:
+        - name

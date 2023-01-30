@@ -54,8 +54,39 @@ from src.tools.model_tools.allegiances import GroupFormer
 class AgentFleet:                                         # to be implemented, not yet included in the other scripts
     """Class to contain both the agents in ForagerAgent objects (or a more specified version of it)
     and global data on all agents in the model """
-    def __init__(self,
+
+    def __init__(self):
+
+        self.agents = dict()
+        self.total_catch = 0                            # Tracker for total catch of all agents and time_steps combined
+        self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
+        self.average_expected_competitor_tracker = defaultdict(dict)                                                    # tracker to contain the average expected amount of competitors expected when picking any cell
+        self.forage_visit_tracker = defaultdict(dict)                                                                   # tracker to contain where agents have been forager in what time
+        self.heatmap_expectation_tracker = defaultdict(dict)                                                            # tracker to contain what agents were expecting to find in the chosen location
+        self.uncorrected_catch_tracker = defaultdict(dict)                                                              # tracker to contain what would have been an agents catch in a chose location if no competitors would have been present
+        self.corrected_catch_tracker = defaultdict(dict)
+        self.realised_competition_tracker = defaultdict(dict)                                                           # tracker to contain the amount of competitors an agent has encountered in a given time step
+        self.heatmap_tracker = defaultdict(dict)
+        self.catch_potential_tracker = defaultdict(dict)
+        self.group_former = None
+
+    def finalize_setup(self,
+                       number_of_sharing_groups=10,
+                       group_division_style='equal_mutually_exclusive_groups',
+                       group_dynamics=False,
+                       duration_model=100):
+        
+        self.group_former = GroupFormer(self,
+                                        number_of_groups=number_of_sharing_groups,
+                                        division_style=group_division_style,
+                                        group_dynamics=group_dynamics)   
+        self.__init_group_allegiances()
+        self.__init_time_data_trackers(duration_model=duration_model)
+        self.__init_potential_receivers()
+
+    def add(self,
                  nb_agents=100,
+                 subgroup_name='',
                  choice_set=20,
                  catchability_coefficient=0.2,
                  nb_alternatives_known=4,
@@ -66,14 +97,12 @@ class AgentFleet:                                         # to be implemented, n
                  receiver_choice_strategy='random_choice',
                  receiving_strategy='combine_receiver',
                  number_of_shared_alternatives=1,
-                 number_of_agents_shared_with=1,
-                 number_of_sharing_groups=10,
-                 group_division_style='equal_mutually_exclusive_groups',
-                 group_dynamics=False):
-#TODO KW: ensure that the hard wired values above are not used in the first time step. these need to come from init_param from time=0 onwards
+                 number_of_agents_shared_with=1):
+        #TODO KW: ensure that the hard wired values above are not used in the first time step. these need to come from init_param from time=0 onwards
 
-        self.agents = self.__init_agents(
+        add_agents = self.__init_agents(
                                nb_agents=nb_agents,
+                               subgroup_name=subgroup_name,
                                choice_set=choice_set,
                                catchability_coefficient=catchability_coefficient,
                                nb_alternatives_known=nb_alternatives_known,
@@ -85,31 +114,15 @@ class AgentFleet:                                         # to be implemented, n
                                receiving_strategy=receiving_strategy,
                                number_of_shared_alternatives=number_of_shared_alternatives,
                                number_of_agents_shared_with=number_of_agents_shared_with)                        # almost ready to replace the line above and init_objects.py
-
-        self.total_catch = 0                            # Tracker for total catch of all agents and time_steps combined
-        self.total_time_step_catch_tracker = {}         # tracker for total catch each time_step
-        self.average_expected_competitor_tracker = defaultdict(dict)                                                    # tracker to contain the average expected amount of competitors expected when picking any cell
-        self.forage_visit_tracker = defaultdict(dict)                                                                   # tracker to contain where agents have been forager in what time
-        self.heatmap_expectation_tracker = defaultdict(dict)                                                            # tracker to contain what agents were expecting to find in the chosen location
-        self.uncorrected_catch_tracker = defaultdict(dict)                                                              # tracker to contain what would have been an agents catch in a chose location if no competitors would have been present
-        self.corrected_catch_tracker = defaultdict(dict)
-        self.realised_competition_tracker = defaultdict(dict)                                                           # tracker to contain the amount of competitors an agent has encountered in a given time step
-        self.heatmap_tracker = defaultdict(dict)
-        self.catch_potential_tracker = defaultdict(dict)
-
-        self.__init_time_data_trackers(duration_model=duration_model)
-        self.group_former = self.__init_group_allegiances(number_of_groups=number_of_sharing_groups,                    # set up for better initialisation of group_former, reuiqres the best initiliasation of self.agents a few lines above
-                                                          group_division_style=group_division_style,
-                                                          group_dynamics=group_dynamics)
-        self.__init_potential_receivers(receiver_choice_strategy=receiver_choice_strategy)
-
+        
+        self.agents.update(add_agents)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------------------------- Methods Called by Initialization --------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
     # UNIMPLEMENTED
-    def __init_agents(self, nb_agents, choice_set,
+    def __init_agents(self, nb_agents, subgroup_name, choice_set,
                       catchability_coefficient, nb_alternatives_known,
                       explore_probability, duration_model,
                       choice_method="random",
@@ -122,7 +135,7 @@ class AgentFleet:                                         # to be implemented, n
         agent_dictionary = dict()
         agent_tracker = 0                                                                                               # make counter for following while loop functioning
         while agent_tracker < nb_agents:
-            agent_id = 'agent_' + str(agent_tracker).zfill(len(str(nb_agents)))                                         # construct agent ID
+            agent_id = 'agent_' + str(subgroup_name) + '_' + str(agent_tracker).zfill(len(str(nb_agents)))                                         # construct agent ID
             agent_dictionary[agent_id] = ForagerAgent(choice_set=choice_set,
                                                       choice_method=choice_method,
                                                       agent_id=agent_id,
@@ -152,24 +165,17 @@ class AgentFleet:                                         # to be implemented, n
                 # proceed to next agent
             duration_counter += 1
 
-    def __init_group_allegiances(self, number_of_groups=10,
-                                     group_division_style='equal_mutually_exclusive_groups',
-                                     group_dynamics=False):
-        """initialize groups of agents"""
-        group_former = GroupFormer(self,
-                                   number_of_groups=number_of_groups,
-                                   division_style=group_division_style,
-                                   group_dynamics=group_dynamics)                                                       # set up for later use of group based sharing, not yet implemented properly
+    def __init_group_allegiances(self):
+        """initialize groups of agents"""                                                    # set up for later use of group based sharing, not yet implemented properly
 
         for agent in self.agents:
-            self.agents[agent].group_allegiance = group_former.relevant_data['personal_allegiances'][agent]
+            self.agents[agent].group_allegiance = self.group_former.relevant_data['personal_allegiances'][agent]
 
-        return group_former
-
-    def __init_potential_receivers(self, receiver_choice_strategy):
+    def __init_potential_receivers(self):
         """in agents, initialize with whom agents may share information based on their group allegiances"""
-        for agent in self.agents:                                                                                       # loop over agents
-            self.agents[agent].heatmap_exchanger.functionality['pick_receiver'][receiver_choice_strategy]['init'] \
+        for _, agent in self.agents.items():                                                                                       # loop over agents
+            receiver_choice_strategy = agent.pick_receiver_strategy
+            agent.heatmap_exchanger.functionality['pick_receiver'][receiver_choice_strategy]['init'] \
             (
                 agent_set=self
             )
@@ -288,6 +294,7 @@ class ForagerAgent:
         self.time_step_catch = {}                                                                                       # tracker variable to check time_step fluctuations in catch
         self.knowledge_evolution_tracker = defaultdict(dict)                                                            # tracker to identify how the memory of an agent changes over time
         self.group_allegiance = None                                                                                    # for later functionality in group sharing
+        self.pick_receiver_strategy = pick_receiver_strategy
 
         # basic attributes/parameters
         self.id = agent_id                                                                                              # id consistent with other indices used in the rest of the model
