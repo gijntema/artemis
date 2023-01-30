@@ -1,3 +1,6 @@
+# Generate documentation with:
+#   generate-schema-doc agent_schema.yml doc/agent_schema.md
+# TODO: add descriptions for everything
 required:
 - name
 - nb_agents

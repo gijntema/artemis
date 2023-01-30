@@ -1,3 +1,6 @@
+# Generate documentation with:
+#   generate-schema-doc config_schema.yml doc/config_schema.md
+# TODO: add descriptions for everything
 required:
 - scenario_id
 - model
@@ -15,7 +18,18 @@ properties:
     - duration
     - nb_iterations
     - reporting
+    properties:
+      duration:
+        description: time a simulation runs for
+        type: number
+      nb_iterations:
+        description: number of iterations per simulation every scenario is tested for
+        type: number
+      reporting:
+        description: indicates if a scenario run reports using all print statements in the script (False --> only report what scenario the model starts running and the total runtime)
+        type: bool
   agents: 
+    description: Settings for the agents in the model; see agent_schema.yml
     type: array
   fleet:
     type: object
