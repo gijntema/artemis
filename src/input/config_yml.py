@@ -11,6 +11,7 @@ AGENT_SCHEMA_PATH = os.path.join(SCHEMA_DIR, AGENT_SCHEMA_FILENAME)
 
 
 class Configuration:
+    """Class to contain simulation configuration parameters."""
 
     _config_data: dict
     _agents: list
@@ -21,11 +22,13 @@ class Configuration:
         self._agents = list(AgentConfiguration(agent, agent_schema) for agent in self._config_data['agents'])
 
     def to_yml(self, filename):
+        """Save config data to yml file."""
         with open(filename, 'w') as file:
             yaml.dump(self._config_data, file, default_flow_style=False)
 
     @staticmethod
     def read_yml(filename):
+        """Read config data from yml file."""
         def _read_data_from_yml(filename):
             with open(filename) as file:
                 data = yaml.load(file, Loader=yaml.FullLoader)
@@ -113,6 +116,7 @@ class Configuration:
 
 
 class AgentConfiguration:
+    """Class to contain agent configuration parameters."""
 
     _agent_data: dict
 

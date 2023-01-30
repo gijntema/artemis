@@ -84,7 +84,7 @@ class AgentFleet:                                         # to be implemented, n
         self.__init_time_data_trackers(duration_model=duration_model)
         self.__init_potential_receivers()
 
-    def add(self,
+    def add(self,  #TODO: ideally this just takes a AgentConfiguration object as single argument.
                  nb_agents=100,
                  subgroup_name='',
                  choice_set=20,
