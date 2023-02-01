@@ -114,6 +114,14 @@ class Configuration:
     def group_dynamics(self):
         return self._config_data['fleet']['receiver_choice']['group_attributes']['group_dynamics']
 
+    @property
+    def pick_receiver_strategy(self):
+        return self._config_data['fleet']['receiver_choice']['name']
+
+    @property
+    def share_partners(self):
+        return self._config_data['fleet']['receiver_choice']['nb_receivers']
+
 
 class AgentConfiguration:
     """Class to contain agent configuration parameters."""
@@ -159,11 +167,3 @@ class AgentConfiguration:
     @property
     def receiving_strategy(self):
         return self._agent_data['sharing']['receiving']['name']
-
-    @property
-    def pick_receiver_strategy(self):
-        return self._agent_data['sharing']['receiver_choice']['name']
-
-    @property
-    def share_partners(self):
-        return self._agent_data['sharing']['receiver_choice']['nb_receivers']

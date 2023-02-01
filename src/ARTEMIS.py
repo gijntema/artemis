@@ -139,10 +139,10 @@ def run_artemis(scenario_file, output_subfolder):
                 duration_model=config.duration,
                 choice_method=agent.choice_method,
                 sharing_strategy=agent.sharing_strategy,
-                receiver_choice_strategy=agent.pick_receiver_strategy,
+                receiver_choice_strategy=config.pick_receiver_strategy,
                 receiving_strategy=agent.receiving_strategy,
                 number_of_shared_alternatives=agent.shared_alternatives,
-                number_of_agents_shared_with=agent.share_partners
+                number_of_agents_shared_with=config.share_partners
                 )
         fleet.finalize_setup(
             number_of_sharing_groups=config.number_of_groups,

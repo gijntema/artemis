@@ -10,43 +10,76 @@ required:
 properties:
   name:
     type: string
+    description: name of agent group
   nb_agents: 
     type: number
+    description: the number of ForagerAgents that forage in the model
   catchability_coefficient: 
     type: number
+    description: the fraction of the resource stock in a given choice option / DiscreteAlternative/ environment unit an agent receives if foraging there
   choice_method: 
     type: object
+    description: settings for the way an agent chooses a choice option / DiscreteAlternative/ environment unit
     required:
     - name
     - explore_attributes
     - heatmap_attributes
     properties:
+      name:
+        type: string
+        description: name of the method an agent employs to choose a choice option / DiscreteAlternative/ environment unit to forage in
       explore_attributes:
         type: object
+        description: settings if 'explore' is part of the method an agent employs to choose a choice option / DiscreteAlternative/ environment unit
         required:
         - explore_probability
+        properties:
+          explore_probability:
+            type: number
+            description: the probability an agent uses picks a random choice option / DiscreteAlternative/ environment unit
       heatmap_attributes:
         type: object
+        description: settings if 'heatmap' is part of the method an agent employs to choose a choice option / DiscreteAlternative/ environment unit
         required:
         - init_nb_alternative_known
+        properties:
+          init_nb_alternative_known:
+            type: number
+            description: initial number of choice option / DiscreteAlternative/ environment unit an agent has information/memory on
   sharing: 
     type: object
+    description: settings for the way an agent shares and receives information on choice option / DiscreteAlternative/ environment units with/from other agents
     required:
     - sharing
-    - receiver_choice
     - receiving
     properties:
       sharing:
         type: object
+        description: settings for what information an agent shares with on choice option / DiscreteAlternative/ environment units
         required:
         - name
+        - no_sharing_attributes
+        - random_sharing_attributes
         - nb_options_shared
-      receiver_choice:
-        type: object
-        required:
-        - name
-        - nb_receivers
+        properties:
+          name:
+            type: string
+            description: name of the method an agent employs to determine what information on choice option / DiscreteAlternative/ environment unit to share with other agents
+          no_sharing_attributes:
+            type: object
+            description: placeholder for settings if 'no_sharing' is part of the method an agent employs to determine what information on choice option / DiscreteAlternative/ environment unit with other agents
+          random_sharing_attributes:
+            type: object
+            description: placeholder for settings if 'random_sharing' is part of the method an agent employs to determine what information on choice option / DiscreteAlternative/ environment unit with other agents
+          nb_options_shared:
+            type: number
+            description: number of choice option / DiscreteAlternative/ environment unit an agent shares information on with other agents every time unit
       receiving:
         type: object
+        description: settings for how an agent receives/accepts information from other agents on choice option / DiscreteAlternative/ environment units
         required:
         - name
+        properties:
+          name:
+            type: string
+            description: name of the method an agent employs to receive/accept information from other agents on choice option / DiscreteAlternative/ environment unit
