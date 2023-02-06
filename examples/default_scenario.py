@@ -13,7 +13,7 @@ from src.ARTEMIS import run_artemis
 scenario_file = 'default_config.yml'  # Config file that needs to be run
 output_subfolder = '../../../examples/example_output/' # determines that the output should be written to a subfolder in the regular output folder (if not define output_subfolder = '')
 
-# R=un the simulation
+# Run the simulation
 random.seed(0)  # Make sure we always get the same result.
 np.random.seed(0)  # Make sure we always get the same result.
 run_artemis(scenario_file, output_subfolder)

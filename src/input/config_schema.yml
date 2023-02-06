@@ -1,6 +1,5 @@
 # Generate documentation with:
-#   generate-schema-doc config_schema.yml doc/config_schema.md
-# TODO: add descriptions for everything
+#   generate-schema-doc --config template_name=md_nested config_schema.yml doc/config_schema.md
 type: object
 description: scenario configuration
 required:

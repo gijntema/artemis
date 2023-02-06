@@ -1,6 +1,5 @@
 # Generate documentation with:
-#   generate-schema-doc agent_schema.yml doc/agent_schema.md
-# TODO: add descriptions for everything
+#   generate-schema-doc --config template_name=md_nested agent_schema.yml doc/agent_schema.md
 required:
 - name
 - nb_agents
