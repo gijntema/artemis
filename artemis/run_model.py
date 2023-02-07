@@ -62,6 +62,8 @@ class ModelRunner:
                   "---------------------------------------------------------------------------------------------------"
                   )
             time_id = str(time_tracker).zfill(len(str(duration)))                                                       # construct the time step id in text
+            
+            # START HERE ON ISSUE #2
             random.shuffle(agent_index_list)                                                                            # shuffle agent foraging order for equal opportunities
             fleet.update_memory_trackers(time_id)                                                                       # record knowledge on the choice options/ environmental units /  DiscreteALternatives at the start of a time period
             fleet.update_average_expected_competitor_tracker(time_id)                                                   # update tracker for the average expected amount of competitors
