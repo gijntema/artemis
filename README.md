@@ -25,19 +25,25 @@ First make sure you have git installed from; https://git-scm.com/
 
 Define the desired local location of the model
 
-    $ cd \<desired project directory>\ARTEMIS
+```
+cd \<desired project directory>\ARTEMIS
+```
 
 clone the remote repository into the defined location:
 
 (Using https):
 
-    $ git clone https://git.wur.nl/ecodyn/artemis.git
+```
+git clone https://git.wur.nl/ecodyn/artemis.git
+```
 
 or
 
 (Using SSH key):
 
-    $ git clone git@git.wur.nl:ecodyn/artemis.git
+```
+git clone git@git.wur.nl:ecodyn/artemis.git
+```
 
 ### Create virtual environment
 Depends on the interpreter chosen (should be adjusted to include several interpreters)
@@ -49,17 +55,19 @@ Depends on the interpreter chosen (should be adjusted to include several interpr
 
 Enter into terminal:
 
-    $ pip install -r requirements.txt 
-
+```
+pip install -r requirements.txt 
+```
 
 ### Adjust initial parameters (if not running the basic version of the model)
 Open `examples/default_config.yml` and enter desired parameters defined there.
-To see the correct variables to be used per scenario, see **src/input_descriptions.md**.
+More information on the correct variables to be used per scenario at **docs/input_descriptions.md** and  **docs/*_schema.md**.
 
 ### Starting the model
-run `python examples/default_scenario.py`
+Run `python examples/default_scenario.py`. 
+For a script that does some parameter variation, see `examples/default_scenario_vary_parameters.py`
 
 ### Tips for adjusting the Model
 Please realise that a testing framework **tests/test_functionality.py** is present to test if any adjustments hinder 
 the functionality of the model. New functionality test can also be included in this framework. Simply run the script 
-to test the functionality **OUTDATED SHOULD BE CHECKED FOR FUNCTIONALITY**
+to test the functionality **OUTDATED SHOULD BE CHECKED FOR FUNCTIONALITY**.
