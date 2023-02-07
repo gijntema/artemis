@@ -17,7 +17,7 @@
 
 # # import testing package and internal modules
 import unittest
-from src.tools.model_tools.agents import ForagerAgent, FishermanAgent, PredatorAgent
+from artemis.core.agents import ForagerAgent, FishermanAgent, PredatorAgent
 
 
 # TODO: rework module to pytest framework rather than unittest

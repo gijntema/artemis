@@ -50,7 +50,7 @@ Version Number:
 import numpy as np
 import copy
 from collections import defaultdict
-from src.tools.model_tools.resource_dynamics import DynamicsHandler
+from artemis.core.resource_dynamics import DynamicsHandler
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------------- Objects to contain the full choice set -----------------------------------------

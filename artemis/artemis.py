@@ -53,16 +53,16 @@ import pandas as pd                                                             
 # Import Internal Modules built for ARTEMIS functionality
 # ----------------------------------------------------------------------------------------------------------------------
 
-from src.input.config_yml import Configuration                                                                          # Module to save and access the configuration settings from a simulations scenario config file
-from src.run_model import ModelRunner                                                                                   # Module to run the model using initialized agents and choices
+from artemis.io.input.config_yml import Configuration                                                                   # Module to save and access the configuration settings from a simulations scenario config file
+from artemis.run_model import ModelRunner                                                                               # Module to run the model using initialized agents and choices
 
-from src.tools.model_tools.agents import AgentFleet                                                                     # Module with agents (and groups of agents) functionality
-from src.tools.model_tools.choice_set import ChoiceSet                                                                  # Module with choice option (e.g. grid cells) functionality, representing the physical environment agents operate in
-from src.tools.model_tools.competition import CompetitionHandler                                                        # Module that handles model feedbacks as a result of competition between agents
+from artemis.core.agents import AgentFleet                                                                              # Module with agents (and groups of agents) functionality
+from artemis.core.choice_set import ChoiceSet                                                                           # Module with choice option (e.g. grid cells) functionality, representing the physical environment agents operate in
+from artemis.core.competition import CompetitionHandler                                                                 # Module that handles model feedbacks as a result of competition between agents
 
-from src.tools.output_tools.printing import PrintBlocker                                                                # Module that allows for blocking of print statements in the scripts
-from src.tools.output_tools.raw_data_extraction import DataExtractor                                                    # Module to generate output data (as pandas dataframes) from the objects in the model
-from src.tools.output_tools.export_data import DataWriter                                                               # Module to write datafiles from the output data
+from artemis.io.output.printing import PrintBlocker                                                                     # Module that allows for blocking of print statements in the scripts
+from artemis.io.output.raw_data_extraction import DataExtractor                                                         # Module to generate output data (as pandas dataframes) from the objects in the model
+from artemis.io.output.export_data import DataWriter                                                                    # Module to write datafiles from the output data
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Set up structure for configuration of the model (The ConfigHandler object and the scenario file csv)

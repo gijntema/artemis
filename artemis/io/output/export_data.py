@@ -56,7 +56,7 @@ class DataWriter:
         using a specified filename and a standard suffix"""
 
         if isinstance(pd_dataframe, pd.DataFrame) and isinstance(filename, str):
-            file_path = "output/data_output/{}{}.csv".format(filename, self.output_file_suffix)                         # attach path to desired output folder
+            file_path = "{}{}.csv".format(filename, self.output_file_suffix)                         # attach path to desired output folder
             pd_dataframe.to_csv(file_path)
         else:
             raise TypeError("Method only supports pandas.Dataframe objects as input and filename as strings")           # error handling: only pandas.Dataframes are accepted and only string filenames
@@ -66,7 +66,7 @@ class DataWriter:
         using a specified filename and a standard suffix"""
 
         if isinstance(pd_dataframe, pd.DataFrame) and isinstance(filename, str):
-            file_path = "output/data_output/{}{}.json".format(filename, self.output_file_suffix)                        # attach path to desired output folder
+            file_path = "{}{}.json".format(filename, self.output_file_suffix)                        # attach path to desired output folder
             pd_dataframe.to_json(file_path)
         else:
             raise TypeError("Method only supports pandas.Dataframe objects as input and filename as strings")           # error handling: only pandas.Dataframes are accepted and only string filenames

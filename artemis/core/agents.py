@@ -47,9 +47,9 @@ Version Number:
 import random
 import copy
 from collections import defaultdict
-from src.tools.model_tools.choice_making import ChoiceMaker
-from src.tools.model_tools.sharing import HeatmapExchanger
-from src.tools.model_tools.allegiances import GroupFormer
+from artemis.core.choice_making import ChoiceMaker
+from artemis.core.sharing import HeatmapExchanger
+from artemis.core.allegiances import GroupFormer
 
 class AgentFleet:                                         # to be implemented, not yet included in the other scripts
     """Class to contain both the agents in ForagerAgent objects (or a more specified version of it)

@@ -1,5 +1,5 @@
-# Generate documentation with:
-#   generate-schema-doc --config template_name=md_nested agent_schema.yml doc/agent_schema.md
+# Generate documentation with (in repo root):
+#   generate-schema-doc --config template_name=md_nested artemis/io/input/agent_schema.yml docs/agent_schema.md
 required:
 - name
 - nb_agents

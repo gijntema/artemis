@@ -10,7 +10,7 @@ Examples include food foraging or commercial fishing.
 	* Python 3.9.4+
 	* Git
 
-see src/package_versions.txt for python packages and versions employed
+see `requirements.txt` for python packages and versions employed
 
 
 ## Getting Started
@@ -49,16 +49,15 @@ Depends on the interpreter chosen (should be adjusted to include several interpr
 
 Enter into terminal:
 
-    $ pip install -r src/package_versions.txt 
+    $ pip install -r requirements.txt 
 
 
 ### Adjust initial parameters (if not running the basic version of the model)
-Create a .csv file (**base_config.csv** is a template) to define the correct variables to be used per scenario, see **src/input_descriptions.md** 
-for descriptions of the different variables that can be adjusted
+Open `examples/default_config.yml` and enter desired parameters defined there.
+To see the correct variables to be used per scenario, see **src/input_descriptions.md**.
 
 ### Starting the model
-open src/ARTEMIS.py and define .csv file that contains defined input variables (**line 72**)
-run **src/ARTEMIS.py**
+run `python examples/default_scenario.py`
 
 ### Tips for adjusting the Model
 Please realise that a testing framework **tests/test_functionality.py** is present to test if any adjustments hinder 

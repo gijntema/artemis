@@ -1,5 +1,5 @@
-# Generate documentation with:
-#   generate-schema-doc --config template_name=md_nested config_schema.yml doc/config_schema.md
+# Generate documentation with (in repo root):
+#   generate-schema-doc --config template_name=md_nested artemis/io/input/config_schema.yml docs/config_schema.md
 type: object
 description: scenario configuration
 required:

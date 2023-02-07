@@ -1,2 +1,0 @@
-Enter Output Data Description Here:
-For now used to prevent Error when running from different machines

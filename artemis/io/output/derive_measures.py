@@ -19,7 +19,7 @@
 
 # SEE BOTTOM FOR EXECUTION OF SCRIPT -- ALSO DEFINE PROPER SCENARIO FILE THERE
 
-from src.tools.output_tools.export_data import DataWriter
+from artemis.io.output.export_data import DataWriter
 import pandas as pd
 import re
 import copy
