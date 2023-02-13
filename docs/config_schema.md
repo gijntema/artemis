@@ -14,7 +14,6 @@
       - [4.1.2.2. [Required] Property root > fleet > receiver_choice > group_attributes > group_formation](#fleet_receiver_choice_group_attributes_group_formation)
       - [4.1.2.3. [Required] Property root > fleet > receiver_choice > group_attributes > group_dynamics](#fleet_receiver_choice_group_attributes_group_dynamics)
     - [4.1.3. [Required] Property root > fleet > receiver_choice > random_choice_attributes](#fleet_receiver_choice_random_choice_attributes)
-    - [4.1.4. [Required] Property root > fleet > receiver_choice > nb_receivers](#fleet_receiver_choice_nb_receivers)
 - [5. [Required] Property root > options](#options)
   - [5.1. [Required] Property root > options > nb_options](#options_nb_options)
   - [5.2. [Required] Property root > options > growth](#options_growth)
@@ -270,22 +269,6 @@
 | **Additional properties** | [[Any type: allowed]](# "Additional Properties of any type are allowed.") |
 
 **Description:** settings if 'random_choice' is part of the method to determine with whom to share information on choice option / DiscreteAlternative/ enviroment units
-
-</blockquote>
-</details>
-
-<details>
-<summary><strong> <a name="fleet_receiver_choice_nb_receivers"></a>4.1.4. [Required] Property root > fleet > receiver_choice > nb_receivers</strong>  
-
-</summary>
-<blockquote>
-
-|              |          |
-| ------------ | -------- |
-| **Type**     | `number` |
-| **Required** | Yes      |
-
-**Description:** number of agents that an agent shares information with every unit of time
 
 </blockquote>
 </details>
@@ -609,4 +592,4 @@
 </details>
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2023-02-06 at 16:12:33 +0100
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2023-02-13 at 12:20:11 +0100

@@ -15,8 +15,10 @@
     - [5.1.2. [Required] Property root > sharing > sharing > no_sharing_attributes](#sharing_sharing_no_sharing_attributes)
     - [5.1.3. [Required] Property root > sharing > sharing > random_sharing_attributes](#sharing_sharing_random_sharing_attributes)
     - [5.1.4. [Required] Property root > sharing > sharing > nb_options_shared](#sharing_sharing_nb_options_shared)
-  - [5.2. [Required] Property root > sharing > receiving](#sharing_receiving)
-    - [5.2.1. [Required] Property root > sharing > receiving > name](#sharing_receiving_name)
+  - [5.2. [Required] Property root > sharing > receiver_choice](#sharing_receiver_choice)
+    - [5.2.1. [Required] Property root > sharing > receiver_choice > nb_receivers](#sharing_receiver_choice_nb_receivers)
+  - [5.3. [Required] Property root > sharing > receiving](#sharing_receiving)
+    - [5.3.1. [Required] Property root > sharing > receiving > name](#sharing_receiving_name)
 
 |                           |                                                                           |
 | ------------------------- | ------------------------------------------------------------------------- |
@@ -269,7 +271,40 @@
 </details>
 
 <details>
-<summary><strong> <a name="sharing_receiving"></a>5.2. [Required] Property root > sharing > receiving</strong>  
+<summary><strong> <a name="sharing_receiver_choice"></a>5.2. [Required] Property root > sharing > receiver_choice</strong>  
+
+</summary>
+<blockquote>
+
+|                           |                                                                           |
+| ------------------------- | ------------------------------------------------------------------------- |
+| **Type**                  | `object`                                                                  |
+| **Required**              | Yes                                                                       |
+| **Additional properties** | [[Any type: allowed]](# "Additional Properties of any type are allowed.") |
+
+**Description:** settings for with whom an agent shares information on choice option / DiscreteAlternative/ environment units
+
+<details>
+<summary><strong> <a name="sharing_receiver_choice_nb_receivers"></a>5.2.1. [Required] Property root > sharing > receiver_choice > nb_receivers</strong>  
+
+</summary>
+<blockquote>
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `number` |
+| **Required** | Yes      |
+
+**Description:** number of agents that an agent shares information with every unit of time
+
+</blockquote>
+</details>
+
+</blockquote>
+</details>
+
+<details>
+<summary><strong> <a name="sharing_receiving"></a>5.3. [Required] Property root > sharing > receiving</strong>  
 
 </summary>
 <blockquote>
@@ -283,7 +318,7 @@
 **Description:** settings for how an agent receives/accepts information from other agents on choice option / DiscreteAlternative/ environment units
 
 <details>
-<summary><strong> <a name="sharing_receiving_name"></a>5.2.1. [Required] Property root > sharing > receiving > name</strong>  
+<summary><strong> <a name="sharing_receiving_name"></a>5.3.1. [Required] Property root > sharing > receiving > name</strong>  
 
 </summary>
 <blockquote>
@@ -305,4 +340,4 @@
 </details>
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2023-02-06 at 16:12:20 +0100
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2023-02-13 at 12:20:04 +0100
