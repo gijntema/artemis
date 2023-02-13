@@ -23,7 +23,8 @@ for intfac, resprob, nbrec in itertools.product(interference_factors, reset_prob
     scenario_data['competition']['interference_attributes']['interference_factor'] = intfac
     scenario_data['options']['stock_reset']['reset_probability'] = resprob
     for agent in scenario_data['agents']:
-        agent['sharing']['receiver_choice']['nb_receivers'] = nbrec
+        if agent['name'] == "subfleet001":  # In this example, only change nb_receivers for subfleet 1.
+            agent['sharing']['receiver_choice']['nb_receivers'] = nbrec
 
     # Set output folder and make sure it exists.
     dirname = f'intfac{intfac}_resprob{resprob}_nbsrec{nbrec}'
