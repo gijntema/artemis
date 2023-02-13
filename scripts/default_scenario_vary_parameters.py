@@ -5,16 +5,13 @@ import itertools
 this_file_dir = os.path.dirname(__file__)
 sys.path.append(os.path.dirname(this_file_dir))
 
-import numpy as np
-import pandas as pd
-import random
 import artemis
 
 
-# Set inputs
-scenario_file = os.path.join(this_file_dir, 'default_config.yml')  # Config file that needs to be run
+# Set inputs.
+scenario_file = os.path.join(this_file_dir, 'default_config.yml')  # Config file that needs to be run.
 scenario_data = artemis.io.read_data_from_yml(scenario_file)  # Read scenario_file.
-output_basefolder = os.path.join(this_file_dir, 'vary_output/') # Determines output directory
+output_basefolder = os.path.join(this_file_dir, 'vary_output/')  # Determines output directory.
 
 # Run the simulation for different combinations of parameters.
 interference_factors = [0.9, 1.0]

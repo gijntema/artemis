@@ -10,12 +10,12 @@ import random
 import artemis
 
 
-# Set inputs
-scenario_file = os.path.join(this_file_dir, 'default_config.yml')  # Config file that needs to be run
-output_subfolder = os.path.join(this_file_dir, 'example_output/') # Determines output directory
-reference_subfolder = os.path.join(this_file_dir, 'reference_output/') # Determines reference directory
+# Set inputs.
+scenario_file = os.path.join(this_file_dir, 'default_config.yml')  # Config file that needs to be run.
+output_subfolder = os.path.join(this_file_dir, 'example_output/')  # Determines output directory.
+reference_subfolder = os.path.join(this_file_dir, 'reference_output/')  # Determines reference directory.
 
-# Run the simulation
+# Run the simulation.
 random.seed(0)  # Make sure we always get the same result.
 np.random.seed(0)  # Make sure we always get the same result.
 scenario_data = artemis.io.read_data_from_yml(scenario_file)  # Read scenario_file.
