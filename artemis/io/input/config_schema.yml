@@ -37,8 +37,12 @@ properties:
     type: object
     description: fleet settings; these apply to all agents defined under 'agents'
     required:
+    - agent_order
     - receiver_choice
     properties:
+      agent_order:
+        type: string
+        description: setting for ordering agent between each time step (for now 'constant' or 'shuffle')
       receiver_choice:
         type: object
         description: settings for with whom an agent shares information on choice option / DiscreteAlternative/ environment units

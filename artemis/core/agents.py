@@ -69,6 +69,7 @@ class AgentFleet:                                         # to be implemented, n
         self.heatmap_tracker = defaultdict(dict)
         self.catch_potential_tracker = defaultdict(dict)
         self.group_former = None
+        self.agent_index_list = []
 
     def finalize_setup(self,
                        number_of_sharing_groups=10,
@@ -83,6 +84,8 @@ class AgentFleet:                                         # to be implemented, n
         self.__init_group_allegiances()
         self.__init_time_data_trackers(duration_model=duration_model)
         self.__init_potential_receivers()
+        self.agent_index_list = list(self.agents.keys())
+
 
     def add(self,  #TODO: ideally this just takes a AgentConfiguration object as single argument.
                  nb_agents=100,
@@ -183,6 +186,14 @@ class AgentFleet:                                         # to be implemented, n
 # ----------------------------------------------------------------------------------------------------------------------
 # --------------------------------- Methods to update agent(set) related trackers --------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
+
+    def order_agents(self, method):
+        """Reorders agent indices in self.agent_index_list."""
+        if method == 'shuffle':
+            self.agent_index_list = list(self.agents.keys())
+            random.shuffle(self.agent_index_list)                                                                       # shuffle agent foraging order for equal opportunities
+        elif method == 'constant':
+            pass                                                                                                        # keep agent_index_list ordering as is
 
     def update_agent_trackers(self, agent_id, catch, alternative_index, time_tracker):
         """" updates the data contained in a single ForagerAgent

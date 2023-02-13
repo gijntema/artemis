@@ -168,6 +168,7 @@ def run_artemis(scenario_data, output_subfolder, save_config=False):
                                 sd_init_stock=config.sd_init_stock,
                                 competition_handler=competition_handler,
                                 stock_reset_chance=config.chance_reset_stock,                                           # TODO: Move  stock_reset chance as internal Attribute of individual DiscreteAlternative Objects, to allow for flexibility
+                                agent_ordering_method=config.agent_order,
                                 iteration_id=iteration_counter,
                                 max_stock=config.max_stock,
                                 min_stock=config.min_stock)
