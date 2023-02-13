@@ -19,8 +19,10 @@ agents:
             nb_options_shared: 1
             no_sharing_attributes: {}
             random_sharing_attributes: {}
+        receiver_choice:
+            nb_receivers: 0
         receiving:
-            name: combine_receiver
+            name: willing_receiver
 -   name: subfleet002
     nb_agents: 10
     catchability_coefficient: 0.2
@@ -36,8 +38,10 @@ agents:
             nb_options_shared: 1
             no_sharing_attributes: {}
             random_sharing_attributes: {}
+        receiver_choice:
+            nb_receivers: 0
         receiving:
-            name: combine_receiver
+            name: willing_receiver
 fleet:
     receiver_choice:
         name: static_group_choice
@@ -46,7 +50,6 @@ fleet:
             group_formation: equal_mutually_exclusive_groups
             group_dynamics: False
         random_choice_attributes: {}
-        nb_receivers: 0
 options:
     nb_options: 20
     growth:

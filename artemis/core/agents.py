@@ -86,7 +86,7 @@ class AgentFleet:                                         # to be implemented, n
 
     def add(self,  #TODO: ideally this just takes a AgentConfiguration object as single argument.
                  nb_agents=100,
-                 subgroup_name='',
+                 subfleet_name='',
                  choice_set=20,
                  catchability_coefficient=0.2,
                  nb_alternatives_known=4,
@@ -102,7 +102,7 @@ class AgentFleet:                                         # to be implemented, n
 
         add_agents = self.__init_agents(
                                nb_agents=nb_agents,
-                               subgroup_name=subgroup_name,
+                               subfleet_name=subfleet_name,
                                choice_set=choice_set,
                                catchability_coefficient=catchability_coefficient,
                                nb_alternatives_known=nb_alternatives_known,
@@ -122,7 +122,7 @@ class AgentFleet:                                         # to be implemented, n
 # ----------------------------------------------------------------------------------------------------------------------
 
     # UNIMPLEMENTED
-    def __init_agents(self, nb_agents, subgroup_name, choice_set,
+    def __init_agents(self, nb_agents, subfleet_name, choice_set,
                       catchability_coefficient, nb_alternatives_known,
                       explore_probability, duration_model,
                       choice_method="random",
@@ -135,7 +135,7 @@ class AgentFleet:                                         # to be implemented, n
         agent_dictionary = dict()
         agent_tracker = 0                                                                                               # make counter for following while loop functioning
         while agent_tracker < nb_agents:
-            agent_id = 'agent_' + str(subgroup_name) + '_' + str(agent_tracker).zfill(len(str(nb_agents)))                                         # construct agent ID
+            agent_id = 'agent_' + str(subfleet_name) + '_' + str(agent_tracker).zfill(len(str(nb_agents)))                                         # construct agent ID
             agent_dictionary[agent_id] = ForagerAgent(choice_set=choice_set,
                                                       choice_method=choice_method,
                                                       agent_id=agent_id,

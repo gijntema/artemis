@@ -18,7 +18,8 @@ reference_subfolder = os.path.join(this_file_dir, 'reference_output/') # Determi
 # Run the simulation
 random.seed(0)  # Make sure we always get the same result.
 np.random.seed(0)  # Make sure we always get the same result.
-artemis.run_artemis(scenario_file, output_subfolder)
+scenario_data = artemis.io.read_data_from_yml(scenario_file)  # Read scenario_file.
+artemis.run_artemis(scenario_data, output_subfolder, save_config=False)
 
 # Make sure the output is the same as it was before.
 

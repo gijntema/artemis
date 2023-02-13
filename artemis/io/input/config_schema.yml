@@ -46,7 +46,6 @@ properties:
         - name
         - group_attributes
         - random_choice_attributes
-        - nb_receivers
         properties:
           name:
             type: string
@@ -71,9 +70,6 @@ properties:
           random_choice_attributes:
             type: object
             description: settings if 'random_choice' is part of the method to determine with whom to share information on choice option / DiscreteAlternative/ enviroment units
-          nb_receivers:
-            type: number
-            description: number of agents that an agent shares information with every unit of time
   options: 
     type: object
     description: settings for the choice option / DiscreteAlternative/ environment units in the model

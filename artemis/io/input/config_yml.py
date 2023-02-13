@@ -10,14 +10,22 @@ CONFIG_SCHEMA_PATH = os.path.join(SCHEMA_DIR, CONFIG_SCHEMA_FILENAME)
 AGENT_SCHEMA_PATH = os.path.join(SCHEMA_DIR, AGENT_SCHEMA_FILENAME)
 
 
+def read_data_from_yml(filename):
+    with open(filename) as file:
+        data = yaml.load(file, Loader=yaml.FullLoader)
+    return data
+
+
 class Configuration:
     """Class to contain simulation configuration parameters."""
 
     _config_data: dict
     _agents: list
 
-    def __init__(self, config_data, config_schema, agent_schema):
+    def __init__(self, config_data):
         self._config_data = config_data
+        config_schema = read_data_from_yml(CONFIG_SCHEMA_PATH)
+        agent_schema = read_data_from_yml(AGENT_SCHEMA_PATH)
         validate(instance=self._config_data, schema=config_schema)
         self._agents = list(AgentConfiguration(agent, agent_schema) for agent in self._config_data['agents'])
 
@@ -29,14 +37,8 @@ class Configuration:
     @staticmethod
     def read_yml(filename):
         """Read config data from yml file."""
-        def _read_data_from_yml(filename):
-            with open(filename) as file:
-                data = yaml.load(file, Loader=yaml.FullLoader)
-            return data
-        config_schema = _read_data_from_yml(CONFIG_SCHEMA_PATH)
-        agent_schema = _read_data_from_yml(AGENT_SCHEMA_PATH)
-        config_data = _read_data_from_yml(filename)
-        return Configuration(config_data, config_schema, agent_schema)
+        config_data = read_data_from_yml(filename)
+        return Configuration(config_data)
 
     @property
     def agents(self):
@@ -118,10 +120,6 @@ class Configuration:
     def pick_receiver_strategy(self):
         return self._config_data['fleet']['receiver_choice']['name']
 
-    @property
-    def share_partners(self):
-        return self._config_data['fleet']['receiver_choice']['nb_receivers']
-
 
 class AgentConfiguration:
     """Class to contain agent configuration parameters."""
@@ -163,6 +161,10 @@ class AgentConfiguration:
     @property
     def shared_alternatives(self):
         return self._agent_data['sharing']['sharing']['nb_options_shared']
+
+    @property
+    def share_partners(self):
+        return self._agent_data['sharing']['receiver_choice']['nb_receivers']
 
     @property
     def receiving_strategy(self):

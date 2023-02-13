@@ -46,7 +46,7 @@ Version Number:
 # ----------------------------------------------------------------------------------------------------------------------
 
 import timeit                                                                                                           # Import module to track runtime
-start = timeit.default_timer()                                                                                          # Start timer for model run
+import os
 import pandas as pd                                                                                                     # Pandas dataframes as data structure tool
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -69,13 +69,16 @@ from artemis.io.output.export_data import DataWriter                            
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-def run_artemis(scenario_file, output_subfolder):
+def run_artemis(scenario_data, output_subfolder, save_config=False):
 
     # default specifications of the model
     # scenario_file = 'base_config.csv'  # Config file that needs to be run
     # output_subfolder = ''   # subfolder of the results that the data should be exported to '' results in no subfolder, Please don't forge to make the actual subfolder before running the model'
 
-    config = Configuration.read_yml(scenario_file)                                                                      # define and load yml containing the parameters for the scenario
+    start = timeit.default_timer()                                                                                          # Start timer for model run
+    config = Configuration(scenario_data)                                                                                   # define parameters for the scenario
+    if save_config:
+        config.to_yml(os.path.join(output_subfolder, 'config.yml'))
 
     # ----------------------------------------------------------------------------------------------------------------------
     # Set up objects that are independent on simulation settings
@@ -131,7 +134,7 @@ def run_artemis(scenario_file, output_subfolder):
         for agent in config.agents:
             fleet.add(
                 nb_agents=agent.number_of_agents,
-                subgroup_name=agent.name,
+                subfleet_name=agent.name,
                 choice_set=choice_set,
                 catchability_coefficient=agent.catchability_coefficient,
                 nb_alternatives_known=agent.init_number_of_alternatives_known,
@@ -142,7 +145,7 @@ def run_artemis(scenario_file, output_subfolder):
                 receiver_choice_strategy=config.pick_receiver_strategy,
                 receiving_strategy=agent.receiving_strategy,
                 number_of_shared_alternatives=agent.shared_alternatives,
-                number_of_agents_shared_with=config.share_partners
+                number_of_agents_shared_with=agent.share_partners
                 )
         fleet.finalize_setup(
             number_of_sharing_groups=config.number_of_groups,
@@ -194,9 +197,9 @@ def run_artemis(scenario_file, output_subfolder):
     # ---- exit iteration loop ----
 
     data_writer.write_csv(time_x_agent_data,
-                        '{}flat_time_x_agent_results'.format(output_subfolder))                                       # write csv output file for data specific per unit of time and agent
+                          os.path.join(output_subfolder, 'flat_time_x_agent_results'))                                  # write csv output file for data specific per unit of time and agent
     data_writer.write_csv(time_x_environment_data,
-                        '{}flat_time_x_environment_results'.format(output_subfolder))                                 # write csv output file for data specific per unit of time and choice option/environmental subsection
+                          os.path.join(output_subfolder, 'flat_time_x_environment_results'))                            # write csv output file for data specific per unit of time and choice option/environmental subsection
 
     # Enable Printing
     print_blocker.enable_print()                                                                                        # enable printing to report on runtime and other prints that are always desired regardless of print blocking

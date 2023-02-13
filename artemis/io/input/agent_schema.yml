@@ -50,6 +50,7 @@ properties:
     description: settings for the way an agent shares and receives information on choice option / DiscreteAlternative/ environment units with/from other agents
     required:
     - sharing
+    - receiver_choice
     - receiving
     properties:
       sharing:
@@ -73,6 +74,15 @@ properties:
           nb_options_shared:
             type: number
             description: number of choice option / DiscreteAlternative/ environment unit an agent shares information on with other agents every time unit
+      receiver_choice:
+        type: object
+        description: settings for with whom an agent shares information on choice option / DiscreteAlternative/ environment units
+        required:
+        - nb_receivers
+        properties:
+          nb_receivers:
+            type: number
+            description: number of agents that an agent shares information with every unit of time
       receiving:
         type: object
         description: settings for how an agent receives/accepts information from other agents on choice option / DiscreteAlternative/ environment units
