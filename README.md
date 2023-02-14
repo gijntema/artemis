@@ -74,4 +74,9 @@ to test the functionality **OUTDATED SHOULD BE CHECKED FOR FUNCTIONALITY**.
 
 ### Profiling the code
 
-`python -m cProfile scripts/default_scenario.py`
+```
+python -m cProfile -o profiling.txt scripts/default_scenario.py
+python -m pstats profiling.txt
+profiling.txt% sort cumulative
+profiling.txt% stats 30
+```
