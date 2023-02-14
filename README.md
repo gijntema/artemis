@@ -71,3 +71,7 @@ For a script that does some parameter variation, see `examples/default_scenario_
 Please realise that a testing framework **tests/test_functionality.py** is present to test if any adjustments hinder 
 the functionality of the model. New functionality test can also be included in this framework. Simply run the script 
 to test the functionality **OUTDATED SHOULD BE CHECKED FOR FUNCTIONALITY**.
+
+### Profiling the code
+
+`python -m cProfile scripts/default_scenario.py`
