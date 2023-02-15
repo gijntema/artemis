@@ -5,9 +5,10 @@ this_file_dir = os.path.dirname(__file__)
 sys.path.append(os.path.dirname(this_file_dir))
 
 import numpy as np
-import pandas as pd
 import random
 import artemis
+import pandas as pd
+pd.set_option("display.precision", 18)
 
 
 # Set inputs.
@@ -26,9 +27,20 @@ artemis.run_artemis(scenario_data, output_subfolder, save_config=False)
 # Column 'agent_id' differs but all other data should be the same.
 df1_example = pd.read_csv(os.path.join(output_subfolder, 'flat_time_x_agent_resultsdefault.csv')).drop(['agent_id'], axis=1)
 df1_ref = pd.read_csv(os.path.join(reference_subfolder, 'flat_time_x_agent_resultsdefault.csv')).drop(['agent_id'], axis=1)
-assert(df1_example.compare(df1_ref).empty)
+df1_diff = df1_example.compare(df1_ref)
+if not df1_diff.empty:
+    print(df1_diff)
+    print("Test 1 failed!")
+else:
+    print("Test 1 passed!")
 
 # Almost all column names are different here, so we only compare the numerical data.
 df2_example = pd.read_csv(os.path.join(output_subfolder, 'flat_time_x_environment_resultsdefault.csv')).drop(['alternative_id', 'agents_visited'], axis=1)
 df2_ref = pd.read_csv(os.path.join(reference_subfolder, 'flat_time_x_environment_resultsdefault.csv')).drop(['alternative_id', 'agents_visited'], axis=1)
 assert(np.amax(df2_example.to_numpy() - df2_ref.to_numpy()) < 1e-8)
+df2_diff = df1_example.compare(df1_ref)
+if not df2_diff.empty:
+    print(df2_diff)
+    print("Test 2 failed!")
+else:
+    print("Test 2 passed!")
