@@ -241,15 +241,14 @@ class AgentFleet:                                         # to be implemented, n
         
         for i, agent in enumerate(keys_agents):                                                                         # Loop over Agents (1) to transform an agent heatmap into a probability map --> what is the chance an agent will i each option
             agent_data = self.agents[agent]
-            prob_matrix[i, :] = np.array([agent_data.heatmap[key] for key in keys_options])
-            prob_matrix[i, :] /= np.sum(prob_matrix[i, :])
-            prob_matrix[i, :] *= (1 - agent_data.explore_probability)
-            prob_matrix[i, :] += agent_data.explore_probability/number_of_options
+            prob_matrix[i, :] = np.array([agent_data.heatmap[key] for key in keys_options])                             # create copy of heatmap and put in 2D numpy array for fast calculation
+            prob_matrix[i, :] /= np.sum(prob_matrix[i, :])                                                              # divide heatmap entries by sum of entries to gain proportional weights as probability of choosing an option
+            prob_matrix[i, :] *= (1 - agent_data.explore_probability)                                                   # correct for the fact that probability of choosing an option based on the heatmap is not 100%
+            prob_matrix[i, :] += agent_data.explore_probability/number_of_options                                       # add the chance of choosing the option at random through exploration
 
-        encounter_matrix = np.zeros((number_of_agents, number_of_agents))
-        encounter_matrix = np.matmul(prob_matrix, prob_matrix.T)
-        np.fill_diagonal(encounter_matrix, 0)
-        competitor_tracker = np.sum(encounter_matrix, axis=1) / number_of_options
+        encounter_matrix = np.matmul(prob_matrix, prob_matrix.T)                                                        # calculate chances of agents meeting eachother
+        np.fill_diagonal(encounter_matrix, 0)                                                                           # disregard the chance of meeting oneself
+        competitor_tracker = np.sum(encounter_matrix, axis=1) / number_of_options                                       # sum over target agents and divide cumulative tracker by number of options
 
         for i, agent in enumerate(keys_agents):
             self.average_expected_competitor_tracker[time_id][agent] = competitor_tracker[i]
