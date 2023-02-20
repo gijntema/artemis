@@ -49,6 +49,7 @@ import copy
 from collections import defaultdict
 from artemis.core.choice_making import ChoiceMaker
 from artemis.core.sharing import HeatmapExchanger
+from artemis.core.agent_ordering import AgentOrderer
 from artemis.core.allegiances import GroupFormer
 
 class AgentFleet:                                         # to be implemented, not yet included in the other scripts
@@ -70,12 +71,15 @@ class AgentFleet:                                         # to be implemented, n
         self.catch_potential_tracker = defaultdict(dict)
         self.group_former = None
         self.agent_index_list = []
+        self.agent_orderer = None
+        self._finalized = False                                                                                         # If AgentFleet is finalized, no more agents can be added.
 
     def finalize_setup(self,
                        number_of_sharing_groups=10,
                        group_division_style='equal_mutually_exclusive_groups',
                        group_dynamics=False,
-                       duration_model=100):
+                       duration_model=100,
+                       agent_ordering_strategy='shuffle'):
         
         self.group_former = GroupFormer(self,
                                         number_of_groups=number_of_sharing_groups,
@@ -85,6 +89,9 @@ class AgentFleet:                                         # to be implemented, n
         self.__init_time_data_trackers(duration_model=duration_model)
         self.__init_potential_receivers()
         self.agent_index_list = list(self.agents.keys())
+        self.agent_orderer = AgentOrderer(agent=self,
+                                          strategy=agent_ordering_strategy)
+        self._finalized = True
 
 
     def add(self,  #TODO: ideally this just takes a AgentConfiguration object as single argument.
@@ -103,6 +110,9 @@ class AgentFleet:                                         # to be implemented, n
                  number_of_agents_shared_with=1):
         #TODO KW: ensure that the hard wired values above are not used in the first time step. these need to come from init_param from time=0 onwards
 
+        if self._finalized:
+            raise ValueError('AgentFleet already finalized; cannot add more agents.')
+        
         add_agents = self.__init_agents(
                                nb_agents=nb_agents,
                                subfleet_name=subfleet_name,
@@ -187,13 +197,9 @@ class AgentFleet:                                         # to be implemented, n
 # --------------------------------- Methods to update agent(set) related trackers --------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
-    def order_agents(self, method):
+    def order_agents(self):
         """Reorders agent indices in self.agent_index_list."""
-        if method == 'shuffle':
-            self.agent_index_list = list(self.agents.keys())
-            random.shuffle(self.agent_index_list)                                                                       # shuffle agent foraging order for equal opportunities
-        elif method == 'constant':
-            pass                                                                                                        # keep agent_index_list ordering as is
+        self.agent_index_list = self.agent_orderer.run_ordering()
 
     def update_agent_trackers(self, agent_id, catch, alternative_index, time_tracker):
         """" updates the data contained in a single ForagerAgent

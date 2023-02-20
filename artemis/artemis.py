@@ -151,7 +151,8 @@ def run_artemis(scenario_data, output_subfolder, save_config=False):
             number_of_sharing_groups=config.number_of_groups,
             group_division_style=config.division_style,
             group_dynamics=config.group_dynamics,
-            duration_model=config.duration
+            duration_model=config.duration,
+            agent_ordering_strategy=config.agent_order
             )
 
     # ----------------------------------------------------------------------------------------------------------------------
@@ -168,7 +169,6 @@ def run_artemis(scenario_data, output_subfolder, save_config=False):
                                 sd_init_stock=config.sd_init_stock,
                                 competition_handler=competition_handler,
                                 stock_reset_chance=config.chance_reset_stock,                                           # TODO: Move  stock_reset chance as internal Attribute of individual DiscreteAlternative Objects, to allow for flexibility
-                                agent_ordering_method=config.agent_order,
                                 iteration_id=iteration_counter,
                                 max_stock=config.max_stock,
                                 min_stock=config.min_stock)

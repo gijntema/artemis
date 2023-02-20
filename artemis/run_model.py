@@ -48,7 +48,6 @@ class ModelRunner:
                   sd_init_stock,                                                                                        # the standard deviation value of a reset stock if the stock is reset as drawn from a normal distribution
                   competition_handler,                                                                                  # object that ensures the effects of competition are implemented
                   stock_reset_chance,                                                                                   # the chance a stock is reste at the end of time step
-                  agent_ordering_method,                                                                                # method for ordering agents
                   iteration_id,                                                                                         # for reporting on iterations
                   min_stock,                                                                                            # the minimum value of a reset stock if the stock is reset as drwan from a uniform distribution
                   max_stock):                                                                                           # the maximum value of a reset stock if the stock is reset as drwan from a uniform distribution
@@ -62,7 +61,7 @@ class ModelRunner:
                   )
             time_id = str(time_tracker).zfill(len(str(duration)))                                                       # construct the time step id in text
             
-            fleet.order_agents(method=agent_ordering_method)                                                            # shuffle agent foraging order for equal opportunities
+            fleet.order_agents()                                                                                        # shuffle agent foraging order for equal opportunities
             fleet.update_memory_trackers(time_id)                                                                       # record knowledge on the choice options/ environmental units /  DiscreteALternatives at the start of a time period
             fleet.update_average_expected_competitor_tracker(time_id)                                                   # update tracker for the average expected amount of competitors
             choice_set.update_environmental_stock_tracker(time_id=time_id)                                              # save real stock ofevrry subunit of the environment (e.g. grid cell) into a tracker

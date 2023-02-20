@@ -7,13 +7,14 @@
   - [2.3. [Required] Property root > model > reporting](#model_reporting)
 - [3. [Required] Property root > agents](#agents)
 - [4. [Required] Property root > fleet](#fleet)
-  - [4.1. [Required] Property root > fleet > receiver_choice](#fleet_receiver_choice)
-    - [4.1.1. [Required] Property root > fleet > receiver_choice > name](#fleet_receiver_choice_name)
-    - [4.1.2. [Required] Property root > fleet > receiver_choice > group_attributes](#fleet_receiver_choice_group_attributes)
-      - [4.1.2.1. [Required] Property root > fleet > receiver_choice > group_attributes > nb_groups](#fleet_receiver_choice_group_attributes_nb_groups)
-      - [4.1.2.2. [Required] Property root > fleet > receiver_choice > group_attributes > group_formation](#fleet_receiver_choice_group_attributes_group_formation)
-      - [4.1.2.3. [Required] Property root > fleet > receiver_choice > group_attributes > group_dynamics](#fleet_receiver_choice_group_attributes_group_dynamics)
-    - [4.1.3. [Required] Property root > fleet > receiver_choice > random_choice_attributes](#fleet_receiver_choice_random_choice_attributes)
+  - [4.1. [Required] Property root > fleet > agent_order](#fleet_agent_order)
+  - [4.2. [Required] Property root > fleet > receiver_choice](#fleet_receiver_choice)
+    - [4.2.1. [Required] Property root > fleet > receiver_choice > name](#fleet_receiver_choice_name)
+    - [4.2.2. [Required] Property root > fleet > receiver_choice > group_attributes](#fleet_receiver_choice_group_attributes)
+      - [4.2.2.1. [Required] Property root > fleet > receiver_choice > group_attributes > nb_groups](#fleet_receiver_choice_group_attributes_nb_groups)
+      - [4.2.2.2. [Required] Property root > fleet > receiver_choice > group_attributes > group_formation](#fleet_receiver_choice_group_attributes_group_formation)
+      - [4.2.2.3. [Required] Property root > fleet > receiver_choice > group_attributes > group_dynamics](#fleet_receiver_choice_group_attributes_group_dynamics)
+    - [4.2.3. [Required] Property root > fleet > receiver_choice > random_choice_attributes](#fleet_receiver_choice_random_choice_attributes)
 - [5. [Required] Property root > options](#options)
   - [5.1. [Required] Property root > options > nb_options](#options_nb_options)
   - [5.2. [Required] Property root > options > growth](#options_growth)
@@ -162,7 +163,23 @@
 **Description:** fleet settings; these apply to all agents defined under 'agents'
 
 <details>
-<summary><strong> <a name="fleet_receiver_choice"></a>4.1. [Required] Property root > fleet > receiver_choice</strong>  
+<summary><strong> <a name="fleet_agent_order"></a>4.1. [Required] Property root > fleet > agent_order</strong>  
+
+</summary>
+<blockquote>
+
+|              |          |
+| ------------ | -------- |
+| **Type**     | `string` |
+| **Required** | Yes      |
+
+**Description:** setting for ordering agent between each time step (for now 'constant' or 'shuffle')
+
+</blockquote>
+</details>
+
+<details>
+<summary><strong> <a name="fleet_receiver_choice"></a>4.2. [Required] Property root > fleet > receiver_choice</strong>  
 
 </summary>
 <blockquote>
@@ -176,7 +193,7 @@
 **Description:** settings for with whom an agent shares information on choice option / DiscreteAlternative/ environment units
 
 <details>
-<summary><strong> <a name="fleet_receiver_choice_name"></a>4.1.1. [Required] Property root > fleet > receiver_choice > name</strong>  
+<summary><strong> <a name="fleet_receiver_choice_name"></a>4.2.1. [Required] Property root > fleet > receiver_choice > name</strong>  
 
 </summary>
 <blockquote>
@@ -192,7 +209,7 @@
 </details>
 
 <details>
-<summary><strong> <a name="fleet_receiver_choice_group_attributes"></a>4.1.2. [Required] Property root > fleet > receiver_choice > group_attributes</strong>  
+<summary><strong> <a name="fleet_receiver_choice_group_attributes"></a>4.2.2. [Required] Property root > fleet > receiver_choice > group_attributes</strong>  
 
 </summary>
 <blockquote>
@@ -206,7 +223,7 @@
 **Description:** settings if 'group' is part of the method to determine with whom to share information on choice option / DiscreteAlternative/ environment units
 
 <details>
-<summary><strong> <a name="fleet_receiver_choice_group_attributes_nb_groups"></a>4.1.2.1. [Required] Property root > fleet > receiver_choice > group_attributes > nb_groups</strong>  
+<summary><strong> <a name="fleet_receiver_choice_group_attributes_nb_groups"></a>4.2.2.1. [Required] Property root > fleet > receiver_choice > group_attributes > nb_groups</strong>  
 
 </summary>
 <blockquote>
@@ -222,7 +239,7 @@
 </details>
 
 <details>
-<summary><strong> <a name="fleet_receiver_choice_group_attributes_group_formation"></a>4.1.2.2. [Required] Property root > fleet > receiver_choice > group_attributes > group_formation</strong>  
+<summary><strong> <a name="fleet_receiver_choice_group_attributes_group_formation"></a>4.2.2.2. [Required] Property root > fleet > receiver_choice > group_attributes > group_formation</strong>  
 
 </summary>
 <blockquote>
@@ -238,7 +255,7 @@
 </details>
 
 <details>
-<summary><strong> <a name="fleet_receiver_choice_group_attributes_group_dynamics"></a>4.1.2.3. [Required] Property root > fleet > receiver_choice > group_attributes > group_dynamics</strong>  
+<summary><strong> <a name="fleet_receiver_choice_group_attributes_group_dynamics"></a>4.2.2.3. [Required] Property root > fleet > receiver_choice > group_attributes > group_dynamics</strong>  
 
 </summary>
 <blockquote>
@@ -257,7 +274,7 @@
 </details>
 
 <details>
-<summary><strong> <a name="fleet_receiver_choice_random_choice_attributes"></a>4.1.3. [Required] Property root > fleet > receiver_choice > random_choice_attributes</strong>  
+<summary><strong> <a name="fleet_receiver_choice_random_choice_attributes"></a>4.2.3. [Required] Property root > fleet > receiver_choice > random_choice_attributes</strong>  
 
 </summary>
 <blockquote>
@@ -592,4 +609,4 @@
 </details>
 
 ----------------------------------------------------------------------------------------------------------------------------
-Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2023-02-13 at 12:20:11 +0100
+Generated using [json-schema-for-humans](https://github.com/coveooss/json-schema-for-humans) on 2023-02-20 at 15:27:14 +0100
