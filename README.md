@@ -7,8 +7,8 @@ in strategies of human or biological agents in foraging or extracting resources.
 Examples include food foraging or commercial fishing.
 
 ## Requirements
-	* Python 3.9.4+
-	* Git
+- Python 3.9.4+
+- Git
 
 see `requirements.txt` for python packages and versions employed
 
@@ -16,8 +16,8 @@ see `requirements.txt` for python packages and versions employed
 ## Getting Started
 
 ### Install Python and a Python interpreter (e.g. PyCharm)
-* Python : https://www.python.org/downloads/
-* Pycharm : https://www.jetbrains.com/pycharm/
+- Python : https://www.python.org/downloads/
+- Pycharm : https://www.jetbrains.com/pycharm/
 
 
 ### Clone remote repository ARTEMIS to a local git repository
