@@ -52,8 +52,6 @@ class ModelRunner:
                   min_stock,                                                                                            # the minimum value of a reset stock if the stock is reset as drwan from a uniform distribution
                   max_stock):                                                                                           # the maximum value of a reset stock if the stock is reset as drwan from a uniform distribution
 
-        agent_index_list = list(fleet.agents.keys())                                                                    # identify the id of every agent in the model and load to a list
-
         # loop for every time step
         time_tracker = 0                                                                                                # set a counter for time steps
         while time_tracker < duration:                                                                                  # begin looping over all time steps in the model
@@ -62,13 +60,14 @@ class ModelRunner:
                   "---------------------------------------------------------------------------------------------------"
                   )
             time_id = str(time_tracker).zfill(len(str(duration)))                                                       # construct the time step id in text
-            random.shuffle(agent_index_list)                                                                            # shuffle agent foraging order for equal opportunities
+            
+            fleet.order_agents()                                                                                        # shuffle agent foraging order for equal opportunities
             fleet.update_memory_trackers(time_id)                                                                       # record knowledge on the choice options/ environmental units /  DiscreteALternatives at the start of a time period
             fleet.update_average_expected_competitor_tracker(time_id)                                                   # update tracker for the average expected amount of competitors
             choice_set.update_environmental_stock_tracker(time_id=time_id)                                              # save real stock ofevrry subunit of the environment (e.g. grid cell) into a tracker
 
             # loop for every agent
-            for agent in agent_index_list:                                                                              # begin choosing a forage option (e.g. grid cell) that every agent wil forage in
+            for agent in fleet.agent_index_list:                                                                        # begin choosing a forage option (e.g. grid cell) that every agent wil forage in
 
                 fleet.update_heatmap_tracker(time_id=time_id, agent_id=agent)                                           # save current perception of the full environment (heatmap) into a tracker
                 fleet.update_catch_potential_tracker(time_id=time_id, agent_id=agent, choice_set=choice_set)
@@ -82,7 +81,7 @@ class ModelRunner:
                                                              fleet.agents[agent].heatmap[alternative_index]))
                 competition_handler.load_competition_data(alternative_index, agent)                                     # load the id of the chosen alternative to the object that will introduce competition between agents
 
-            for agent in agent_index_list:                                                                              # Second agent loop to execute foraging --> second loop is needed to account for competition
+            for agent in fleet.agent_index_list:                                                                        # Second agent loop to execute foraging --> second loop is needed to account for competition
                 competition_handler.competition_correction(choice_set, fleet, agent, time_id=time_id)                   # Catch is corrected for competition effects and trackers are updated, if harvest removal is on, the stock is also reduced
                 fleet.agents[agent].heatmap_exchanger.provide_data(fleet)                                               # share data with other agent(s)
 

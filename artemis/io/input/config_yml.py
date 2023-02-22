@@ -120,6 +120,10 @@ class Configuration:
     def pick_receiver_strategy(self):
         return self._config_data['fleet']['receiver_choice']['name']
 
+    @property
+    def agent_order(self):
+        return self._config_data['fleet']['agent_order']
+
 
 class AgentConfiguration:
     """Class to contain agent configuration parameters."""

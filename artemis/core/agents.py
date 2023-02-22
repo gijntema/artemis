@@ -47,8 +47,10 @@ Version Number:
 import random
 import copy
 from collections import defaultdict
+import numpy as np
 from artemis.core.choice_making import ChoiceMaker
 from artemis.core.sharing import HeatmapExchanger
+from artemis.core.agent_ordering import AgentOrderer
 from artemis.core.allegiances import GroupFormer
 
 class AgentFleet:                                         # to be implemented, not yet included in the other scripts
@@ -69,12 +71,16 @@ class AgentFleet:                                         # to be implemented, n
         self.heatmap_tracker = defaultdict(dict)
         self.catch_potential_tracker = defaultdict(dict)
         self.group_former = None
+        self.agent_index_list = []
+        self.agent_orderer = None
+        self._finalized = False                                                                                         # If AgentFleet is finalized, no more agents can be added.
 
     def finalize_setup(self,
                        number_of_sharing_groups=10,
                        group_division_style='equal_mutually_exclusive_groups',
                        group_dynamics=False,
-                       duration_model=100):
+                       duration_model=100,
+                       agent_ordering_strategy='shuffle'):
         
         self.group_former = GroupFormer(self,
                                         number_of_groups=number_of_sharing_groups,
@@ -83,6 +89,11 @@ class AgentFleet:                                         # to be implemented, n
         self.__init_group_allegiances()
         self.__init_time_data_trackers(duration_model=duration_model)
         self.__init_potential_receivers()
+        self.agent_index_list = list(self.agents.keys())
+        self.agent_orderer = AgentOrderer(agent=self,
+                                          strategy=agent_ordering_strategy)
+        self._finalized = True
+
 
     def add(self,  #TODO: ideally this just takes a AgentConfiguration object as single argument.
                  nb_agents=100,
@@ -100,6 +111,9 @@ class AgentFleet:                                         # to be implemented, n
                  number_of_agents_shared_with=1):
         #TODO KW: ensure that the hard wired values above are not used in the first time step. these need to come from init_param from time=0 onwards
 
+        if self._finalized:
+            raise ValueError('AgentFleet already finalized; cannot add more agents.')
+        
         add_agents = self.__init_agents(
                                nb_agents=nb_agents,
                                subfleet_name=subfleet_name,
@@ -184,6 +198,10 @@ class AgentFleet:                                         # to be implemented, n
 # --------------------------------- Methods to update agent(set) related trackers --------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 
+    def order_agents(self):
+        """Reorders agent indices in self.agent_index_list."""
+        self.agent_index_list = self.agent_orderer.run_ordering()
+
     def update_agent_trackers(self, agent_id, catch, alternative_index, time_tracker):
         """" updates the data contained in a single ForagerAgent
         as well as the more general agent trackers in AgentSet"""
@@ -215,39 +233,25 @@ class AgentFleet:                                         # to be implemented, n
     def update_average_expected_competitor_tracker(self, time_id):
         """calculating the average number of competitors expected in a given time step for every agent"""
 
-        temp_probability_dictionary = {}                                                                                # temporary dictionary to store agent specific probability maps fro choosing a option (e.g. grid cell) to forage in/from
         number_of_options = len(self.agents[next(iter(self.agents))].heatmap)                                           # get total number of options(e.g. the amount of grid cells an agent can choose from) as the number of entries in the first agents heatmap
+        keys_options = list(self.agents[next(iter(self.agents))].heatmap.keys())
+        number_of_agents = len(self.agents)
+        keys_agents = list(self.agents.keys())
+        prob_matrix = np.zeros((number_of_agents, number_of_options))
+        
+        for i, agent in enumerate(keys_agents):                                                                         # Loop over Agents (1) to transform an agent heatmap into a probability map --> what is the chance an agent will i each option
+            agent_data = self.agents[agent]
+            prob_matrix[i, :] = np.array([agent_data.heatmap[key] for key in keys_options])                             # create copy of heatmap and put in 2D numpy array for fast calculation
+            prob_matrix[i, :] /= np.sum(prob_matrix[i, :])                                                              # divide heatmap entries by sum of entries to gain proportional weights as probability of choosing an option
+            prob_matrix[i, :] *= (1 - agent_data.explore_probability)                                                   # correct for the fact that probability of choosing an option based on the heatmap is not 100%
+            prob_matrix[i, :] += agent_data.explore_probability/number_of_options                                       # add the chance of choosing the option at random through exploration
 
-        for agent in self.agents:                                                                                       # Loop over Agents (1) to transform an agent heatmap into a probability map --> what is the chance an agent will i each option
-            agent_data = self.agents[agent]                                                                             # define agent data to keep the script visually pleasing
-            sum_heatmap_entries = sum(agent_data.heatmap.values())                                                      # calculate sum of heatmap entries (e.g. memories of grid cells) for later use
+        encounter_matrix = np.matmul(prob_matrix, prob_matrix.T)                                                        # calculate chances of agents meeting eachother
+        np.fill_diagonal(encounter_matrix, 0)                                                                           # disregard the chance of meeting oneself
+        competitor_tracker = np.sum(encounter_matrix, axis=1) / number_of_options                                       # sum over target agents and divide cumulative tracker by number of options
 
-            # print('{} with sum heatmap entries: {}\t and full heatmap: \t {}'.format(agent,
-            #                                                                        sum_heatmap_entries,
-            #                                                                        agent_data.heatmap))
-            probability_of_exploration = agent_data.explore_probability                                                 # get probability of picking a random option for late ruse
-
-            probability_map = copy.deepcopy(agent_data.heatmap)                                                         # create copy of heatmap to overwrite with new data (still contains the regular heatmap entries, but ensures same data structure)
-            for entry in probability_map:                                                                               # loop over all entries in an agents heatmap to transform memory catch data into probabilities of choosing that option
-                probability_map[entry] /= sum_heatmap_entries                                                           # divide heatmap entries by sum of entries to gain proportional weights as probability of choosing an option
-                probability_map[entry] *= (1-probability_of_exploration)                                                # correct for the fact that probability of choosing an option based on the heatmap is not 100%
-                probability_map[entry] += probability_of_exploration/number_of_options                                  # add the chance of choosing the option at random through exploration
-
-            temp_probability_dictionary[agent] = copy.deepcopy(probability_map)                                         # make entry for currently considered agent in dictionary of probability maps and load constructed probability map
-
-        for agent_i in temp_probability_dictionary:                                                                     # Loop over Agents (2): calculate the expected encounters for each agent, when considering their choice probabilities-- this is NOT internalised in an agent decision making process, merely used as descriptive statistic
-            cumulative_encounters_expected = 0                                                                          # initialize cumulative tracker for expected encounters in options for foraging
-            for entry in temp_probability_dictionary[agent_i]:                                                          # loop over the newly acquired probabilities of choosing each option
-                for agent_j in temp_probability_dictionary:                                                             # loop over Agents (3): pairwise comparisons of the chance of encountering any potential competitors j (other agents)
-                    if agent_i != agent_j:                                                                              # disregard the chance of meeting oneself
-                        encounter_chance = \
-                            temp_probability_dictionary[agent_i][entry] * \
-                            temp_probability_dictionary[agent_j][entry]                                                 # chance at meeting in the considered option: Pi,k,t,real * Pj,k,t,real
-
-                        cumulative_encounters_expected += encounter_chance                                              # add the pairwise expected encounters to the cumulative expected competitors
-            average_encounters_expected = cumulative_encounters_expected / number_of_options                            # divide cumulative tracker by number of options --> Cexp,i,t
-
-            self.average_expected_competitor_tracker[time_id][agent_i] = average_encounters_expected                    # add the calculated measure to overall tracker in the agent_set as tracker[time=t][agent=i] = Cexp,i,t
+        for i, agent in enumerate(keys_agents):
+            self.average_expected_competitor_tracker[time_id][agent] = competitor_tracker[i]
 
     def update_forage_visit_tracker(self, time_id, agent_id, chosen_alternative):
         self.forage_visit_tracker[time_id][agent_id] = chosen_alternative

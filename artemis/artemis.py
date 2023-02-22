@@ -151,7 +151,8 @@ def run_artemis(scenario_data, output_subfolder, save_config=False):
             number_of_sharing_groups=config.number_of_groups,
             group_division_style=config.division_style,
             group_dynamics=config.group_dynamics,
-            duration_model=config.duration
+            duration_model=config.duration,
+            agent_ordering_strategy=config.agent_order
             )
 
     # ----------------------------------------------------------------------------------------------------------------------

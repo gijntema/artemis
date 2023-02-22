@@ -43,6 +43,7 @@ agents:
         receiving:
             name: willing_receiver
 fleet:
+    agent_order: shuffle
     receiver_choice:
         name: static_group_choice
         group_attributes:
