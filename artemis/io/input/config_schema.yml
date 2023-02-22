@@ -1,0 +1,166 @@
+# Generate documentation with (in repo root):
+#   generate-schema-doc --config template_name=md_nested artemis/io/input/config_schema.yml docs/config_schema.md
+type: object
+description: scenario configuration
+required:
+- scenario_id
+- model
+- agents
+- fleet
+- options
+- competition
+properties:
+  scenario_id: 
+    type: string
+    description: scenario identifier
+  model: 
+    type: object
+    description: general settings for the model
+    required:
+    - duration
+    - nb_iterations
+    - reporting
+    properties:
+      duration:
+        type: number
+        description: time a simulation runs for
+      nb_iterations:
+        type: number
+        description: number of iterations per simulation every scenario is tested for
+      reporting:
+        type: boolean
+        description: indicates if a scenario run reports using all print statements in the script (False --> only report what scenario the model starts running and the total runtime)
+  agents: 
+    type: array
+    description: settings for the agents in the model; see agent_schema.yml
+  fleet:
+    type: object
+    description: fleet settings; these apply to all agents defined under 'agents'
+    required:
+    - agent_order
+    - receiver_choice
+    properties:
+      agent_order:
+        type: string
+        description: setting for ordering agent between each time step (for now 'constant' or 'shuffle')
+      receiver_choice:
+        type: object
+        description: settings for with whom an agent shares information on choice option / DiscreteAlternative/ environment units
+        required:
+        - name
+        - group_attributes
+        - random_choice_attributes
+        properties:
+          name:
+            type: string
+            description: name of the method an agent employs to determine with whom to share information on choice option / DiscreteAlternative/ environment unit
+          group_attributes:
+            type: object
+            description: settings if 'group' is part of the method to determine with whom to share information on choice option / DiscreteAlternative/ environment units
+            required:
+            - nb_groups
+            - group_formation
+            - group_dynamics
+            properties:
+              nb_groups:
+                type: number
+                description: determine how many 'friend' groups of agents are in the model
+              group_formation:
+                type: string
+                description: determines the way 'friend' groups are formed at the start of a model run
+              group_dynamics:
+                type: boolean
+                description: determines how 'friend' group might change over time (False is no change)
+          random_choice_attributes:
+            type: object
+            description: settings if 'random_choice' is part of the method to determine with whom to share information on choice option / DiscreteAlternative/ enviroment units
+  options: 
+    type: object
+    description: settings for the choice option / DiscreteAlternative/ environment units in the model
+    required:
+    - nb_options
+    - growth
+    - stock_reset
+    properties:
+      nb_options:
+        type: number
+        description: number of subdivisions of the environment (choice option / DiscreteAlternative/ environment units) (e.g. Grid cells) in the model and therefore the number of choices an agent has
+      growth:
+        type: object
+        description: settings on the way stocks that can be foraged in different choice option / DiscreteAlternative/ environment units change over time
+        required:
+        - growth_type
+        - growth_attributes
+        properties:
+          growth_type:
+            type: string
+            description: the way stocks in choice option / DiscreteAlternative/ environment units change over time
+          growth_attributes:
+            type: object
+            description: additional settings on the way stocks in choice option / DiscreteAlternative/ environment units change over time
+            required:
+            - growth_factor
+            properties:
+              growth_factor:
+                type: number
+                description: speed of growth of stocks (per time unit) --> Stock(t+1) = Stock(t, growth_factor)
+      stock_reset:
+        type: object
+        description: settings for the way a stock in a choice option / DiscreteAlternative/ environment units resets (if it resets) at the end of a time unit t
+        required:
+        - name
+        - reset_probability
+        - uniform_attributes
+        - normal_attributes
+        properties:
+          name:
+            type: string
+            description: the way a stock in a choice option / DiscreteAlternative/ environment units resets at the end of a time unit
+          reset_probability:
+            type: number
+            description: the probability a stock in a choice option / DiscreteAlternative/ environment units resets at the end of a time unit
+          uniform_attributes:
+            type: object
+            description: settings if 'uniform' is in the way a stock in a choice option / DiscreteAlternative/ environment units is reset at the end of a time unit
+            required:
+            - min_stock
+            - max_stock
+            properties:
+              min_stock:
+                type: number
+                description: the minimum value a stock in a choice option / DiscreteAlternative/ environment units can get after a reset
+              max_stock:
+                type: number
+                description: the maximum value a stock in a choice option / DiscreteAlternative/ environment units can get after a reset
+          normal_attributes:
+            type: object
+            description: settings if 'normal' is in the way a stock in a choice option / DiscreteAlternative/ environment units is reset at the end of a time unit
+            required:
+            - init_stock
+            - sd_init_stock
+            properties:
+              init_stock:
+                type: number
+                description: the mean value a stock in a stock in a choice option / DiscreteAlternative/ environment units can get after a reset
+              sd_init_stock:
+                type: number
+                description: the standard deviation of a value a stock in a choice option / DiscreteAlternative/ environment units can get after a reset
+  competition: 
+    type: object
+    description: settings for the way agents are hindered in foraging by other agents in the model
+    required:
+    - name
+    - interference_attributes
+    properties:
+      name:
+        type: string
+        description: the way agents are hindered in foraging by other agents in the model
+      interference_attributes:
+        type: object
+        description: settings if 'interference' is in the way agents are hindered in foraging by other agents in the model
+        required:
+        - interference_factor
+        properties:
+          interference_factor:
+            type: number
+            description: the fraction foraging success is corrected for, for every other agent, if other agents choose the same choice option / DiscreteAlternative/ environment units to forage in in the same time unit

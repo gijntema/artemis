@@ -1,0 +1,72 @@
+scenario_id: default
+model:
+    duration: 500
+    nb_iterations: 1
+    reporting: False
+agents:
+-   name: subfleet001
+    nb_agents: 90
+    catchability_coefficient: 0.2
+    choice_method:
+        name: explore_weighted_heatmap
+        explore_attributes:
+            explore_probability: 0.2
+        heatmap_attributes:
+            init_nb_alternative_known: 20
+    sharing:
+        sharing:
+            name: last_event_sharing
+            nb_options_shared: 1
+            no_sharing_attributes: {}
+            random_sharing_attributes: {}
+        receiver_choice:
+            nb_receivers: 0
+        receiving:
+            name: willing_receiver
+-   name: subfleet002
+    nb_agents: 10
+    catchability_coefficient: 0.2
+    choice_method:
+        name: explore_weighted_heatmap
+        explore_attributes:
+            explore_probability: 0.2
+        heatmap_attributes:
+            init_nb_alternative_known: 20
+    sharing:
+        sharing:
+            name: last_event_sharing
+            nb_options_shared: 1
+            no_sharing_attributes: {}
+            random_sharing_attributes: {}
+        receiver_choice:
+            nb_receivers: 0
+        receiving:
+            name: willing_receiver
+fleet:
+    agent_order: shuffle
+    receiver_choice:
+        name: static_group_choice
+        group_attributes:
+            nb_groups: 1
+            group_formation: equal_mutually_exclusive_groups
+            group_dynamics: False
+        random_choice_attributes: {}
+options:
+    nb_options: 20
+    growth:
+        growth_type: static
+        growth_attributes:
+            growth_factor: 1
+    stock_reset:
+        name: uniform_random_repeat
+        reset_probability: 0
+        uniform_attributes:
+            min_stock: 0
+            max_stock: 200
+        normal_attributes:
+            init_stock: 100
+            sd_init_stock: 25
+competition:
+    name: interference-simple
+    interference_attributes:
+        interference_factor: 1
