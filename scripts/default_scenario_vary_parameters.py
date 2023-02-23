@@ -26,6 +26,9 @@ for intfac, resprob, nbrec in itertools.product(interference_factors, reset_prob
         if agent['name'] == "subfleet001":  # In this example, only change nb_receivers for subfleet 1. (remove if statement to adjust values in all agents)
             agent['sharing']['receiver_choice']['nb_receivers'] = nbrec
 
+    #agent['sharing']['receiver_choice'][
+    #    'nb_receivers'] = nbrec  # if changes is wanted in all agents use this one and comment block the above if statement
+
     scenario_suffix = f'intfac{intfac}_resprob{resprob}_nbsrecSubFleet1{nbrec}'
     scenario_data['scenario_id'] = scenario_suffix
 
