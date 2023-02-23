@@ -35,12 +35,12 @@ for intfac, resprob, nbrec in itertools.product(interference_factors,reset_proba
     #    'nb_receivers'] = nbrec  # if changes is wanted in all agents use this one and comment block the above if statement
     # agent_name_suffix += "_" + SubFleetAll
 
-    scenario_suffix = f'intfac{intfac}_resprob{resprob}_nbsrecSubFleetOne{nbrec}'
+    # esnure scenario is being renamed for proper output naming
+    scenario_suffix = f'_intfac{intfac}_resprob{resprob}_nbsrec{agent_name_suffix}{nbrec}'
     scenario_data['scenario_id'] = scenario_suffix
 
     # Set output folder and make sure it exists.
-    dirname = scenario_suffix
-    output_subfolder = os.path.join(output_basefolder, "_" + dirname)
+    output_subfolder = os.path.join(output_basefolder, scenario_suffix[1:])
     if not os.path.exists(output_subfolder):
         os.makedirs(output_subfolder)
 
