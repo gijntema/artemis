@@ -27,7 +27,7 @@ for intfac, resprob, nbrec in itertools.product(interference_factors, reset_prob
             agent['sharing']['receiver_choice']['nb_receivers'] = nbrec
 
     # Set output folder and make sure it exists.
-    dirname = f'intfac{intfac}_resprob{resprob}_nbsrec{nbrec}'
+    dirname = f'intfac{intfac}_resprob{resprob}_nbsrecSubFleet1{nbrec}'
     output_subfolder = os.path.join(output_basefolder, dirname)
     if not os.path.exists(output_subfolder):
         os.makedirs(output_subfolder)
