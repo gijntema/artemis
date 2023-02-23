@@ -27,15 +27,15 @@ for intfac, resprob, nbrec in itertools.product(interference_factors,reset_proba
     scenario_data['options']['stock_reset']['reset_probability'] = resprob
     agent_name_suffix = ""
     for agent in scenario_data['agents']:
-        if agent['name'] == "subfleet001":  # In this example, only change nb_receivers for subfleet 1. (remove if statement to adjust values in all agents)
-            agent['sharing']['receiver_choice']['nb_receivers'] = nbrec
-            agent_name_suffix += "_" + "SubFleetOne"
+    #    if agent['name'] == "subfleet001":  # In this example, only change nb_receivers for subfleet 1. (remove if statement to adjust values in all agents)
+    #        agent['sharing']['receiver_choice']['nb_receivers'] = nbrec
+    #        agent_name_suffix += "_" + "SubFleetOne"
 
-    #agent['sharing']['receiver_choice'][
-    #    'nb_receivers'] = nbrec  # if changes is wanted in all agents use this one and comment block the above if statement
-    # agent_name_suffix += "_" + SubFleetAll
+        agent['sharing']['receiver_choice'][
+        'nb_receivers'] = nbrec  # if changes is wanted in all agents use this one and comment block the above if statement
+        agent_name_suffix += "_" + SubFleetAll
 
-    # esnure scenario is being renamed for proper output naming
+    # ensure scenario is being renamed for proper output naming
     scenario_suffix = f'_intfac{intfac}_resprob{resprob}_nbsrec{agent_name_suffix}{nbrec}'
     scenario_data['scenario_id'] = scenario_suffix
 

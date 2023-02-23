@@ -24,6 +24,10 @@ artemis.run_artemis(scenario_data, output_subfolder, save_config=False)
 
 # Make sure the output is the same as it was before.
 
+# ----------------------------------------------------------------------------------------------------------------------
+# TEST OUTPUTS COMPARED TO OLDER VERSION ONLY WORKS UNDER VALUES IN default_config.py TEST FOR PROGRAMMING CHANGES
+# ----------------------------------------------------------------------------------------------------------------------
+
 # Column 'agent_id' differs but all other data should be the same.
 df1_example = pd.read_csv(os.path.join(output_subfolder, 'flat_time_x_agent_resultsdefault.csv')).drop(['agent_id'], axis=1)
 df1_ref = pd.read_csv(os.path.join(reference_subfolder, 'flat_time_x_agent_resultsdefault.csv')).drop(['agent_id'], axis=1)
@@ -32,6 +36,10 @@ df1_diff = df1_example.compare(df1_ref)
 if not df1_diff.empty:
     print(df1_diff)
 print("Test 1 passed!")
+
+# ----------------------------------------------------------------------------------------------------------------------
+# TEST OUTPUTS COMPARED TO OLDER VERSION ONLY WORKS UNDER VALUES IN default_config.py TEST FOR PROGRAMMING CHANGES
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Almost all column names are different here, so we only compare the numerical data.
 df2_example = pd.read_csv(os.path.join(output_subfolder, 'flat_time_x_environment_resultsdefault.csv')).drop(['alternative_id', 'agents_visited'], axis=1)
