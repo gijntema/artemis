@@ -2,11 +2,13 @@
 import sys
 import os
 import itertools
+import timeit
 this_file_dir = os.path.dirname(__file__)
 sys.path.append(os.path.dirname(this_file_dir))
 
 import artemis
 
+start = timeit.default_timer()
 
 # Set inputs.
 scenario_file = os.path.join(this_file_dir, 'default_config.yml')  # Config file that needs to be run.
@@ -40,3 +42,9 @@ for intfac, resprob, nbrec in itertools.product(interference_factors, reset_prob
 
     # Run simulation.
     artemis.run_artemis(scenario_data, output_subfolder, save_config=True)
+
+# time full run of all scenarios
+stop = timeit.default_timer()                                                                                           # stop run timer
+execution_time = stop - start                                                                                           # calculate elapsed runtime (in seconds)
+
+print("Total Runtime: \t{} seconds".format(str(execution_time)))
