@@ -19,8 +19,9 @@ output_basefolder = os.path.join(this_file_dir, 'vary_output/')  # Determines ou
 interference_factors = [0.9, 1.0]
 reset_probabilities = [0.0, 0.2]
 nbs_receivers = [0, 1]
-for intfac, resprob, nbrec in itertools.product(interference_factors, reset_probabilities, nbs_receivers):
 
+# for loop over all combinations fo parameter settings
+for intfac, resprob, nbrec in itertools.product(interference_factors,reset_probabilities,nbs_receivers):
     # Set parameters.
     scenario_data['competition']['interference_attributes']['interference_factor'] = intfac
     scenario_data['options']['stock_reset']['reset_probability'] = resprob
