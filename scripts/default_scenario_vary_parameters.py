@@ -29,7 +29,7 @@ for intfac, resprob, nbrec in itertools.product(interference_factors, reset_prob
     #agent['sharing']['receiver_choice'][
     #    'nb_receivers'] = nbrec  # if changes is wanted in all agents use this one and comment block the above if statement
 
-    scenario_suffix = f'intfac{intfac}_resprob{resprob}_nbsrecSubFleet1{nbrec}'
+    scenario_suffix = f'intfac{intfac}_resprob{resprob}_nbsrecSubFleetOne{nbrec}'
     scenario_data['scenario_id'] = scenario_suffix
 
     # Set output folder and make sure it exists.
