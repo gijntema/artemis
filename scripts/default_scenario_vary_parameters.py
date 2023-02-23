@@ -26,8 +26,11 @@ for intfac, resprob, nbrec in itertools.product(interference_factors, reset_prob
         if agent['name'] == "subfleet001":  # In this example, only change nb_receivers for subfleet 1.
             agent['sharing']['receiver_choice']['nb_receivers'] = nbrec
 
+    scenario_suffix = f'intfac{intfac}_resprob{resprob}_nbsrecSubFleet1{nbrec}'
+    scenario_data['scenario_id'] = scenario_suffix
+
     # Set output folder and make sure it exists.
-    dirname = f'intfac{intfac}_resprob{resprob}_nbsrecSubFleet1{nbrec}'
+    dirname = scenario_suffix
     output_subfolder = os.path.join(output_basefolder, dirname)
     if not os.path.exists(output_subfolder):
         os.makedirs(output_subfolder)
