@@ -33,7 +33,7 @@ for intfac, resprob, nbrec in itertools.product(interference_factors,reset_proba
 
         agent['sharing']['receiver_choice'][
         'nb_receivers'] = nbrec  # if changes is wanted in all agents use this one and comment block the above if statement
-        agent_name_suffix += "_" + SubFleetAll
+        agent_name_suffix += "_" + "SubFleetAll"
 
     # ensure scenario is being renamed for proper output naming
     scenario_suffix = f'_intfac{intfac}_resprob{resprob}_nbsrec{agent_name_suffix}{nbrec}'
