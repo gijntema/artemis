@@ -58,13 +58,13 @@ pip install -e .
 
 ### Running the example scripts
 Make sure you are in the correct virtual environment. To activate it,
-run `.\venv\Scripts\activate`. Then, run `python examples/default_scenario.py`. 
+run `.\venv\Scripts\activate`. Then, run `python scripts/default_scenario.py`. 
 Output should be written to `scripts/example_output`.
 
-For a script that does some parameter variation, see `examples/default_scenario_vary_parameters.py`.
+For a script that does some parameter variation, see `scripts/default_scenario_vary_parameters.py`.
 
 ### Make your own ARTEMIS scripts
-To adjust initial parameters (if not running the basic version of the model), copy `examples/default_config.yml` and
+To adjust initial parameters (if not running the basic version of the model), copy `scripts/default_config.yml` and
 rename it to start your own parameter file. Open the copy in your editor of choice (we recommend PyCharm) and enter desired parameters defined there.
 More information on the correct variables to be used per scenario at **docs/input_descriptions.md** and  **docs/*_schema.md**.
 
@@ -83,7 +83,7 @@ scenario_data = artemis.io.read_data_from_yml(scenario_file)  # Read scenario_fi
 artemis.run_artemis(scenario_data, output_subfolder, save_config=False)  # Run artemis.
 ```
 
-It is also possible to change parameter values in the python script - for an example, see `examples/default_scenario_vary_parameters.py`.
+It is also possible to change parameter values in the python script - for an example, see `scripts/default_scenario_vary_parameters.py`.
 
 ### Tips for adjusting the Model
 Please realise that a testing framework **tests/test_functionality.py** is present to test if any adjustments hinder 
