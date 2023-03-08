@@ -64,9 +64,26 @@ Output should be written to `scripts/example_output`.
 For a script that does some parameter variation, see `examples/default_scenario_vary_parameters.py`.
 
 ### Make your own ARTEMIS scripts
-Adjust initial parameters (if not running the basic version of the model)
-Open `examples/default_config.yml` in your editor of choice (we recommend PyCharm) and enter desired parameters defined there.
+To adjust initial parameters (if not running the basic version of the model), copy `examples/default_config.yml` and
+rename it to start your own parameter file. Open the copy in your editor of choice (we recommend PyCharm) and enter desired parameters defined there.
 More information on the correct variables to be used per scenario at **docs/input_descriptions.md** and  **docs/*_schema.md**.
+
+A `yml` parameter file can be read and run with a python script:
+
+```python
+import artemis
+import os
+
+# Set inputs/outputs.
+scenario_file = "path/to/your_parameter_file.yml"
+output_subfolder = "path/where/you/want/your/output"
+
+# Run the simulation.
+scenario_data = artemis.io.read_data_from_yml(scenario_file)  # Read scenario_file.
+artemis.run_artemis(scenario_data, output_subfolder, save_config=False)  # Run artemis.
+```
+
+It is also possible to change parameter values in the python script - for an example, see `examples/default_scenario_vary_parameters.py`.
 
 ### Tips for adjusting the Model
 Please realise that a testing framework **tests/test_functionality.py** is present to test if any adjustments hinder 
