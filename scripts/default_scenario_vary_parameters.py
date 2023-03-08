@@ -1,14 +1,10 @@
-# Make sure the repo root dir is in PYTHONPATH (a hacky solution, until we have a setup script).
-import sys
 import os
 import itertools
-this_file_dir = os.path.dirname(__file__)
-sys.path.append(os.path.dirname(this_file_dir))
-
 import artemis
 
 
 # Set inputs.
+this_file_dir = os.path.dirname(__file__)
 scenario_file = os.path.join(this_file_dir, 'default_config.yml')  # Config file that needs to be run.
 scenario_data = artemis.io.read_data_from_yml(scenario_file)  # Read scenario_file.
 output_basefolder = os.path.join(this_file_dir, 'vary_output/')  # Determines output directory.
