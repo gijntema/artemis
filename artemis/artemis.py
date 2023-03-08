@@ -1,20 +1,3 @@
-#
-# This file is part of ARTEMIS (https://git.wur.nl/ecodyn/artemis.git).
-# Copyright (c) 2021 Wageningen Marine Research
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-
 # TODO: Update Description Below
 """
 This Module is used as the main execution of the model, it is divided into four core aspects:
@@ -178,15 +161,15 @@ def run_artemis(scenario_data, output_subfolder, save_config=False):
     # ----------------------------------------------------------------------------------------------------------------------
 
         time_x_agent_data = \
-            time_x_agent_data.append(
+            time_x_agent_data = pd.concat([time_x_agent_data,
                 data_extractor.get_time_x_agent_data(agent_set=fleet,
-                                                     iteration_id=iteration_counter)).reset_index(drop=True)            # Get Dataframe with data specific per unit of time and agent (e.g. actual catch obtained, competition encountered)
+                                                     iteration_id=iteration_counter)]).reset_index(drop=True)           # Get Dataframe with data specific per unit of time and agent (e.g. actual catch obtained, competition encountered)
 
         time_x_environment_data = \
-            time_x_environment_data.append(
-            data_extractor.get_time_x_environment_data(agent_set=fleet,
-                                                       choice_set=choice_set,
-                                                       iteration_id=iteration_counter)).reset_index(drop=True)          # Get Dataframe with data specific per unit of time and choice option/environmental subsection (e.g. real stock present, agents catch expectation of each option)
+            time_x_environment_data = pd.concat([time_x_environment_data,
+                data_extractor.get_time_x_environment_data(agent_set=fleet,
+                                                           choice_set=choice_set,
+                                                           iteration_id=iteration_counter)]).reset_index(drop=True)     # Get Dataframe with data specific per unit of time and choice option/environmental subsection (e.g. real stock present, agents catch expectation of each option)
 
         iteration_counter += 1                                                                                          # progress to the next iteration
 
