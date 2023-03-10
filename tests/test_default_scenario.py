@@ -44,5 +44,6 @@ def test_regression_default_scenario():
     print("Environment results passed!")
 
 
+# If you want to run the test function directly.
 if __name__ == "__main__":
     test_regression_default_scenario()

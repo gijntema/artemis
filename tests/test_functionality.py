@@ -15,3 +15,8 @@ def test_forageragent():
     agent = ForagerAgent(choice_set=ChoiceSet(), choice_method='full_heatmap')
     assert type(agent.heatmap) is dict
     assert agent.heatmap['alternative_0'] == 0
+
+
+# If you want to run the test function directly.
+if __name__ == "__main__":
+    test_forageragent()
