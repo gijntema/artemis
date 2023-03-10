@@ -1,4 +1,4 @@
-""""Basic tests to see if the modules are properly loaded; run with pytest."""
+""""Unit tests for artemis.core.agents.ForagerAgent; run with pytest."""
 
 # import testing package and internal modules
 from artemis.core.agents import ForagerAgent
