@@ -85,12 +85,16 @@ artemis.run_artemis(scenario_data, output_subfolder, save_config=False)  # Run a
 
 It is also possible to change parameter values in the python script - for an example, see `scripts/default_scenario_vary_parameters.py`.
 
-### Tips for adjusting the Model
-Please realise that a testing framework **tests/test_functionality.py** is present to test if any adjustments hinder 
-the functionality of the model. New functionality test can also be included in this framework. Simply run the script 
-to test the functionality **OUTDATED SHOULD BE CHECKED FOR FUNCTIONALITY**.
+### Testing
+
+Please realise that a testing framework `tests/test_*.py` is present to test if any adjustments hinder 
+the functionality of the model. New functionality test can also be included in this framework.
+
+To run the tests, run: `pytest -s`. Without the `-s` option there will be an error due to the use of `PrintBlocker`.
 
 ### Profiling the code
+
+To get profiling results, you can run:
 
 ```
 python -m cProfile -o profiling.txt scripts/default_scenario.py
