@@ -90,7 +90,8 @@ It is also possible to change parameter values in the python script - for an exa
 Please realise that a testing framework `tests/test_*.py` is present to test if any adjustments hinder 
 the functionality of the model. New functionality test can also be included in this framework.
 
-To run the tests, run the command `pytest`. To see stdout output, add the `-s` option, or run the test 
+To run the tests, again make sure you are in the correct virtual environment. 
+Then run the command `pytest`. To see stdout output, add the `-s` option, or run the test 
 scripts directly without using pytest.
 
 ### Profiling the code
