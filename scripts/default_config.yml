@@ -5,7 +5,7 @@ model:
     reporting: False
 agents:
 -   name: subfleet001
-    nb_agents: 90
+    nb_agents: 99
     catchability_coefficient: 0.2
     choice_method:
         name: explore_weighted_heatmap
@@ -24,7 +24,7 @@ agents:
         receiving:
             name: willing_receiver
 -   name: subfleet002
-    nb_agents: 10
+    nb_agents: 1
     catchability_coefficient: 0.2
     choice_method:
         name: explore_weighted_heatmap

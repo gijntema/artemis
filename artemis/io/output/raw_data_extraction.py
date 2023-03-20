@@ -1,20 +1,3 @@
-#
-# This file is part of ARTEMIS (https://git.wur.nl/ecodyn/artemis.git).
-# Copyright (c) 2021 Wageningen Marine Research
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-
 """
 This Module is aimed at extracting data and measures from unusable data formats and currently functions to:
 -   extract raw data from the objects AgentSet, ForagerAgent, ChoiceSet and DiscreteAlternative
@@ -404,14 +387,18 @@ class DataExtractor:
 
         input_data = agent_set.heatmap_tracker                                                                          # define what part of the agent fleet the data is at
 
+        dict_output = {}
         for agent in agent_set.agents:                                                                                  # loop over every agent to get a seperate data series for every individual agent
             agent_expected_catch_series = []                                                                            # prepare data container for the considered data series to load into the output data
             for time in input_data:                                                                                     # fill data container for the considered data by looping over time and choice options in the tracker variables
                 for alternative in input_data[time][agent]:
                     agent_expected_catch_series.append(input_data[time][agent][alternative])                            # add time and choice option specific data point to prepared data container
 
-            data_output[agent + '_catch_expectation_heatmap'] = agent_expected_catch_series                             # load data container (for a specific agent) into desired output data format
+            dict_output[agent + '_catch_expectation_heatmap'] = agent_expected_catch_series                             # load data container (for a specific agent) into desired output data format
 
+        data_append = pd.DataFrame(dict_output)
+        # TODO: merge on agent/time columns (instead of index) would be better.
+        data_output = data_output.merge(data_append, left_index=True, right_index=True)
         return data_output                                                                                              # return output data
 
     def __extract_flat_time_environment_agent_potential_catch(self, agent_set, choice_set, data_output, iteration_id):
@@ -421,14 +408,19 @@ class DataExtractor:
 
         input_data = agent_set.catch_potential_tracker                                                                  # define what part of the agent fleet the data is at
 
+        dict_output = {}
         for agent in agent_set.agents:                                                                                  # loop over every agent to get a seperate data series for every individual agent
             agent_catch_potential_series = []                                                                           # prepare data container for the considered data series to load into the output data
             for time in input_data:                                                                                     # fill data container for the considered data by looping over time and choice options in the tracker variables
                 for alternative in input_data[time][agent]:
                     agent_catch_potential_series.append(input_data[time][agent][alternative])                           # add time and choice option specific data point to prepared data container
 
-            data_output[agent + '_catch_potential'] = agent_catch_potential_series                                      # load data container (for a specific agent) into desired output data format
+            dict_output[agent + '_catch_potential'] = agent_catch_potential_series                                      # load data container (for a specific agent) into desired output data format
             # TODO: Quick and dirty fix does not take competition into account
+        
+        data_append = pd.DataFrame(dict_output)
+        # TODO: merge on agent/time columns (instead of index) would be better.
+        data_output = data_output.merge(data_append, left_index=True, right_index=True)
         return data_output                                                                                              # return output data
 
 # ----------------------------------------------------------------------------------------------------------------------
