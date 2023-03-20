@@ -40,7 +40,7 @@ Alternatively, you can use a git client with a GUI like GitHub Desktop.
 
 Make sure you have python 3.9.4+ installed (https://www.anaconda.com/ or https://www.python.org/downloads/)
 
-Then, if you use windows, type in a command prompt:
+Then, if you use windows, go to the repository root directory and type in a command prompt:
 
 ```
 python -m venv venv
@@ -91,7 +91,8 @@ Please realise that a testing framework `tests/test_*.py` is present to test if 
 the functionality of the model. New functionality test can also be included in this framework.
 
 To run the tests, again make sure you are in the correct virtual environment. 
-Then run the command `pytest`. To see stdout output, add the `-s` option, or run the test 
+Then run the command `pytest` (or if that does not work run `python -m pytest`). 
+To see stdout output, add the `-s` option, or run the test 
 scripts directly without using pytest.
 
 ### Profiling the code
