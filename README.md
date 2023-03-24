@@ -106,6 +106,23 @@ profiling.txt% sort cumulative
 profiling.txt% stats 30
 ```
 
+### Generating the documentation
+
+Generating the markdown documentation:
+
+```
+generate-schema-doc --config template_name=md_nested artemis/io/input/agent_schema.yml docs/markdown/agent_schema.md
+generate-schema-doc --config template_name=md_nested artemis/io/input/config_schema.yml docs/markdown/config_schema.md
+```
+
+Generating the html documentation:
+
+```
+generate-schema-doc artemis/io/input/agent_schema.yml docs/html/build/agent_schema.html
+generate-schema-doc artemis/io/input/config_schema.yml docs/html/build/config_schema.html
+sphinx-build -b html docs/html/source docs/html/build
+```
+
 ## License
 
 Copyright (c) 2021 Wageningen Marine Research

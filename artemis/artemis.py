@@ -53,11 +53,18 @@ from artemis.io.output.export_data import DataWriter                            
 
 
 def run_artemis(scenario_data, output_subfolder, save_config=False):
-
-    # default specifications of the model
-    # scenario_file = 'base_config.csv'  # Config file that needs to be run
-    # output_subfolder = ''   # subfolder of the results that the data should be exported to '' results in no subfolder, Please don't forge to make the actual subfolder before running the model'
-
+    """Run the ARTEMIS model and write output files.
+    
+    Parameters
+    ----------
+    scenario_data: dict
+        Python dictionary containing scenario data.
+    output_subfolder: str
+        Path to output subfolder.
+    save_config: bool, optional
+        Set to True to save configuration file to output subfolder. Default: False.
+    """
+    
     start = timeit.default_timer()                                                                                          # Start timer for model run
     config = Configuration(scenario_data)                                                                                   # define parameters for the scenario
     if save_config:
