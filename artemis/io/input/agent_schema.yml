@@ -1,7 +1,7 @@
 # Generate documentation with (in repo root):
 #   generate-schema-doc --config template_name=md_nested artemis/io/input/agent_schema.yml docs/markdown/agent_schema.md
 type: object
-title: ARTEMIS agent configuration input documentation
+title: ARTEMIS agent configuration
 description: This document will tell you what fields are required in the agent configuration yml-file.
 required:
 - name
