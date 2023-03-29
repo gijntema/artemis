@@ -33,3 +33,5 @@ exclude_patterns = []
 
 html_theme = 'sphinx_book_theme'
 html_static_path = []
+html_theme_options = {"use_download_button": False,
+                      "use_fullscreen_button": False}

@@ -1,23 +1,24 @@
-.. artemis documentation master file, created by
-   sphinx-quickstart on Fri Mar 24 15:47:27 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 ARTEMIS docs
 ============
 
-Welcome to the documentation of ARTEMIS. Blabla...
 
+Welcome to the documentation of ARTEMIS.
+
+The Agents in Resource Tracking and Extracting Model for Information Strategies (ARTEMIS)
+is a general investigation into the role of informed decision making
+in strategies of human or biological agents in foraging or extracting resources.
+Examples include food foraging or commercial fishing.
 
 Navigation
 ##########
 
 .. toctree::
-   :maxdepth: 2
+   :titlesonly:
    
+   self
    installation
    usage
-   input format
+   input_format
    api
 
 Indices and tables
