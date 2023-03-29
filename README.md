@@ -123,6 +123,19 @@ generate-schema-doc artemis/io/input/config_schema.yml docs/html/build/config_sc
 sphinx-build -b html docs/html/source docs/html/build
 ```
 
+### Building a distribution
+
+See https://packaging.python.org/en/latest/tutorials/packaging-projects/
+
+```
+pip install --upgrade build
+python -m build
+pip install --upgrade twine
+twine upload --repository ARTEMIS dist/*
+```
+
+In order for this to work on GitLab CI, make sure `TWINE_USERNAME` and `TWINE_PASSWORD` are set on GitLab.
+
 ## License
 
 Copyright (c) 2021 Wageningen Marine Research
