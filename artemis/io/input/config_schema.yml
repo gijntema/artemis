@@ -1,7 +1,8 @@
 # Generate documentation with (in repo root):
-#   generate-schema-doc --config template_name=md_nested artemis/io/input/config_schema.yml docs/config_schema.md
+#   generate-schema-doc --config template_name=md_nested artemis/io/input/config_schema.yml docs/markdown/config_schema.md
 type: object
-description: scenario configuration
+title: ARTEMIS scenario configuration
+description: This document will tell you what fields are required in the scenario configuration yml-file.
 required:
 - scenario_id
 - model

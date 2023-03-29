@@ -66,7 +66,8 @@ For a script that does some parameter variation, see `scripts/default_scenario_v
 ### Make your own ARTEMIS scripts
 To adjust initial parameters (if not running the basic version of the model), copy `scripts/default_config.yml` and
 rename it to start your own parameter file. Open the copy in your editor of choice (we recommend PyCharm) and enter desired parameters defined there.
-More information on the correct variables to be used per scenario at **docs/input_descriptions.md** and  **docs/*_schema.md**.
+More information on the correct variables to be used per scenario at **docs/input_descriptions.md** and in the html documentation
+(to generate the html documentation, see below).
 
 A `yml` parameter file can be read and run with a python script:
 
@@ -104,6 +105,36 @@ python -m cProfile -o profiling.txt scripts/default_scenario.py
 python -m pstats profiling.txt
 profiling.txt% sort cumulative
 profiling.txt% stats 30
+```
+
+### Generating the documentation
+
+Generating the markdown documentation:
+
+```
+generate-schema-doc --config template_name=md_nested artemis/io/input/agent_schema.yml docs/markdown/agent_schema.md
+generate-schema-doc --config template_name=md_nested artemis/io/input/config_schema.yml docs/markdown/config_schema.md
+```
+
+Generating the html documentation:
+
+```
+generate-schema-doc artemis/io/input/agent_schema.yml docs/html/build/agent_schema.html
+generate-schema-doc artemis/io/input/config_schema.yml docs/html/build/config_schema.html
+sphinx-build -b html docs/html/source docs/html/build
+```
+
+The html pages will end up in the directory `docs/html/build`.
+
+### Building a distribution
+
+See https://packaging.python.org/en/latest/tutorials/packaging-projects/
+
+```
+pip install --upgrade build
+python -m build
+pip install --upgrade twine
+twine upload --repository ARTEMIS dist/*
 ```
 
 ## License
