@@ -66,7 +66,8 @@ For a script that does some parameter variation, see `scripts/default_scenario_v
 ### Make your own ARTEMIS scripts
 To adjust initial parameters (if not running the basic version of the model), copy `scripts/default_config.yml` and
 rename it to start your own parameter file. Open the copy in your editor of choice (we recommend PyCharm) and enter desired parameters defined there.
-More information on the correct variables to be used per scenario at **docs/input_descriptions.md** and  **docs/*_schema.md**.
+More information on the correct variables to be used per scenario at **docs/input_descriptions.md** and in the html documentation
+(to generate the html documentation, see below).
 
 A `yml` parameter file can be read and run with a python script:
 
