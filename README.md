@@ -123,6 +123,8 @@ generate-schema-doc artemis/io/input/config_schema.yml docs/html/build/config_sc
 sphinx-build -b html docs/html/source docs/html/build
 ```
 
+The html pages will end up in the directory `docs/html/build`.
+
 ### Building a distribution
 
 See https://packaging.python.org/en/latest/tutorials/packaging-projects/
