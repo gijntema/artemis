@@ -19,6 +19,7 @@ Navigation
    installation
    usage
    input_format
+   output_format
    api
 
 Indices and tables
